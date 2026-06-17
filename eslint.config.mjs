@@ -47,6 +47,10 @@ const eslintConfig = defineConfig([
     "test-results/**",
     "playwright-report/**",
     "coverage/**",
+    // Serwist-generated service worker bundle (gitignored, never hand-edited).
+    // It is a minified Workbox build, not project source — linting it is noise.
+    "public/sw*.js",
+    "public/swe-worker-*.js",
   ]),
 ]);
 

@@ -116,13 +116,58 @@ Which phases cover which requirements. Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (to be filled by roadmapper) | — | Pending |
+| PLAT-01 | Phase 1 — Platform Foundation | Pending |
+| PLAT-02 | Phase 1 — Platform Foundation | Pending |
+| PLAT-03 | Phase 1 — Platform Foundation | Pending |
+| PLAT-04 | Phase 1 — Platform Foundation | Pending |
+| PLAT-05 | Phase 1 — Platform Foundation | Pending |
+| AUTH-01 | Phase 1 — Platform Foundation | Pending |
+| AUTH-04 | Phase 1 — Platform Foundation | Pending |
+| ONBD-01 | Phase 2 — Supply-Side Onboarding | Pending |
+| ONBD-02 | Phase 2 — Supply-Side Onboarding | Pending |
+| ONBD-03 | Phase 2 — Supply-Side Onboarding | Pending |
+| ONBD-04 | Phase 2 — Supply-Side Onboarding | Pending |
+| ONBD-05 | Phase 2 — Supply-Side Onboarding | Pending |
+| ONBD-06 | Phase 2 — Supply-Side Onboarding | Pending |
+| AUTH-03 | Phase 2 — Supply-Side Onboarding | Pending |
+| NOTF-04 | Phase 2 — Supply-Side Onboarding | Pending |
+| BOOK-05 | Phase 3 — Payments Trust Spine | Pending |
+| HLTH-01 | Phase 3 — Payments Trust Spine | Pending |
+| BOOK-01 | Phase 4 — Transfer Entity + Booking Form | Pending |
+| BOOK-02 | Phase 4 — Transfer Entity + Booking Form | Pending |
+| BOOK-03 | Phase 4 — Transfer Entity + Booking Form | Pending |
+| BOOK-04 | Phase 4 — Transfer Entity + Booking Form | Pending |
+| BOOK-06 | Phase 4 — Transfer Entity + Booking Form | Pending |
+| BOOK-07 | Phase 4 — Transfer Entity + Booking Form | Pending |
+| XFER-01 | Phase 4 — Transfer Entity + Booking Form | Pending |
+| AUTH-02 | Phase 4 — Transfer Entity + Booking Form | Pending |
+| CLAIM-02 | Phase 5 — Claim Correctness | Pending |
+| CLAIM-03 | Phase 5 — Claim Correctness | Pending |
+| CLAIM-01 | Phase 6 — Driver & Admin Views | Pending |
+| CLAIM-04 | Phase 6 — Driver & Admin Views | Pending |
+| CLAIM-05 | Phase 6 — Driver & Admin Views | Pending |
+| CLAIM-06 | Phase 6 — Driver & Admin Views | Pending |
+| OPS-01 | Phase 6 — Driver & Admin Views | Pending |
+| OPS-02 | Phase 6 — Driver & Admin Views | Pending |
+| OPS-03 | Phase 6 — Driver & Admin Views | Pending |
+| OPS-04 | Phase 6 — Driver & Admin Views | Pending |
+| NOTF-01 | Phase 7 — Notifications | Pending |
+| NOTF-02 | Phase 7 — Notifications | Pending |
+| NOTF-03 | Phase 7 — Notifications | Pending |
+| NOTF-05 | Phase 7 — Notifications | Pending |
+| NOTF-06 | Phase 7 — Notifications | Pending |
+| HLTH-02 | Phase 8 — Platform Health | Pending |
+| HLTH-03 | Phase 8 — Platform Health | Pending |
+| HLTH-04 | Phase 8 — Platform Health | Pending |
+| HLTH-05 | Phase 8 — Platform Health | Pending |
 
 **Coverage:**
-- v1 requirements: 37 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 37 ⚠️ (resolved at roadmap creation)
+- v1 requirements: 44 total (PLAT 5, AUTH 4, ONBD 6, BOOK 7, XFER 1, CLAIM 6, NOTF 6, OPS 4, HLTH 5)
+- Mapped to phases: 44 ✓
+- Unmapped: 0 ✓
+
+> Note: the prior summary line cited "37 total" before the categories were fully enumerated; the actual v1 requirement count is 44. All 44 are mapped to exactly one phase, with no orphans or duplicates.
 
 ---
 *Requirements defined: 2026-06-17*
-*Last updated: 2026-06-17 after initial definition*
+*Last updated: 2026-06-17 after roadmap creation (traceability populated, count corrected to 44)*

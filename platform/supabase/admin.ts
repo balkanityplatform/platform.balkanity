@@ -7,14 +7,21 @@ import "server-only";
 // read from the NON-public `SUPABASE_SERVICE_ROLE_KEY` — never a `NEXT_PUBLIC_` name
 // (threat T-02-02).
 //
+// The project URL is NOT a secret (it already ships to the browser as
+// `NEXT_PUBLIC_SUPABASE_URL`), so we read that single source of truth here rather
+// than a duplicate `SUPABASE_URL` var. The ONLY server-only secret in this module is
+// the service-role KEY. A duplicated URL var is a drift foot-gun against the
+// "never target Kalvia" rule and a latent runtime failure on the `paid` write path
+// if left unset (CR-01).
+//
 // Phase 1 has no service-role write yet; this establishes the pattern + the build guard
 // for later phases (e.g. the Stripe webhook's `paid` write). Source: 01-RESEARCH Pattern 3.
 import { createClient } from "@supabase/supabase-js";
 
 export function createAdminClient() {
   return createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!, // URL is not secret — single source of truth
+    process.env.SUPABASE_SERVICE_ROLE_KEY!, // the ONLY server-only secret here
     {
       auth: {
         autoRefreshToken: false,

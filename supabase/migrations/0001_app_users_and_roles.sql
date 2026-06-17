@@ -45,47 +45,28 @@ create policy "app_users_self_read"
   to authenticated
   using ((select auth.uid()) = id);
 
--- 6) Seed the first admin (D-02). The auth.users row is created idempotently here so the
---    FK is satisfiable without an out-of-band dashboard step; if the auth account already
---    exists (e.g. created via dashboard), the conflict is ignored and we reuse its id.
---    email_confirmed_at is set so the admin can request a magic link immediately.
-with seed_admin as (
-  insert into auth.users (
-    instance_id,
-    id,
-    aud,
-    role,
-    email,
-    encrypted_password,
-    email_confirmed_at,
-    created_at,
-    updated_at,
-    raw_app_meta_data,
-    raw_user_meta_data
-  )
-  values (
-    '00000000-0000-0000-0000-000000000000',
-    gen_random_uuid(),
-    'authenticated',
-    'authenticated',
-    'admin@balkanity.com',
-    '',                       -- no password; magic-link (passwordless) only (D-01)
-    now(),
-    now(),
-    now(),
-    '{"provider":"email","providers":["email"]}'::jsonb,
-    '{}'::jsonb
-  )
-  on conflict (email) do nothing
-  returning id, email
-)
+-- 6) Seed the first admin (D-02) from a PRE-EXISTING auth account.
+--    DECISION (resolved): admin@balkanity.com is created first via the Supabase Auth
+--    API / dashboard ("Add user") so it gets a proper auth.users + auth.identities
+--    record — a direct auth.users INSERT here would skip auth.identities and break
+--    magic-link OTP sign-in in plan 01-03. This migration therefore does NOT touch the
+--    auth schema; it only links the app_users row to the existing auth user, by email.
+--
+--    REQUIRED ORDER: create the admin auth user BEFORE applying this migration.
+--    The guard below RAISES if no admin row was seeded, so applying out of order
+--    fails fast (AUTH-01: exactly one admin must exist) instead of silently seeding none.
 insert into public.app_users (id, email, role)
-select id, email, 'admin'::public.app_user_role
-from seed_admin
--- Cover the case where the auth.users row already existed (ON CONFLICT skipped the insert):
--- fall back to looking the user up by email so the admin app_users row is still seeded.
-union
 select u.id, u.email, 'admin'::public.app_user_role
 from auth.users u
-where u.email = 'admin@balkanity.com'
+where lower(u.email) = lower('admin@balkanity.com')
 on conflict (id) do nothing;
+
+do $$
+begin
+  if not exists (
+    select 1 from public.app_users where role = 'admin'
+  ) then
+    raise exception
+      'AUTH-01 seed guard: no admin row in app_users. Create the admin@balkanity.com auth user (Supabase Auth API / dashboard) BEFORE applying 0001, then re-run.';
+  end if;
+end $$;

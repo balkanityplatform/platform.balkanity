@@ -13,7 +13,7 @@ This roadmap delivers the first module of the Balkanity Platform — Welcome Pic
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Platform Foundation** - Platform/module seam, auth & roles, typed Supabase clients, design system, EN/BG toggle, installable PWA shell
+- [x] **Phase 1: Platform Foundation** - Platform/module seam, auth & roles, typed Supabase clients, design system, EN/BG toggle, installable PWA shell (completed 2026-06-17)
 - [ ] **Phase 2: Supply-Side Onboarding** - Admin no-code CRUD for companies/properties/destinations + price/commission, slug links, and driver invites
 - [ ] **Phase 3: Payments Trust Spine** - Code-created Checkout Session + signature-verified idempotent webhook as the sole `paid` author, with webhook_events log
 - [ ] **Phase 4: Transfer Entity + Booking Form** - Guest books & prepays via slug link, lifecycle state machine, confirmation email, and magic-link status page
@@ -57,7 +57,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 01-05-PLAN.md — Serwist PWA shell + offline fallback + real brand assets (D-09) + Vercel deploy
+- [x] 01-05-PLAN.md — Serwist PWA shell + offline fallback + real brand assets (D-09) + Vercel deploy
 
 **Notes**: REVIEW/SIGN-OFF REQUIRED — touches auth and the first schema migration (`app_users` + roles). First migration is the flagged/irreversible schema gate; sign off before applying. Lock PWA library to `@serwist/next` (never `next-pwa`). Avoids Pitfalls 7 (key leak), 9/13 boundary erosion, 12 (SW caching stale auth).
 **UI hint**: yes
@@ -189,7 +189,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Platform Foundation | 4/5 | In Progress|  |
+| 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
 | 2. Supply-Side Onboarding | 0/TBD | Not started | - |
 | 3. Payments Trust Spine | 0/TBD | Not started | - |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |

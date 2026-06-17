@@ -19,13 +19,24 @@ export async function getCurrentRole(): Promise<AppRole | null> {
 
   if (!user) return null;
 
+  // Distinguish a genuine query/transport error from a legitimate "no row"
+  // result (WR-05). `maybeSingle()` returns data:null without erroring on zero
+  // rows, so a real error (transient DB outage, RLS misconfig, network blip)
+  // surfaces in `error` instead of being collapsed into a phantom logout. A real
+  // error is logged (not silently treated as "signed out"); only a missing row
+  // legitimately resolves to null.
   const { data, error } = await supabase
     .from("app_users")
     .select("role")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
-  if (error || !data) return null;
+  if (error) {
+    console.error("role lookup failed", error);
+    return null;
+  }
+
+  if (!data) return null;
 
   return (data.role as AppRole) ?? null;
 }

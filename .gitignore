@@ -31,3 +31,8 @@ next-env.d.ts
 
 # Supabase CLI scratch
 supabase/.temp/
+
+# Raw brand-asset masters (kept locally by the user; web-ready derivatives are
+# committed under public/icons, public/brand, platform/ui/pictograms). Trailing
+# space in the folder name is intentional — matches the real directory.
+Branding /

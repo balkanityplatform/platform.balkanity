@@ -5,6 +5,7 @@
 // (white-dominant, teal accent — 60/30/10). The interactive form is a thin client
 // island (SignInForm); auth behaviour is unchanged from 01-03. The LanguageToggle
 // lets a guest/admin flip EN↔BG before signing in.
+import Image from "next/image";
 import { getDict, getLang } from "@/platform/i18n/dictionary";
 import { LanguageToggle } from "@/platform/ui/LanguageToggle";
 import { SignInForm } from "./SignInForm";
@@ -14,7 +15,16 @@ export default async function SignInPage() {
 
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col bg-white px-[24px] py-[32px]">
-      <div className="flex justify-end">
+      <div className="flex items-center justify-between">
+        {/* Real Balkanity mark (D-09 / SC-5) — never re-drawn; from public/brand. */}
+        <Image
+          src="/brand/balkanity-logo.png"
+          alt="Balkanity"
+          width={120}
+          height={120}
+          priority
+          className="h-[48px] w-auto"
+        />
         <LanguageToggle current={lang} label={t.langToggle} />
       </div>
 

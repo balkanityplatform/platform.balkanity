@@ -29,7 +29,7 @@ declare const self: ServiceWorkerGlobalScope;
 
 // Pitfall 12: every sensitive document path is matched here and forced
 // NetworkFirst. Listed BEFORE defaultCache so it wins for these navigations.
-const SENSITIVE_DOCUMENT = /^\/(sign-in|admin|auth)(\/|$)/;
+const SENSITIVE_DOCUMENT = /^\/(sign-in|admin|auth|driver)(\/|$)/;
 
 const authNetworkFirst: RuntimeCaching = {
   matcher({ request, url, sameOrigin }) {

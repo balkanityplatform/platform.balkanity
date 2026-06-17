@@ -34,7 +34,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. The admin can sign in to the desktop console; an authenticated user resolves to exactly one app role ∈ {admin, driver, guest} enforced server-side via `auth.getUser()`
   4. A build that imports the service-role or Stripe secret key into client-reachable code fails (`server-only` enforced); the browser only ever holds the anon key
   5. Brand tokens (six colours + white, Montserrat) and real logo/pictogram assets render via shared components (StatusDot = coloured dot + text label, 52px primary CTA); UI text flips between EN and BG
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 01-01-PLAN.md — Scaffold Next 16 + platform/modules seam (ESLint) + Vitest/Playwright Wave 0
+- [ ] 01-02-PLAN.md — Three-way Supabase client split + server-only boundary + flagged app_users migration (SIGN-OFF)
+- [ ] 01-03-PLAN.md — Magic-link admin sign-in + role resolution + role-based redirect + placeholder console
+- [ ] 01-04-PLAN.md — Brand tokens + Montserrat + StatusDot/Button/LanguageToggle + EN/BG dictionary
+- [ ] 01-05-PLAN.md — Serwist PWA shell + offline fallback + real brand assets (D-09) + Vercel deploy
 **Notes**: REVIEW/SIGN-OFF REQUIRED — touches auth and the first schema migration (`app_users` + roles). First migration is the flagged/irreversible schema gate; sign off before applying. Lock PWA library to `@serwist/next` (never `next-pwa`). Avoids Pitfalls 7 (key leak), 9/13 boundary erosion, 12 (SW caching stale auth).
 **UI hint**: yes
 
@@ -144,7 +150,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Platform Foundation | 0/TBD | Not started | - |
+| 1. Platform Foundation | 0/5 | Not started | - |
 | 2. Supply-Side Onboarding | 0/TBD | Not started | - |
 | 3. Payments Trust Spine | 0/TBD | Not started | - |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |

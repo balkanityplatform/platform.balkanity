@@ -511,21 +511,24 @@ All verified patterns are inline in Architecture Patterns above (Patterns 1–6)
 
 **If this table is empty:** it is not — six assumptions need planner/user acknowledgment. Most are LOW risk; A4 (schema) is the flagged sign-off gate.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **D-09 brand assets not in repo (BLOCKER for SC-5).**
    - What we know: `Mockups/`, `Balkanity Branding/`, `PRD.md`, `PRD-BG.md` are all confirmed **absent** (`ls` 2026-06-17).
    - What's unclear: final committed paths and exact filenames of the marks/pictograms.
    - Recommendation: Planner sequences logo/icon-rendering tasks AFTER an asset-commit checkpoint; token/typography/component/i18n tasks proceed now. Do not satisfy SC-5 with placeholders.
+   - **RESOLVED:** Plan 01-05 gates logo/pictogram rendering behind a `checkpoint:human-action` asset-commit; token/typography/component/i18n work proceeds in 01-04. SC-5 is explicitly NOT satisfied by placeholders.
 
 2. **First-migration schema shape (`app_users` + roles) — flagged/irreversible.**
    - What we know: needs `id` (FK to `auth.users`), `email`, `role ∈ {admin,driver,guest}`, RLS, and a seed admin insert (D-02).
    - What's unclear: enum vs text for role; one-role-column vs roles table; exact RLS policies.
    - Recommendation: Planner surfaces the migration SQL for sign-off BEFORE applying (CLAUDE.md review gate). Recommend single `role` enum/text column (AUTH-01 = exactly one role).
+   - **RESOLVED:** Plan 01-02 places a `checkpoint:decision` (role storage shape) + `checkpoint:human-verify` (SQL sign-off) before the `autonomous: false` [BLOCKING] schema-push task targeting ref `qyhdogajtmnvxphrslwm`.
 
 3. **`middleware.ts` vs `proxy.ts` (CLAUDE.md text vs Next 16).**
    - What we know: Next 16 deprecated `middleware.ts` → `proxy.ts`; codemod exists; both function today.
    - Recommendation: Greenfield → use `proxy.ts`. Planner confirms with user (trivial, but it contradicts a CLAUDE.md sentence).
+   - **RESOLVED:** SKELETON.md and Plan 01-03 use `proxy.ts` (with `getClaims()` for refresh, `getUser()` for authz); the deviation from CLAUDE.md's "middleware.ts" sentence is flagged in-plan as intentional.
 
 ## Environment Availability
 

@@ -14,14 +14,20 @@ import { getCurrentRole } from "@/platform/auth/role";
 export default async function Home() {
   const role = await getCurrentRole();
 
+  // Explicit control flow: do NOT rely on redirect() throwing NEXT_REDIRECT to
+  // prevent case fall-through (WR-06). Each branch breaks so the routing stays
+  // correct even if redirect() is ever wrapped/swapped or a log line is added.
   switch (role) {
     case "admin":
       redirect("/admin");
+      break;
     case "driver":
       redirect("/driver");
+      break;
     case "guest":
       // Guests do not depend on `/` (D-03); neutral bounce to sign-in.
       redirect("/sign-in");
+      break;
     default:
       redirect("/sign-in");
   }

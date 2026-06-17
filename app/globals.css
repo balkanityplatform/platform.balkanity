@@ -1,3 +1,18 @@
 @import "tailwindcss";
 
-/* Brand design tokens (six colours + white, Montserrat) are added in plan 01-04. */
+/* Brand design tokens — six colours + white + Montserrat (PLAT-03, locked).
+ * Tailwind v4 CSS-first @theme: `--color-*` / `--font-*` so the build generates
+ * the brand utilities (bg-teal, text-slate, font-sans, …). No tailwind.config.js.
+ * Hex values are the locked brand palette (UI-SPEC Color contract). */
+@theme {
+  --color-teal: #029b87; /* primary / actions / links / claimed */
+  --color-teal2: #047982; /* secondary / avatars / paid */
+  --color-amber: #febe21; /* in-progress / en_route / attention / live */
+  --color-coral: #e44b4b; /* alerts / unclaimed / cancelled / destructive / errors */
+  --color-slate: #2f4858; /* headings / text / dark surfaces / sidebar */
+  --color-grey: #66676f; /* muted / requested / completed */
+  --color-white: #ffffff; /* base surface */
+
+  --font-sans: var(--font-montserrat), "Montserrat", ui-sans-serif, system-ui,
+    sans-serif;
+}

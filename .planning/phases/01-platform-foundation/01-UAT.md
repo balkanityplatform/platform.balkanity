@@ -19,7 +19,7 @@ awaiting: user response
 ## Tests
 
 ### 1. Deploy to the Balkanity Vercel project
-expected: Four env vars set (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY public; SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY server-only), deployed to balkanity_platform_project (confirmed NOT Kalvia ref utyatpadtibqqswsfvtr), production URL captured and reachable.
+expected: Env vars set in balkanity_platform_project (confirmed NOT Kalvia ref utyatpadtibqqswsfvtr): NEXT_PUBLIC_SUPABASE_URL + NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (public); SUPABASE_SERVICE_ROLE_KEY (server-only — never NEXT_PUBLIC_); and NEXT_PUBLIC_SITE_URL set to the production URL (required by the WR-04 fix — the magic-link email redirect is derived from it; without it the deployed magic link will not land on /auth/confirm). Note: a separate SUPABASE_URL is no longer needed — the service-role client now reads NEXT_PUBLIC_SUPABASE_URL (CR-01 fix). Deployed, production URL captured and reachable.
 result: [pending]
 
 ### 2. Mobile PWA install + offline fallback

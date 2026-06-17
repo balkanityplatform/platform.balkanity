@@ -1,50 +1,29 @@
-"use client";
-// app/sign-in/page.tsx — admin magic-link sign-in form (AUTH-04 / D-01).
+// app/sign-in/page.tsx — admin magic-link sign-in (AUTH-04 / D-01), re-skinned (01-04).
 //
-// Passwordless: an email field + "Send magic link" CTA wired to the sendMagicLink
-// server action. On success shows the "Check your email…" confirmation. Copy is the
-// EN canonical from the UI-SPEC Copywriting Contract, inline now and keyed to the
-// same ids the typed EN/BG dictionary will adopt in 01-04. Plain markup — the styled
-// 52px Button + tokens land in 01-04; this uses the same copy ids meanwhile.
-import { useActionState } from "react";
-import { type SignInState, sendMagicLink } from "./actions";
+// Server Component shell: resolves copy through the EN/BG dictionary (getDict reads
+// the lang cookie server-side → no flash) and renders the brand-styled surface
+// (white-dominant, teal accent — 60/30/10). The interactive form is a thin client
+// island (SignInForm); auth behaviour is unchanged from 01-03. The LanguageToggle
+// lets a guest/admin flip EN↔BG before signing in.
+import { getDict, getLang } from "@/platform/i18n/dictionary";
+import { LanguageToggle } from "@/platform/ui/LanguageToggle";
+import { SignInForm } from "./SignInForm";
 
-const initialState: SignInState = { status: "idle" };
-
-export default function SignInPage() {
-  const [state, formAction, pending] = useActionState(
-    sendMagicLink,
-    initialState,
-  );
+export default async function SignInPage() {
+  const [t, lang] = await Promise.all([getDict(), getLang()]);
 
   return (
-    <main>
-      <h1>Sign in</h1>
+    <main className="mx-auto flex min-h-dvh max-w-md flex-col bg-white px-[24px] py-[32px]">
+      <div className="flex justify-end">
+        <LanguageToggle current={lang} label={t.langToggle} />
+      </div>
 
-      {state.status === "sent" ? (
-        // copy id: magicLinkSent
-        <p role="status">{state.message}</p>
-      ) : (
-        <form action={formAction}>
-          <label htmlFor="email">Email address</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            required
-          />
-
-          {state.status === "error" ? (
-            // copy id: signInError
-            <p role="alert">{state.message}</p>
-          ) : null}
-
-          <button type="submit" disabled={pending}>
-            Send magic link
-          </button>
-        </form>
-      )}
+      <div className="mt-[48px] flex flex-col gap-[24px]">
+        <h1 className="text-[28px] font-semibold leading-[1.2] text-slate">
+          {t.signInCta}
+        </h1>
+        <SignInForm copy={{ emailLabel: t.emailLabel, signInCta: t.signInCta }} />
+      </div>
     </main>
   );
 }

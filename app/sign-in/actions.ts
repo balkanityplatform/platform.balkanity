@@ -5,8 +5,10 @@
 // flow anywhere. `shouldCreateUser: false` → no open signup; the admin is seeded
 // via SQL (D-02, 01-02). Light V5 input validation (plain email check; zod arrives
 // Phase 3/4 at the booking/webhook trust boundary). Strings keyed to the UI-SPEC
-// Copywriting Contract; the typed EN/BG dictionary wiring lands in 01-04.
+// Copywriting Contract; resolved through the typed EN/BG dictionary (01-04) so the
+// confirmation/error messages honour the current language.
 import { headers } from "next/headers";
+import { getDict } from "@/platform/i18n/dictionary";
 import { createClient } from "@/platform/supabase/server";
 
 export type SignInState = {
@@ -22,14 +24,11 @@ export async function sendMagicLink(
   formData: FormData,
 ): Promise<SignInState> {
   const email = String(formData.get("email") ?? "").trim();
+  const t = await getDict();
 
   if (!email || !EMAIL_RE.test(email)) {
-    return {
-      status: "error",
-      // copy id: signInError
-      message:
-        "We couldn't send your magic link. Check the email address and try again.",
-    };
+    // copy id: signInError
+    return { status: "error", message: t.signInError };
   }
 
   const origin = (await headers()).get("origin") ?? "";
@@ -44,17 +43,10 @@ export async function sendMagicLink(
   });
 
   if (error) {
-    return {
-      status: "error",
-      // copy id: signInError
-      message:
-        "We couldn't send your magic link. Check the email address and try again.",
-    };
+    // copy id: signInError
+    return { status: "error", message: t.signInError };
   }
 
-  return {
-    status: "sent",
-    // copy id: magicLinkSent
-    message: "Check your email — we've sent you a sign-in link.",
-  };
+  // copy id: magicLinkSent
+  return { status: "sent", message: t.magicLinkSent };
 }

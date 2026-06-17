@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 1 UI-SPEC approved
-last_updated: "2026-06-17T12:24:25.215Z"
-last_activity: 2026-06-17 — Roadmap created (8 phases, fine granularity, MVP mode)
+last_updated: "2026-06-17T12:43:29.648Z"
+last_activity: 2026-06-17
 progress:
   total_phases: 8
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 5
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
-**Current focus:** Phase 1 — Platform Foundation
+**Current focus:** Phase 01 — platform-foundation
 
 ## Current Position
 
-Phase: 1 of 8 (Platform Foundation)
-Plan: 0 of TBD in current phase
+Phase: 01 (platform-foundation) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-06-17 — Roadmap created (8 phases, fine granularity, MVP mode)
+Last activity: 2026-06-17
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 20%
 
 ## Performance Metrics
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 01 P01 | 12 | 3 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -63,6 +64,8 @@ Recent decisions affecting current work:
 - [Roadmap]: 8-phase strict dependency chain — seam/auth → onboarding → payments → transfer → claim → views → notifications → health
 - [Roadmap]: Platform/module seam (PLAT-01) is non-deferrable, established in Phase 1
 - [Roadmap]: `paid` written only by verified idempotent webhook (Phase 3); atomic claim + data-layer PII gating (Phase 5) — both with adversarial test gates
+- [Phase ?]: [01-01]: One-way platform/modules seam enforced via ESLint no-restricted-imports flat-config (PLAT-01)
+- [Phase ?]: [01-01]: Vitest (jsdom) + Playwright (chromium) Wave 0 test baseline established for all later plans
 
 ### Pending Todos
 
@@ -92,6 +95,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-17T11:50:51.866Z
+Last session: 2026-06-17T12:43:09.207Z
 Stopped at: Phase 1 UI-SPEC approved
-Resume file: .planning/phases/01-platform-foundation/01-UI-SPEC.md
+Resume file: None

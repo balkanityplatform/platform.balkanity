@@ -31,14 +31,26 @@ export async function sendMagicLink(
     return { status: "error", message: t.signInError };
   }
 
-  const origin = (await headers()).get("origin") ?? "";
+  // Derive the magic-link redirect base from a trusted, server-configured URL —
+  // NOT the client-supplied `Origin` header (header-controlled redirect target in
+  // the auth email, WR-04). Fall back to `Origin` only when NEXT_PUBLIC_SITE_URL is
+  // unset (local dev). An empty base would yield a relative URL Supabase rejects,
+  // so bail out with the sign-in error instead. (Supabase's dashboard "Redirect
+  // URLs" allowlist is the server-side defense; this is defense-in-depth.)
+  const base =
+    process.env.NEXT_PUBLIC_SITE_URL ?? (await headers()).get("origin");
+  if (!base) {
+    // copy id: signInError
+    return { status: "error", message: t.signInError };
+  }
+
   const supabase = await createClient();
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
       shouldCreateUser: false,
-      emailRedirectTo: `${origin}/auth/confirm`,
+      emailRedirectTo: `${base}/auth/confirm`,
     },
   });
 

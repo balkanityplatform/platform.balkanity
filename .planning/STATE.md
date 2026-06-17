@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 1 UI-SPEC approved
-last_updated: "2026-06-17T14:34:36.675Z"
+stopped_at: Completed 01-04-PLAN.md
+last_updated: "2026-06-17T14:59:03.961Z"
 last_activity: 2026-06-17
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 01 (platform-foundation) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-06-17
 
-Progress: [██████░░░░] 60%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
@@ -54,6 +54,7 @@ Progress: [██████░░░░] 60%
 *Updated after each plan completion*
 | Phase 01 P01 | 12 | 3 tasks | 16 files |
 | Phase 01 P03 | 30min | 3 tasks | 10 files |
+| Phase 01 P04 | 11min | 3 tasks | 20 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [01-01]: Vitest (jsdom) + Playwright (chromium) Wave 0 test baseline established for all later plans
 - [Phase ?]: 01-03: Authz via getCurrentRole() (auth.getUser → app_users.role); proxy.ts (Next 16) refreshes session with getClaims; never getSession for authz (SC-3)
 - [Phase ?]: 01-03: Guest at / bounces to /sign-in (Phase 4 uses /pickup/<slug>); driver at / → /driver (reserved); Supabase magic-link email template must be {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email
+- [Phase 01]: Dict widens dictionary values to string (not as-const literals) so BG translations differ from EN while a missing key still fails tsc
+- [Phase 01]: sign-in page is a Server Component shell + SignInForm client island so dictionary copy resolves server-side (no-flash SSR)
 
 ### Pending Todos
 
@@ -99,6 +102,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-17T14:34:36.670Z
-Stopped at: Phase 1 UI-SPEC approved
+Last session: 2026-06-17T14:59:03.955Z
+Stopped at: Completed 01-04-PLAN.md
 Resume file: None

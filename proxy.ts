@@ -5,9 +5,12 @@
 // identical; this is the current convention (01-RESEARCH A1 / SOTA).
 //
 // Refreshes the Supabase auth session on EVERY request so magic-link sessions stay
-// valid and SSR sees the signed-in user. Uses `getClaims()` (fast local JWT verify)
-// for the refresh path; the authz decision still uses `auth.getUser()` in
-// platform/auth/role.ts. Place NO logic between createServerClient and getClaims —
+// valid and SSR sees the signed-in user. Uses `auth.getUser()` — the canonical
+// @supabase/ssr middleware call that does a server round-trip, reliably triggering
+// token refresh and re-emitting refreshed cookies through setAll (CLAUDE.md:
+// "middleware.ts ... refreshes the session on every request (calls
+// supabase.auth.getUser())"). The authz decision also uses getUser() in
+// platform/auth/role.ts. Place NO logic between createServerClient and getUser —
 // the official Supabase warning: anything in between causes random logouts.
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
@@ -36,8 +39,8 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  // IMPORTANT: no code between createServerClient (above) and getClaims (here).
-  await supabase.auth.getClaims();
+  // IMPORTANT: no code between createServerClient (above) and getUser (here).
+  await supabase.auth.getUser();
 
   return response;
 }

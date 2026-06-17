@@ -45,11 +45,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Three-way Supabase client split + server-only boundary + flagged app_users migration (SIGN-OFF)
+- [x] 01-02-PLAN.md — Three-way Supabase client split + server-only boundary + flagged app_users migration (SIGN-OFF)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-03-PLAN.md — Magic-link admin sign-in + role resolution + role-based redirect + placeholder console
+- [x] 01-03-PLAN.md — Magic-link admin sign-in + role resolution + role-based redirect + placeholder console
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -189,7 +189,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Platform Foundation | 1/5 | In Progress|  |
+| 1. Platform Foundation | 3/5 | In Progress|  |
 | 2. Supply-Side Onboarding | 0/TBD | Not started | - |
 | 3. Payments Trust Spine | 0/TBD | Not started | - |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |

@@ -17,10 +17,10 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 
 ### Authentication & Roles
 
-- [ ] **AUTH-01**: Users have an app role ∈ {admin, driver, guest} enforced across the app
+- [x] **AUTH-01**: Users have an app role ∈ {admin, driver, guest} enforced across the app
 - [ ] **AUTH-02**: Guest can view their transfer status via a passwordless Supabase magic link
 - [ ] **AUTH-03**: Drivers are admin-invited contractors only (no open signup); invite flow creates a driver account
-- [ ] **AUTH-04**: Admin can sign in to the desktop console
+- [x] **AUTH-04**: Admin can sign in to the desktop console
 
 ### Supply-Side Onboarding (Admin, no-code)
 
@@ -121,8 +121,8 @@ Which phases cover which requirements. Populated during roadmap creation.
 | PLAT-03 | Phase 1 — Platform Foundation | Pending |
 | PLAT-04 | Phase 1 — Platform Foundation | Pending |
 | PLAT-05 | Phase 1 — Platform Foundation | Pending |
-| AUTH-01 | Phase 1 — Platform Foundation | Pending |
-| AUTH-04 | Phase 1 — Platform Foundation | Pending |
+| AUTH-01 | Phase 1 — Platform Foundation | Complete |
+| AUTH-04 | Phase 1 — Platform Foundation | Complete |
 | ONBD-01 | Phase 2 — Supply-Side Onboarding | Pending |
 | ONBD-02 | Phase 2 — Supply-Side Onboarding | Pending |
 | ONBD-03 | Phase 2 — Supply-Side Onboarding | Pending |

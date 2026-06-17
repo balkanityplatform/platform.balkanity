@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 1 UI-SPEC approved
-last_updated: "2026-06-17T12:43:29.648Z"
+last_updated: "2026-06-17T14:34:36.675Z"
 last_activity: 2026-06-17
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
+  completed_plans: 3
   percent: 0
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 01 (platform-foundation) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-06-17
 
-Progress: [██░░░░░░░░] 20%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [██░░░░░░░░] 20%
 
 *Updated after each plan completion*
 | Phase 01 P01 | 12 | 3 tasks | 16 files |
+| Phase 01 P03 | 30min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,8 @@ Recent decisions affecting current work:
 - [Roadmap]: `paid` written only by verified idempotent webhook (Phase 3); atomic claim + data-layer PII gating (Phase 5) — both with adversarial test gates
 - [Phase ?]: [01-01]: One-way platform/modules seam enforced via ESLint no-restricted-imports flat-config (PLAT-01)
 - [Phase ?]: [01-01]: Vitest (jsdom) + Playwright (chromium) Wave 0 test baseline established for all later plans
+- [Phase ?]: 01-03: Authz via getCurrentRole() (auth.getUser → app_users.role); proxy.ts (Next 16) refreshes session with getClaims; never getSession for authz (SC-3)
+- [Phase ?]: 01-03: Guest at / bounces to /sign-in (Phase 4 uses /pickup/<slug>); driver at / → /driver (reserved); Supabase magic-link email template must be {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email
 
 ### Pending Todos
 
@@ -83,6 +86,7 @@ None yet.
 - Companion docs PRD.md / PRD-BG.md referenced in PROJECT.md are not yet in the repo — ingest if available.
 - Infra guardrail: all Supabase/Vercel work targets Balkanity only (ref `qyhdogajtmnvxphrslwm`), never Kalvia (`utyatpadtibqqswsfvtr`).
 - Review gate standing: schema / auth / RLS / payment changes require sign-off before applying (Phases 1, 2, 3, 4, 5, 7, 8 all touch flagged areas).
+- SECURITY: .env.local.example (tracked) holds REAL live secrets (anon+service-role keys, DB password for qyhdogajtmnvxphrslwm) — pre-existing, NOT from 01-03. Revert to empty placeholders + rotate service-role key & DB password.
 
 ## Deferred Items
 
@@ -95,6 +99,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-17T12:43:09.207Z
+Last session: 2026-06-17T14:34:36.670Z
 Stopped at: Phase 1 UI-SPEC approved
 Resume file: None

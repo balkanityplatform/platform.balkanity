@@ -13,7 +13,7 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 - [ ] **PLAT-02**: App is an installable, offline-aware PWA shell (Serwist) deployed to the Balkanity Vercel project
 - [x] **PLAT-03**: Brand design tokens (six colours + white, Montserrat) and real logo/pictogram assets are wired as a reusable design system
 - [x] **PLAT-04**: UI strings support an EN/BG toggle
-- [ ] **PLAT-05**: Supabase clients are split — anon client on the browser, service-role only on the server (never shipped to client)
+- [x] **PLAT-05**: Supabase clients are split — anon client on the browser, service-role only on the server (never shipped to client)
 
 ### Authentication & Roles
 
@@ -120,7 +120,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 | PLAT-02 | Phase 1 — Platform Foundation | Pending |
 | PLAT-03 | Phase 1 — Platform Foundation | Complete |
 | PLAT-04 | Phase 1 — Platform Foundation | Complete |
-| PLAT-05 | Phase 1 — Platform Foundation | Pending |
+| PLAT-05 | Phase 1 — Platform Foundation | Complete |
 | AUTH-01 | Phase 1 — Platform Foundation | Complete |
 | AUTH-04 | Phase 1 — Platform Foundation | Complete |
 | ONBD-01 | Phase 2 — Supply-Side Onboarding | Pending |

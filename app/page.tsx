@@ -1,8 +1,28 @@
-export default function Home() {
-  // Placeholder root. Role-based redirect (D-03) is wired in plan 01-03.
-  return (
-    <main>
-      <h1>Balkanity Platform</h1>
-    </main>
-  );
+// app/page.tsx — role-based root redirect (D-03, SC-3).
+//
+// Server Component. Resolves the request's role via getCurrentRole() (which uses
+// auth.getUser(), revalidating the JWT) and routes by role:
+//   null   → /sign-in  (unauthenticated; admin sign-in is the only `/` entry)
+//   admin  → /admin
+//   driver → /driver    (route reserved; may 404 until Phase 2 — acceptable, D-03)
+//   guest  → /sign-in    (guests never enter via `/`; they use /pickup/<slug> in
+//                         Phase 4 — bounce to sign-in is the documented neutral choice)
+// `/` itself never renders UI — it is purely a router.
+import { redirect } from "next/navigation";
+import { getCurrentRole } from "@/platform/auth/role";
+
+export default async function Home() {
+  const role = await getCurrentRole();
+
+  switch (role) {
+    case "admin":
+      redirect("/admin");
+    case "driver":
+      redirect("/driver");
+    case "guest":
+      // Guests do not depend on `/` (D-03); neutral bounce to sign-in.
+      redirect("/sign-in");
+    default:
+      redirect("/sign-in");
+  }
 }

@@ -26,6 +26,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { recordedFeeCents } from "@/platform/payments/fee";
 import { getStripe } from "@/platform/payments/stripe";
 import { createAdminClient } from "@/platform/supabase/admin";
+import { sendBookingConfirmation } from "@/platform/transfers/confirmation-email";
 
 // CONTEXT D-02 lock — Node runtime ONLY. Raw-body + crypto are fragile on Edge.
 export const runtime = "nodejs";
@@ -155,7 +156,7 @@ export async function POST(req: NextRequest) {
       })
       .eq("id", transferId)
       .neq("status", "paid")
-      .select("id");
+      .select("id, guest_email");
 
     if (paidErr) {
       // CR-01: a transient failure on the money-bearing write must NOT be mistaken for
@@ -183,6 +184,21 @@ export async function POST(req: NextRequest) {
       .from("webhook_events")
       .update({ outcome: "processed" })
       .eq("event_id", event.id);
+
+    // BOOK-06: fire the booking-confirmation magic link off the verified `paid`
+    // transition (the send is STUBBED/logged in Phase 4; Phase 7 wires Resend).
+    // This is NOT a second `paid` writer — it performs no transfer write. It is
+    // wrapped in log-and-continue so a failed/missing send NEVER changes the HTTP
+    // status of the money-bearing write above (reconciliation / Phase 7 resend the
+    // confirmation; a charged guest is never lost to an email failure).
+    const guestEmail = paidRows[0]?.guest_email ?? null;
+    if (guestEmail) {
+      try {
+        await sendBookingConfirmation(transferId, guestEmail);
+      } catch (err) {
+        console.error("[BOOK-06] confirmation send failed (continuing)", err);
+      }
+    }
   }
 
   return jsonResponse({ received: true });

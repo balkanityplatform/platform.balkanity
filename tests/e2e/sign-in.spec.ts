@@ -1,76 +1,57 @@
 import { expect, test } from "@playwright/test";
 
-// AUTH-04 sign-in smoke — the AUTOMATABLE portion of the magic-link flow (D-01).
+// AUTH-04 sign-in smoke — email + password LOGIN (decision reversal from magic-link).
 //
-// Asserts: an unauthenticated `/` redirects to /sign-in (D-03); the form shows the
-// "Email address" label and "Send magic link" CTA; a malformed email is rejected
-// server-side with the error copy; a valid email submission is PROCESSED and lands
-// on the success confirmation.
+// Asserts the deterministic, no-network portion of the flow:
+//   - an unauthenticated `/` redirects to /sign-in (D-03);
+//   - the form renders the email + password inputs, the sign-in CTA, and the
+//     forgot-password link;
+//   - submitting bad credentials surfaces the generic, dictionary-keyed error via
+//     the SERVER-SIDE validation path (an empty/short password is rejected before
+//     any Supabase round-trip, so the assertion stays deterministic — no live OTP
+//     or email, no rate-limit flakiness).
 //
-// IMPORTANT — why the success path stubs the network:
-// signInWithOtp hits Supabase's live OTP endpoint, which enforces a strict
-// per-email rate limit (≈60s between sends + an hourly cap) AND would send a real
-// magic-link email each run (burning the Resend cap). A live assertion is therefore
-// non-deterministic. The server action runs server-side, so we cannot page.route the
-// outbound call from the browser; instead we drive the form with a malformed address
-// for the deterministic server-side-validation path, and assert the happy path by
-// intercepting the *form navigation/response* is not possible for a server action —
-// so the success assertion uses the seeded admin and accepts the terminal state
-// (confirmation on a fresh window; documented rate-limit error otherwise), with the
-// confirmation being the asserted happy path on an un-throttled run.
-//
-// The actual magic-link email CLICK is MANUAL (01-VALIDATION manual-only table);
-// the manual walkthrough (submit admin email → open link → /auth/confirm → /admin)
-// is recorded in 01-03-SUMMARY.md.
+// The full credential round-trip (correct password → /admin) and the invite/
+// recovery → /set-password walkthrough are verified MANUALLY (01-VALIDATION
+// manual-only table), since they need a real Supabase session.
 
-test("unauthenticated / redirects to the admin sign-in", async ({ page }) => {
+test("unauthenticated / redirects to the sign-in page", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/sign-in/);
 });
 
-test("sign-in form shows the email label and the magic-link CTA", async ({
+test("sign-in form shows email + password inputs, the CTA and the reset link", async ({
   page,
 }) => {
   await page.goto("/sign-in");
-  await expect(page.getByText("Email address")).toBeVisible();
+
+  await expect(page.getByLabel("Email address")).toBeVisible();
+  await expect(page.getByLabel("Password")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible();
   await expect(
-    page.getByRole("button", { name: "Send magic link" }),
+    page.getByRole("link", { name: "Forgot password?" }),
   ).toBeVisible();
 });
 
-test("a malformed email is rejected with the error copy (server-side V5)", async ({
+test("the forgot-password link navigates to /forgot-password", async ({
+  page,
+}) => {
+  await page.goto("/sign-in");
+  await page.getByRole("link", { name: "Forgot password?" }).click();
+  await expect(page).toHaveURL(/\/forgot-password/);
+});
+
+test("bad credentials surface the generic error (server-side V5)", async ({
   page,
 }) => {
   await page.goto("/sign-in");
   // "a@b" passes the browser's lenient native type=email check (it has an @) but
   // FAILS our stricter server regex (requires a dotted domain), so the click
-  // reaches the server action and exercises the V5 server-side rejection path.
+  // reaches the server action and exercises the generic-rejection path WITHOUT a
+  // live Supabase call. The password field is filled so the browser lets us submit.
   await page.getByLabel("Email address").fill("a@b");
-  await page.getByRole("button", { name: "Send magic link" }).click();
+  await page.getByLabel("Password").fill("not-a-real-password");
+  await page.getByRole("button", { name: "Sign in" }).click();
 
-  await expect(
-    page.getByText(
-      "We couldn't send your magic link. Check the email address and try again.",
-    ),
-  ).toBeVisible();
-});
-
-test("submitting a valid admin email is processed to a terminal state", async ({
-  page,
-}) => {
-  await page.goto("/sign-in");
-  await page.getByLabel("Email address").fill("admin@balkanity.com");
-  await page.getByRole("button", { name: "Send magic link" }).click();
-
-  // On an un-throttled run this is the confirmation (the asserted happy path);
-  // if the live OTP rate limit is hit the action returns the error copy. Either
-  // proves the form → server action → rendered-state wiring is correct. The
-  // magic-link delivery/click itself is verified MANUALLY (see SUMMARY).
-  const confirmation = page.getByText(
-    "Check your email — we've sent you a sign-in link.",
-  );
-  const rateLimited = page.getByText(
-    "We couldn't send your magic link. Check the email address and try again.",
-  );
-  await expect(confirmation.or(rateLimited)).toBeVisible();
+  await expect(page.getByText("Invalid email or password.")).toBeVisible();
 });

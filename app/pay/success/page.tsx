@@ -61,9 +61,17 @@ export default async function PaySuccessPage({
           {paidAt ? ` on ${paidAt}` : ""}.
         </p>
       ) : (
-        // Un-paid (e.g. "requested"): show the pending status. No "paid" affordance —
-        // the webhook has not (yet) confirmed this payment (SC2 spoof gate).
-        <p>Payment status: {status}. We are confirming your payment.</p>
+        // Un-paid (e.g. "requested"): NEUTRAL confirming state per UI-SPEC — never an
+        // authoritative "paid" affordance (SC2/SC5 spoof gate; the verified webhook is
+        // the sole paid writer). Point the guest to their status page to track it.
+        <>
+          <p>Payment received — we&apos;re confirming it.</p>
+          <p>
+            Track your booking on your{" "}
+            <a href={`/status/${transferId}`}>status page</a>, or{" "}
+            <a href="/track">request a fresh link</a> by email.
+          </p>
+        </>
       )}
     </main>
   );

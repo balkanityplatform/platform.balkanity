@@ -5,11 +5,22 @@
 // copy; bg.ts must satisfy this exact shape (a missing/extra key fails `tsc`).
 // Plain typed JSON — no i18n library (D-05).
 export const en = {
-  signInCta: "Send magic link",
-  magicLinkSent: "Check your email — we've sent you a sign-in link.",
-  signInError:
-    "We couldn't send your magic link. Check the email address and try again.",
+  signInHeading: "Sign in",
+  signInCta: "Sign in",
+  signInError: "Invalid email or password.",
   emailLabel: "Email address",
+  passwordLabel: "Password",
+  forgotPasswordLink: "Forgot password?",
+  forgotPasswordHeading: "Reset your password",
+  sendResetCta: "Send reset link",
+  resetEmailSent:
+    "If an account exists for that email, we've sent a password reset link.",
+  setPasswordHeading: "Set your password",
+  newPasswordLabel: "New password",
+  confirmPasswordLabel: "Confirm password",
+  setPasswordCta: "Save password",
+  passwordMismatch: "The passwords don't match. Please try again.",
+  passwordTooShort: "Use at least 8 characters for your password.",
   emptyHeading: "Nothing here yet",
   emptyBody:
     "Your console is ready. Companies, properties, and transfers will appear here as you set them up.",

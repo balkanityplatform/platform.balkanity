@@ -1,10 +1,10 @@
-// app/sign-in/page.tsx — admin magic-link sign-in (AUTH-04 / D-01), re-skinned (01-04).
+// app/sign-in/page.tsx — admin/driver email + password sign-in (AUTH-04).
 //
 // Server Component shell: resolves copy through the EN/BG dictionary (getDict reads
 // the lang cookie server-side → no flash) and renders the brand-styled surface
 // (white-dominant, teal accent — 60/30/10). The interactive form is a thin client
-// island (SignInForm); auth behaviour is unchanged from 01-03. The LanguageToggle
-// lets a guest/admin flip EN↔BG before signing in.
+// island (SignInForm); on success the action redirects to `/` (role-routes). The
+// LanguageToggle lets the user flip EN↔BG before signing in.
 import Image from "next/image";
 import { getDict, getLang } from "@/platform/i18n/dictionary";
 import { LanguageToggle } from "@/platform/ui/LanguageToggle";
@@ -30,9 +30,16 @@ export default async function SignInPage() {
 
       <div className="mt-[48px] flex flex-col gap-[24px]">
         <h1 className="text-[28px] font-semibold leading-[1.2] text-slate">
-          {t.signInCta}
+          {t.signInHeading}
         </h1>
-        <SignInForm copy={{ emailLabel: t.emailLabel, signInCta: t.signInCta }} />
+        <SignInForm
+          copy={{
+            emailLabel: t.emailLabel,
+            passwordLabel: t.passwordLabel,
+            signInCta: t.signInCta,
+            forgotPasswordLink: t.forgotPasswordLink,
+          }}
+        />
       </div>
     </main>
   );

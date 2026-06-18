@@ -15,7 +15,12 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: ["./vitest.setup.ts"],
-    include: ["platform/**/*.test.{ts,tsx}", "modules/**/*.test.{ts,tsx}"],
+    include: [
+      "platform/**/*.test.{ts,tsx}",
+      "modules/**/*.test.{ts,tsx}",
+      // Co-located route-handler/action unit tests (e.g. companies lifecycle, D-12).
+      "app/**/*.test.{ts,tsx}",
+    ],
     exclude: ["tests/e2e/**", "node_modules/**", ".next/**"],
   },
 });

@@ -7,6 +7,7 @@
 // dictionary; chrome is slate console (60/30/10 — slate secondary surface). The
 // onboarding (companies/properties/transfers) arrives in Phase 2.
 import Image from "next/image";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentRole } from "@/platform/auth/role";
 import { getDict, getLang } from "@/platform/i18n/dictionary";
@@ -48,6 +49,24 @@ export default async function AdminPage() {
         <p className="mt-[16px] text-[16px] leading-[1.5] text-grey">
           {t.emptyBody}
         </p>
+
+        {/* Console section nav (Phase 2). Each link routes to a CRUD surface. */}
+        <nav className="mt-[32px] flex flex-col gap-[8px]">
+          {[
+            { href: "/admin/companies", label: t.companiesTitle },
+            { href: "/admin/properties", label: t.propertiesTitle },
+            { href: "/admin/destinations", label: t.destinationsTitle },
+            { href: "/admin/drivers", label: t.driversTitle },
+          ].map((section) => (
+            <Link
+              key={section.href}
+              href={section.href}
+              className="inline-flex min-h-[44px] items-center rounded-md border border-grey/30 px-[16px] text-[16px] font-semibold text-slate hover:bg-slate/5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+            >
+              {section.label}
+            </Link>
+          ))}
+        </nav>
       </section>
     </main>
   );

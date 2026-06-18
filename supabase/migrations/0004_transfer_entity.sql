@@ -68,3 +68,60 @@ comment on column public.wp_transfers.driver_id is
 create index if not exists wp_transfers_arrival_at_idx  on public.wp_transfers (arrival_at);
 -- The guest-self-read RLS policy filters on guest_email — back it with an index.
 create index if not exists wp_transfers_guest_email_idx on public.wp_transfers (guest_email);
+
+-- ============================================================================
+-- 2) BEFORE-UPDATE lifecycle transition-guard trigger — the full 8-state machine
+--    (D-08/D-09/D-10). This is the HARD enforcement boundary: it fires for EVERY writer,
+--    including the service-role webhook and the future claim RPC. The service-role client
+--    bypasses RLS, NOT triggers — so lifecycle legality is guaranteed regardless of who writes.
+--    The app-layer platform/transfers/lifecycle.ts ALLOWED_TRANSITIONS map is the cosmetic
+--    friendly-error mirror of THIS table; the exhaustive 8×8 unit test pins the two together
+--    (T-04-01). The allowed pairs below MUST match that TS map exactly.
+--
+--    D-10 STATE-vs-ACTOR split: this trigger guarantees STATE legality only — `cancelled` is
+--    reachable only from the five pre-pickup states (requested/paid/claimed/en_route/arrived),
+--    and `picked_up`/`completed`/`cancelled` are terminal. The ACTOR legality (e.g. admin-only
+--    cancel) is an app-layer getCurrentRole() gate landing in Phase 6 — the trigger has NO auth
+--    context on the service-role path, so it deliberately does not enforce who may cancel.
+-- ============================================================================
+create or replace function public.wp_enforce_transfer_transition()
+returns trigger
+language plpgsql
+as $$
+begin
+  -- No-op / non-status update pass-through: a same-status UPDATE (or any update that does not
+  -- touch status) is always legal. `is not distinct from` is NULL-safe. This composes with the
+  -- webhook's `.neq("status","paid")` backstop — a redundant requested→paid retry that already
+  -- landed `paid` short-circuits at the client query, and any non-status column edit passes here.
+  if new.status is not distinct from old.status then
+    return new;
+  end if;
+
+  -- The complete allowed-transition map — EXACTLY mirrors platform/transfers/lifecycle.ts
+  -- ALLOWED_TRANSITIONS. requested→paid is load-bearing (Pitfall 4 / T-04-TMP2): without it the
+  -- verified Stripe webhook can never flip a requested transfer to paid and Stripe retries forever.
+  if not (
+       (old.status = 'requested' and new.status in ('paid', 'cancelled'))
+    or (old.status = 'paid'      and new.status in ('claimed', 'cancelled'))
+    or (old.status = 'claimed'   and new.status in ('en_route', 'cancelled'))
+    or (old.status = 'en_route'  and new.status in ('arrived', 'cancelled'))
+    or (old.status = 'arrived'   and new.status in ('picked_up', 'cancelled'))
+    or (old.status = 'picked_up' and new.status in ('completed'))
+    -- 'completed' and 'cancelled' are terminal: no outbound transition is permitted from either.
+  ) then
+    raise exception 'illegal transfer transition: % -> %', old.status, new.status
+      using errcode = 'check_violation';
+  end if;
+
+  return new;
+end;
+$$;
+
+comment on function public.wp_enforce_transfer_transition() is
+  'BEFORE-UPDATE lifecycle guard (D-08/D-09/D-10). Encodes the full 8-state map mirroring platform/transfers/lifecycle.ts; permits requested→paid (Pitfall 4); raises check_violation on any illegal jump. Fires for ALL writers incl. service-role (triggers are not bypassed; only RLS is). State legality only — actor legality is the Phase-6 app gate.';
+
+-- drop-if-exists first for re-runnability, then (re)create the BEFORE UPDATE, FOR EACH ROW trigger.
+drop trigger if exists wp_transfers_transition_guard on public.wp_transfers;
+create trigger wp_transfers_transition_guard
+  before update on public.wp_transfers
+  for each row execute function public.wp_enforce_transfer_transition();

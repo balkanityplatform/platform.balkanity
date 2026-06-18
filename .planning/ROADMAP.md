@@ -88,7 +88,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2; 03 + 05 run in parallel)*
 
-- [ ] 02-03-PLAN.md — Properties CRUD under a company (D-12 bottom-up deactivation)
+- [x] 02-03-PLAN.md — Properties CRUD under a company (D-12 bottom-up deactivation)
 - [ ] 02-05-PLAN.md — [SIGN-OFF] Driver invite (generateLink, no email) + Redirect-URLs allowlist checkpoint
 
 **Wave 4** *(blocked on Wave 3 / 02-03)*
@@ -207,7 +207,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
-| 2. Supply-Side Onboarding | 2/5 | In Progress|  |
+| 2. Supply-Side Onboarding | 3/5 | In Progress|  |
 | 3. Payments Trust Spine | 0/TBD | Not started | - |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |
 | 5. Claim Correctness | 0/TBD | Not started | - |

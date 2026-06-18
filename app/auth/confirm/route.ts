@@ -1,17 +1,22 @@
-// app/auth/confirm/route.ts — magic-link verification (AUTH-04 / D-01).
+// app/auth/confirm/route.ts — email-link verification (AUTH-04).
 //
 // The emailed link lands here and establishes a server-side session (auth cookies
-// set via the @supabase/ssr server client), then redirects to `/`, which
-// role-redirects (Task 3). Two link shapes are supported:
+// set via the @supabase/ssr server client), then redirects by link purpose:
+//   - recovery / invite → /set-password (the user now has a session and must set
+//     a password before continuing; /set-password role-routes on success).
+//   - email / magiclink → /          (guest/legacy passwordless links; `/` role-routes).
+//
+// Two link shapes are supported:
 //
 //   (a) PKCE code flow — `?code=...`. This is what Supabase's DEFAULT email
 //       template emits: `{{ .ConfirmationURL }}` hits Supabase's /auth/v1/verify,
 //       which redirects back here with an auth code. Required on the free tier,
 //       where the email template cannot be customised without custom SMTP.
 //       Same-browser only (the PKCE code_verifier cookie is set at send time).
-//   (b) token_hash flow — `?token_hash=...&type=email`. Used once a custom email
-//       template (`{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email`)
-//       is configured via custom SMTP / Resend (Phase 7); also works cross-device.
+//       Redirects to `/` (the type is not carried on the code flow).
+//   (b) token_hash flow — `?token_hash=...&type=<recovery|invite|email|magiclink>`.
+//       Used once a custom email template is configured via custom SMTP / Resend
+//       (Phase 7); also works cross-device.
 //
 // On failure or missing params, bounce back to /sign-in with an error flag.
 // Node runtime — Supabase auth cookie handling.
@@ -27,12 +32,23 @@ export async function GET(request: NextRequest) {
   const token_hash = searchParams.get("token_hash");
 
   // Allowlist the OTP type at this auth trust boundary — never forward an
-  // attacker-supplied `type` verbatim. This admin-only magic-link flow only
-  // ever uses passwordless email links, so accept only `email`/`magiclink`
-  // (WR-03). Anything else falls through to the error redirect below.
+  // attacker-supplied `type` verbatim (WR-03). AUTH-04 adds `recovery` (forgot
+  // password) and `invite` (admin-driven account creation) alongside the legacy
+  // passwordless `email`/`magiclink`. Anything else falls through to the error
+  // redirect below.
   const rawType = searchParams.get("type");
   const type: EmailOtpType | null =
-    rawType === "email" || rawType === "magiclink" ? rawType : null;
+    rawType === "recovery" ||
+    rawType === "invite" ||
+    rawType === "email" ||
+    rawType === "magiclink"
+      ? rawType
+      : null;
+
+  // recovery/invite sessions must land on the set-password screen; passwordless
+  // links continue to `/` (role-routes). Computed from the validated `type`.
+  const verifiedDest =
+    type === "recovery" || type === "invite" ? "/set-password" : "/";
 
   const supabase = await createClient();
 
@@ -47,7 +63,8 @@ export async function GET(request: NextRequest) {
     // (b) Custom-template token_hash flow.
     const { error } = await supabase.auth.verifyOtp({ token_hash, type });
     if (!error) {
-      return NextResponse.redirect(new URL("/", origin));
+      // recovery/invite → /set-password; email/magiclink → / (see verifiedDest).
+      return NextResponse.redirect(new URL(verifiedDest, origin));
     }
   }
 

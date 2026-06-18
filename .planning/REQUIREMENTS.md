@@ -29,7 +29,7 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 - [x] **ONBD-03**: Admin can create, edit, and list destinations (slug, label, address, zone, airport, active)
 - [x] **ONBD-04**: Admin sets price + commission per destination with a live "you keep" calculation
 - [x] **ONBD-05**: Admin can invite drivers from the console
-- [ ] **ONBD-06**: A second company can be onboarded entirely through the UI (no code/DB edits)
+- [x] **ONBD-06**: A second company can be onboarded entirely through the UI (no code/DB edits)
 
 ### Booking & Payment (Guest)
 
@@ -128,7 +128,7 @@ Which phases cover which requirements. Populated during roadmap creation.
 | ONBD-03 | Phase 2 — Supply-Side Onboarding | Complete |
 | ONBD-04 | Phase 2 — Supply-Side Onboarding | Complete |
 | ONBD-05 | Phase 2 — Supply-Side Onboarding | Complete |
-| ONBD-06 | Phase 2 — Supply-Side Onboarding | Pending |
+| ONBD-06 | Phase 2 — Supply-Side Onboarding | Complete |
 | AUTH-03 | Phase 2 — Supply-Side Onboarding | Pending |
 | NOTF-04 | Phase 2 — Supply-Side Onboarding | Pending |
 | BOOK-05 | Phase 3 — Payments Trust Spine | Pending |

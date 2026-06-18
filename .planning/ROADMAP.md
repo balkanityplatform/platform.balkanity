@@ -93,7 +93,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 / 02-03)*
 
-- [ ] 02-04-PLAN.md — Destinations CRUD (slug auto-fill + "you keep" panel) + second-company e2e (ONBD-06)
+- [x] 02-04-PLAN.md — Destinations CRUD (slug auto-fill + "you keep" panel) + second-company e2e (ONBD-06)
 **Notes**: REVIEW/SIGN-OFF REQUIRED — schema migration (platform companies/properties/destinations + invite handling) and admin-only RLS policies. Keep these tables platform-generic (no transfer-specific columns). Driver-invite email send may be stubbed here and fully wired to the Resend wrapper in Phase 7.
 **UI hint**: yes
 
@@ -207,7 +207,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
-| 2. Supply-Side Onboarding | 3/5 | In Progress|  |
+| 2. Supply-Side Onboarding | 4/5 | In Progress|  |
 | 3. Payments Trust Spine | 0/TBD | Not started | - |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |
 | 5. Claim Correctness | 0/TBD | Not started | - |

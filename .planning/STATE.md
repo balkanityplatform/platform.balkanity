@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-06-18T14:05:43.915Z"
+last_updated: "2026-06-18T14:23:35.315Z"
 last_activity: 2026-06-18
 progress:
   total_phases: 8
   completed_phases: 1
   total_plans: 10
-  completed_plans: 8
+  completed_plans: 9
   percent: 13
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 02 (supply-side-onboarding) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-06-18
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 90%
 
 ## Handoff (for a new session)
 
@@ -65,6 +65,7 @@ Progress: [████████░░] 80%
 | Phase 02 P01 | 8 | 3 tasks | 9 files |
 | Phase 02 P02 | 22min | 2 tasks | 8 files |
 | Phase 02 P03 | 3min | 2 tasks | 5 files |
+| Phase 02 P04 | 5min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [02-02]: Companies CRUD pattern — RSC anon RLS read + service-role write behind getCurrentRole() re-gate (two gates); D-12 (no deactivate with active children) enforced in-action + FK on delete restrict backstop
 - [Phase ?]: [02-03]: Properties slice — parent-company Select is create-only (updateProperty changes name only; parent FK fixed once created); parent name appended to DataList label (name — Company) rather than extending the shared single-label primitive
 - [Phase ?]: [02-03]: Create form gated on >=1 active company (picker offers active companies only); deleteProperty reuses deactivatePropertyBlocked copy for non-childless rows with FK on delete restrict as the DB backstop (ONBD-02 complete)
+- [Phase 02-04]: Destinations slug write path — server slugify() base + nextSlugCandidate probe; DB destinations_slug_key unique index is the race-safe authority (23505 → slugTaken, D-09); parent-property Select is create-only
+- [Phase 02-04]: Live 'you keep' panel (D-06) is a display-only useMemo recompute from pure commission utils (never persisted); proven green by a fireEvent component test — no @testing-library/user-event dependency added
 
 ### Pending Todos
 
@@ -119,6 +122,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-18T14:05:43.910Z
+Last session: 2026-06-18T14:23:09.173Z
 Stopped at: Completed 02-03-PLAN.md
 Resume file: None

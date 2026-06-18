@@ -159,7 +159,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2; 03 + 04 run in parallel)*
 
-- [ ] 04-03-PLAN.md — Booking slice: /pickup/[slug] page + BookingForm + PaxStepper + createBooking action → Stripe Checkout (BOOK-01/02/03/04)
+- [x] 04-03-PLAN.md — Booking slice: /pickup/[slug] page + BookingForm + PaxStepper + createBooking action → Stripe Checkout (BOOK-01/02/03/04)
 - [ ] 04-04-PLAN.md — Status/track slice: confirmation-email stub off paid + LifecycleTimeline + /status/[id] RLS read + /track + /auth/confirm next-threading + sw.ts NetworkFirst (BOOK-06/07, AUTH-02)
 
 **Wave 4** *(blocked on Wave 3)*
@@ -246,7 +246,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
 | 3. Payments Trust Spine | 5/5 | Complete    | 2026-06-18 |
-| 4. Transfer Entity + Booking Form | 2/5 | In Progress|  |
+| 4. Transfer Entity + Booking Form | 3/5 | In Progress|  |
 | 5. Claim Correctness | 0/TBD | Not started | - |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |
 | 7. Notifications | 0/TBD | Not started | - |

@@ -34,9 +34,9 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 ### Booking & Payment (Guest)
 
 - [x] **BOOK-01**: Guest opens a per-destination slug page (`/pickup/<slug>`) showing the destination and fare
-- [ ] **BOOK-02**: Guest completes a short booking form (email required; phone, flight no., pax, luggage, notes as applicable) — guestless checkout
-- [ ] **BOOK-03**: Booking creates a transfer in `requested` and a code-created Stripe Checkout Session (not a dashboard Payment Link)
-- [ ] **BOOK-04**: Checkout clearly states the booking is prepaid & non-refundable before payment
+- [x] **BOOK-02**: Guest completes a short booking form (email required; phone, flight no., pax, luggage, notes as applicable) — guestless checkout
+- [x] **BOOK-03**: Booking creates a transfer in `requested` and a code-created Stripe Checkout Session (not a dashboard Payment Link)
+- [x] **BOOK-04**: Checkout clearly states the booking is prepaid & non-refundable before payment
 - [x] **BOOK-05**: `paid` is set ONLY by a signature-verified Stripe webhook (raw body), idempotent on Stripe event id; the client success redirect never sets `paid`
 - [ ] **BOOK-06**: On `paid`, the guest receives a booking confirmation email (Resend)
 - [ ] **BOOK-07**: Guest status page shows a live lifecycle timeline and a visible payment record/receipt (proof of prepay)
@@ -134,9 +134,9 @@ Which phases cover which requirements. Populated during roadmap creation.
 | BOOK-05 | Phase 3 — Payments Trust Spine | Complete |
 | HLTH-01 | Phase 3 — Payments Trust Spine | Complete |
 | BOOK-01 | Phase 4 — Transfer Entity + Booking Form | Complete |
-| BOOK-02 | Phase 4 — Transfer Entity + Booking Form | Pending |
-| BOOK-03 | Phase 4 — Transfer Entity + Booking Form | Pending |
-| BOOK-04 | Phase 4 — Transfer Entity + Booking Form | Pending |
+| BOOK-02 | Phase 4 — Transfer Entity + Booking Form | Complete |
+| BOOK-03 | Phase 4 — Transfer Entity + Booking Form | Complete |
+| BOOK-04 | Phase 4 — Transfer Entity + Booking Form | Complete |
 | BOOK-06 | Phase 4 — Transfer Entity + Booking Form | Pending |
 | BOOK-07 | Phase 4 — Transfer Entity + Booking Form | Pending |
 | XFER-01 | Phase 4 — Transfer Entity + Booking Form | Complete |

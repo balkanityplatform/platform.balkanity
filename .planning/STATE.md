@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-06-18T20:03:03.357Z"
+last_updated: "2026-06-18T20:09:57.891Z"
 last_activity: 2026-06-18
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 20
-  completed_plans: 17
+  completed_plans: 18
   percent: 38
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 04 (transfer-entity-booking-form) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-06-18
 
-Progress: [█████████░] 85%
+Progress: [█████████░] 90%
 
 ## Handoff (for a new session)
 
@@ -72,6 +72,7 @@ Progress: [█████████░] 85%
 | Phase 03 P03 | 14min | 2 tasks | 4 files |
 | Phase 03 P04 | 4 | 2 tasks | 4 files |
 | Phase 04 P02 | 2min | 3 tasks | 1 files |
+| Phase 04 P03 | 3min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [04-02]: Migration 0004 authored (FILE ONLY, apply deferred to Plan 05) — wp_transfers ALTER adds NULL-able guest PII + lifecycle + driver_id scaffold (D-06); existing Phase-3 seed rows survive (additive, no NOT NULL/defaults)
 - [Phase ?]: [04-02]: BEFORE-UPDATE trigger wp_enforce_transfer_transition encodes the full 8-state map mirroring platform/transfers/lifecycle.ts exactly; permits requested->paid (Pitfall 4); raises check_violation on illegal jumps; fires on service-role webhook (D-08, triggers not bypassed)
 - [Phase ?]: [04-02]: RLS guest-self-read uses (select auth.jwt() ->> 'email') = guest_email (never deprecated email() helper); destinations_public_active_read (active=true, to anon) unblocks /pickup (BOOK-01); no-write-policy lock preserved
+- [Phase ?]: Booking is a public server-action surface (no getCurrentRole gate); zod schema + server-re-read amount are the only gates (04-03)
+- [Phase ?]: Server-trusted amount: createBooking re-reads destinations.price_cents by slug for both the row and the Checkout Session; the booking form submits no amount input (04-03, Pitfall 5)
 
 ### Pending Todos
 
@@ -143,6 +146,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-18T20:03:03.351Z
+Last session: 2026-06-18T20:09:34.750Z
 Stopped at: Completed 04-02-PLAN.md
 Resume file: None

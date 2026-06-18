@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Platform Foundation** - Platform/module seam, auth & roles, typed Supabase clients, design system, EN/BG toggle, installable PWA shell (completed 2026-06-17)
 - [x] **Phase 2: Supply-Side Onboarding** - Admin no-code CRUD for companies/properties/destinations + price/commission, slug links, and driver invites
 - [x] **Phase 3: Payments Trust Spine** - Code-created Checkout Session + signature-verified idempotent webhook as the sole `paid` author, with webhook_events log; migration 0003 live on Balkanity, all 5 success criteria verified incl. live Stripe-CLI replay (completed 2026-06-18)
-- [ ] **Phase 4: Transfer Entity + Booking Form** - Guest books & prepays via slug link, lifecycle state machine, confirmation email, and magic-link status page
+- [x] **Phase 4: Transfer Entity + Booking Form** - Guest books & prepays via slug link, lifecycle state machine, confirmation email, and magic-link status page (completed 2026-06-18)
 - [ ] **Phase 5: Claim Correctness** - Masked pool view, atomic claim RPC (0 double-claims), and data-layer PII gating via RLS
 - [ ] **Phase 6: Driver & Admin Views** - Driver pool/my-run/detail and admin transfers list/detail with assign/reassign/cancel/refund
 - [ ] **Phase 7: Notifications** - In-app feed/bell, Resend wrapper with cap guardrails + email_log, guest/admin emails, opt-in driver digest
@@ -164,7 +164,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3)*
 
-- [ ] 04-05-PLAN.md — [BLOCKING/SIGN-OFF] apply migration 0004 to Balkanity + adversarial DB-trigger/RLS runbook + full booking→pay→confirm→track end-to-end smoke
+- [x] 04-05-PLAN.md — [BLOCKING/SIGN-OFF] apply migration 0004 to Balkanity + adversarial DB-trigger/RLS runbook + full booking→pay→confirm→track end-to-end smoke
 
 **Notes**: REVIEW/SIGN-OFF REQUIRED — `wp_transfers` schema migration (lifecycle fields + PII columns) is flagged/irreversible; sign off before applying. Status/booking data must never be served stale from the SW cache (NetworkFirst / Realtime). Confirmation email may call a stubbed wrapper, fully guarded in Phase 7. Avoids Pitfalls 1, 12.
 **UI hint**: yes
@@ -246,7 +246,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
 | 3. Payments Trust Spine | 5/5 | Complete    | 2026-06-18 |
-| 4. Transfer Entity + Booking Form | 4/5 | In Progress|  |
+| 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
 | 5. Claim Correctness | 0/TBD | Not started | - |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |
 | 7. Notifications | 0/TBD | Not started | - |

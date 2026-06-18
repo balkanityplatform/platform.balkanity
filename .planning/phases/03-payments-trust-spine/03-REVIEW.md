@@ -20,11 +20,13 @@ files_reviewed_list:
   - tests/e2e/webhook-forged.spec.ts
   - tests/e2e/success-spoof.spec.ts
 findings:
-  critical: 2
+  critical: 0   # 2 found, both RESOLVED in 7b956d4 (see Resolution Log)
+  critical_found: 2
+  critical_resolved: 2
   warning: 6
   info: 4
   total: 12
-status: issues_found
+status: criticals_resolved
 ---
 
 # Phase 3: Code Review Report
@@ -32,7 +34,23 @@ status: issues_found
 **Reviewed:** 2026-06-18
 **Depth:** standard
 **Files Reviewed:** 15
-**Status:** issues_found
+**Status:** criticals_resolved (2 Critical fixed in `7b956d4`; 6 Warning + 4 Info remain advisory)
+
+## Resolution Log
+
+- **CR-01 (swallowed DB errors → HTTP 200 / silent money loss): RESOLVED** in `7b956d4`.
+  The webhook now captures every Supabase `error` channel. A transient failure on the
+  audit insert or the `paid` UPDATE returns HTTP 500 so Stripe retries; a failed paid
+  write records `outcome=write_failed` (distinct from `no_matching_transfer`) so
+  reconciliation can tell them apart.
+- **CR-02 (idempotency relied on falsy data, not the 23505 UNIQUE violation): RESOLVED**
+  in `7b956d4`. The replay short-circuit now branches explicitly on Postgres `23505`.
+  New behavioral test `app/api/stripe/webhook/route.idempotency.test.ts` proves a
+  replayed `event_id` returns `200 {duplicate:true}` with ZERO `wp_transfers` writes
+  (SC3), and that transient insert/paid errors return 500. Full suite 86/86 green.
+- **Warnings (WR-01..06) + Info (IN-01..04): OPEN (advisory).** Notable: `stripe_checkout_session_id`
+  never persisted; `recordedFeeCents` lacks an integer guard; `pay/start` gates on
+  `NODE_ENV`; `NEXT_PUBLIC_SITE_URL` empty-fallback. Tracked for a follow-up pass.
 
 ## Summary
 

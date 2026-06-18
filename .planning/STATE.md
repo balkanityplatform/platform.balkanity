@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 02-03-PLAN.md
-last_updated: "2026-06-18T14:23:35.315Z"
+stopped_at: Completed 02-05-PLAN.md (Phase 02 complete; 1 manual UAT open)
+last_updated: "2026-06-18T00:00:00.000Z"
 last_activity: 2026-06-18
 progress:
   total_phases: 8
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 10
-  completed_plans: 9
-  percent: 13
+  completed_plans: 10
+  percent: 25
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 
 ## Current Position
 
-Phase: 02 (supply-side-onboarding) — EXECUTING
-Plan: 5 of 5
-Status: Ready to execute
+Phase: 02 (supply-side-onboarding) — COMPLETE
+Plan: 5 of 5 (complete)
+Status: Phase complete — 1 manual UAT open (signed-in driver-invite walkthrough)
 Last activity: 2026-06-18
 
-Progress: [█████████░] 90%
+Progress: [██████████] 100%
 
 ## Handoff (for a new session)
 
@@ -66,6 +66,7 @@ Progress: [█████████░] 90%
 | Phase 02 P02 | 22min | 2 tasks | 8 files |
 | Phase 02 P03 | 3min | 2 tasks | 5 files |
 | Phase 02 P04 | 5min | 3 tasks | 7 files |
+| Phase 02 P05 | continuation | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [02-03]: Create form gated on >=1 active company (picker offers active companies only); deleteProperty reuses deactivatePropertyBlocked copy for non-childless rows with FK on delete restrict as the DB backstop (ONBD-02 complete)
 - [Phase 02-04]: Destinations slug write path — server slugify() base + nextSlugCandidate probe; DB destinations_slug_key unique index is the race-safe authority (23505 → slugTaken, D-09); parent-property Select is create-only
 - [Phase 02-04]: Live 'you keep' panel (D-06) is a display-only useMemo recompute from pure commission utils (never persisted); proven green by a fireEvent component test — no @testing-library/user-event dependency added
+- [Phase 02-05]: Driver invite via auth.admin.generateLink({type:'invite'}) — creates the auth user + returns the set-password action_link with NO email (D-03, NOTF-04 stubbed → Phase 7); role='driver' written as the literal server-side (never from FormData, T-02-EOP5); invite is the only driver-account path (AUTH-03, no open signup)
+- [Phase 02-05]: redirectTo = ${NEXT_PUBLIC_SITE_URL}/auth/confirm?type=invite (trusted constant, never Origin header — WR-04); URL must be in the Supabase Redirect-URLs allowlist or it silently falls back to Site URL (Pitfall 1) — applied on Balkanity (qyhdogajtmnvxphrslwm); single generic driverAlreadyInvited on re-invite (no enumeration, T-02-ID5)
 
 ### Pending Todos
 
@@ -103,6 +106,7 @@ None yet.
 
 [Issues that affect future work]
 
+- OPEN MANUAL UAT (02-05): signed-in production walkthrough of the driver invite — admin logs in → /admin/drivers → submit invite → confirm the revealed action_link contains /auth/confirm?type=invite and resolves to /set-password → set password → resolves to driver role. Proves AUTH-03 + NOTF-04 end-to-end; creates a real auth user. Code + project config (Redirect-URLs allowlist + NEXT_PUBLIC_SITE_URL) shipped; only the live walkthrough is outstanding.
 - Open decision (before Phase 3): settlement currency EUR vs BGN (affects fee display; EUR 0.25 vs EUR 0.26 discrepancy).
 - Open decision (before Phase 8 / go-live): Supabase Pro vs free + external keep-alive for the real-money pilot.
 - Verify before relying: Resend verified-domain count (Phase 7), pg_cron ≥1.6.4 on Balkanity project (Phase 8).
@@ -122,6 +126,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-18T14:23:09.173Z
-Stopped at: Completed 02-03-PLAN.md
+Last session: 2026-06-18T00:00:00.000Z
+Stopped at: Completed 02-05-PLAN.md — Phase 02 complete (1 manual UAT open)
 Resume file: None

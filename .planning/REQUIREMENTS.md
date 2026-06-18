@@ -19,7 +19,7 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 
 - [x] **AUTH-01**: Users have an app role ∈ {admin, driver, guest} enforced across the app
 - [ ] **AUTH-02**: Guest can view their transfer status via a passwordless Supabase magic link
-- [ ] **AUTH-03**: Drivers are admin-invited contractors only (no open signup); invite flow creates a driver account
+- [x] **AUTH-03**: Drivers are admin-invited contractors only (no open signup); invite flow creates a driver account _(code + project config shipped in 02-05; complete-pending-UAT — one signed-in production walkthrough open: admin → /admin/drivers → invite → action_link resolves to /set-password → driver role)_
 - [x] **AUTH-04**: Admin can sign in to the desktop console via **email + password** (classic credentials). _Decision change 2026-06-18: reverses D-01 (passwordless magic-link) for admin/driver LOGIN → email+password; accounts are admin-created with an invite-to-set-password email + self-service password reset. Magic-link/tokenized access is retained only for guest transfer status (AUTH-02). Role layer (AUTH-01) unchanged._
 
 ### Supply-Side Onboarding (Admin, no-code)
@@ -56,7 +56,7 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 - [ ] **NOTF-01**: Per-user in-app notification feed/bell (shared platform feature; primary channel for drivers)
 - [ ] **NOTF-02**: Guest receives a "driver assigned" email on `claimed` and a "driver has arrived" email on `arrived` (no email on `en_route`)
 - [ ] **NOTF-03**: Admin receives a booking alert email on new paid booking
-- [ ] **NOTF-04**: Driver receives an invite email
+- [x] **NOTF-04**: Driver receives an invite email _(stubbed in 02-05 as a copy-paste set-password link revealed inline — D-03; complete-pending-UAT for the invite path, Resend email send wires in Phase 7)_
 - [ ] **NOTF-05**: Drivers get an opt-in daily digest at a self-chosen time instead of per-transfer email
 - [ ] **NOTF-06**: An email send-guardrail + `email_log` track volume and alarm before the Resend daily cap
 
@@ -129,8 +129,8 @@ Which phases cover which requirements. Populated during roadmap creation.
 | ONBD-04 | Phase 2 — Supply-Side Onboarding | Complete |
 | ONBD-05 | Phase 2 — Supply-Side Onboarding | Complete |
 | ONBD-06 | Phase 2 — Supply-Side Onboarding | Complete |
-| AUTH-03 | Phase 2 — Supply-Side Onboarding | Pending |
-| NOTF-04 | Phase 2 — Supply-Side Onboarding | Pending |
+| AUTH-03 | Phase 2 — Supply-Side Onboarding | Complete (pending UAT) |
+| NOTF-04 | Phase 2 — Supply-Side Onboarding | Complete (pending UAT; email send → Phase 7) |
 | BOOK-05 | Phase 3 — Payments Trust Spine | Pending |
 | HLTH-01 | Phase 3 — Payments Trust Spine | Pending |
 | BOOK-01 | Phase 4 — Transfer Entity + Booking Form | Pending |

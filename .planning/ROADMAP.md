@@ -14,7 +14,7 @@ This roadmap delivers the first module of the Balkanity Platform — Welcome Pic
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Platform Foundation** - Platform/module seam, auth & roles, typed Supabase clients, design system, EN/BG toggle, installable PWA shell (completed 2026-06-17)
-- [ ] **Phase 2: Supply-Side Onboarding** - Admin no-code CRUD for companies/properties/destinations + price/commission, slug links, and driver invites
+- [x] **Phase 2: Supply-Side Onboarding** - Admin no-code CRUD for companies/properties/destinations + price/commission, slug links, and driver invites
 - [ ] **Phase 3: Payments Trust Spine** - Code-created Checkout Session + signature-verified idempotent webhook as the sole `paid` author, with webhook_events log
 - [ ] **Phase 4: Transfer Entity + Booking Form** - Guest books & prepays via slug link, lifecycle state machine, confirmation email, and magic-link status page
 - [ ] **Phase 5: Claim Correctness** - Masked pool view, atomic claim RPC (0 double-claims), and data-layer PII gating via RLS
@@ -89,7 +89,7 @@ Plans:
 **Wave 3** *(blocked on Wave 2; 03 + 05 run in parallel)*
 
 - [x] 02-03-PLAN.md — Properties CRUD under a company (D-12 bottom-up deactivation)
-- [ ] 02-05-PLAN.md — [SIGN-OFF] Driver invite (generateLink, no email) + Redirect-URLs allowlist checkpoint
+- [x] 02-05-PLAN.md — [SIGN-OFF] Driver invite (generateLink, no email) + Redirect-URLs allowlist checkpoint (project config applied; 1 manual UAT open)
 
 **Wave 4** *(blocked on Wave 3 / 02-03)*
 
@@ -207,7 +207,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
-| 2. Supply-Side Onboarding | 4/5 | In Progress|  |
+| 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
 | 3. Payments Trust Spine | 0/TBD | Not started | - |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |
 | 5. Claim Correctness | 0/TBD | Not started | - |

@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: "Completed 03-03-PLAN.md (payments seam: stripe.ts/checkout.ts/fee.ts)"
+stopped_at: "Phase 03 executed (all 5 plans), migration 0003 live on Balkanity, verified 4/5 (human_needed: SC3 live Stripe-CLI replay pending — see 03-UAT.md)"
 last_updated: "2026-06-18T17:38:09.956Z"
 last_activity: 2026-06-18
 progress:
@@ -25,9 +25,9 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 
 ## Current Position
 
-Phase: 03 (payments-trust-spine) — EXECUTING
-Plan: 5 of 5
-Status: Ready to execute
+Phase: 03 (payments-trust-spine) — VERIFICATION human_needed
+Plan: 5 of 5 executed
+Status: Built + migration live + verified 4/5; SC3 live Stripe-CLI replay demo pending (03-UAT.md). Run `/gsd-verify-work 3` after the replay to mark the phase complete.
 Last activity: 2026-06-18
 
 Progress: [█████████░] 93%

@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Platform Foundation** - Platform/module seam, auth & roles, typed Supabase clients, design system, EN/BG toggle, installable PWA shell (completed 2026-06-17)
 - [x] **Phase 2: Supply-Side Onboarding** - Admin no-code CRUD for companies/properties/destinations + price/commission, slug links, and driver invites
-- [x] **Phase 3: Payments Trust Spine** - Code-created Checkout Session + signature-verified idempotent webhook as the sole `paid` author, with webhook_events log (completed 2026-06-18)
+- [ ] **Phase 3: Payments Trust Spine** - Code-created Checkout Session + signature-verified idempotent webhook as the sole `paid` author, with webhook_events log (built + migration live + verified 4/5 on 2026-06-18; pending SC3 live Stripe-CLI replay demo — see 03-UAT.md)
 - [ ] **Phase 4: Transfer Entity + Booking Form** - Guest books & prepays via slug link, lifecycle state machine, confirmation email, and magic-link status page
 - [ ] **Phase 5: Claim Correctness** - Masked pool view, atomic claim RPC (0 double-claims), and data-layer PII gating via RLS
 - [ ] **Phase 6: Driver & Admin Views** - Driver pool/my-run/detail and admin transfers list/detail with assign/reassign/cancel/refund

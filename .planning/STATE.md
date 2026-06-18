@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 3 context gathered
-last_updated: "2026-06-18T16:59:13.109Z"
-last_activity: 2026-06-18 -- Phase 03 planning complete
+last_updated: "2026-06-18T17:18:57.564Z"
+last_activity: 2026-06-18
 progress:
   total_phases: 8
   completed_phases: 2
-  total_plans: 10
-  completed_plans: 10
+  total_plans: 15
+  completed_plans: 11
   percent: 25
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
-**Current focus:** Phase 02 — supply-side-onboarding
+**Current focus:** Phase 03 — payments-trust-spine
 
 ## Current Position
 
-Phase: 02 (supply-side-onboarding) — COMPLETE
-Plan: 5 of 5 (complete)
+Phase: 03 (payments-trust-spine) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-06-18 -- Phase 03 planning complete
+Last activity: 2026-06-18
 
-Progress: [██████████] 100%
+Progress: [███████░░░] 73%
 
 ## Handoff (for a new session)
 
@@ -67,6 +67,7 @@ Progress: [██████████] 100%
 | Phase 02 P03 | 3min | 2 tasks | 5 files |
 | Phase 02 P04 | 5min | 3 tasks | 7 files |
 | Phase 02 P05 | continuation | 3 tasks | 6 files |
+| Phase 03 P01 | 9min | 3 tasks tasks | 10 files files |
 
 ## Accumulated Context
 
@@ -95,6 +96,9 @@ Recent decisions affecting current work:
 - [Phase 02-04]: Live 'you keep' panel (D-06) is a display-only useMemo recompute from pure commission utils (never persisted); proven green by a fireEvent component test — no @testing-library/user-event dependency added
 - [Phase 02-05]: Driver invite via auth.admin.generateLink({type:'invite'}) — creates the auth user + returns the set-password action_link with NO email (D-03, NOTF-04 stubbed → Phase 7); role='driver' written as the literal server-side (never from FormData, T-02-EOP5); invite is the only driver-account path (AUTH-03, no open signup)
 - [Phase 02-05]: redirectTo = ${NEXT_PUBLIC_SITE_URL}/auth/confirm?type=invite (trusted constant, never Origin header — WR-04); URL must be in the Supabase Redirect-URLs allowlist or it silently falls back to Site URL (Pitfall 1) — applied on Balkanity (qyhdogajtmnvxphrslwm); single generic driverAlreadyInvited on re-invite (no enumeration, T-02-ID5)
+- [Phase ?]: [03-01]: 7 Nyquist payment-contract scaffolds land RED first (single paid writer, nodejs+raw-body webhook, migration-0003 RLS/UNIQUE, EUR/integer checkout, real-fee, forged-400 + success-spoof); targets in Plans 02-05 turn them GREEN
+- [Phase ?]: [03-01]: stripe@^22.2.1 installed (official SDK, empty postinstall, no @stripe/stripe-js); apiVersion '2026-05-27.dahlia' type-checks against v22 typings (no cast)
+- [Phase ?]: [03-01]: checkout/fee contract tests use runtime-string dynamic import + typed cast so they tsc-clean before the impl exists while staying RED at runtime
 
 ### Pending Todos
 
@@ -126,6 +130,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-18T16:19:58.861Z
+Last session: 2026-06-18T17:18:36.585Z
 Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-payments-trust-spine/03-CONTEXT.md
+Resume file: None

@@ -115,7 +115,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Wave 0 test baseline (5 vitest + 2 Playwright specs) + install stripe@^22.2 + replay runbook
+- [x] 03-01-PLAN.md — Wave 0 test baseline (5 vitest + 2 Playwright specs) + install stripe@^22.2 + replay runbook
 
 **Wave 2** *(blocked on Wave 1; 02 + 03 run in parallel)*
 
@@ -226,7 +226,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
-| 3. Payments Trust Spine | 0/5 | Planned | - |
+| 3. Payments Trust Spine | 1/5 | In Progress|  |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |
 | 5. Claim Correctness | 0/TBD | Not started | - |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |

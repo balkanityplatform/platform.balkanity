@@ -37,7 +37,7 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 - [ ] **BOOK-02**: Guest completes a short booking form (email required; phone, flight no., pax, luggage, notes as applicable) — guestless checkout
 - [ ] **BOOK-03**: Booking creates a transfer in `requested` and a code-created Stripe Checkout Session (not a dashboard Payment Link)
 - [ ] **BOOK-04**: Checkout clearly states the booking is prepaid & non-refundable before payment
-- [ ] **BOOK-05**: `paid` is set ONLY by a signature-verified Stripe webhook (raw body), idempotent on Stripe event id; the client success redirect never sets `paid`
+- [x] **BOOK-05**: `paid` is set ONLY by a signature-verified Stripe webhook (raw body), idempotent on Stripe event id; the client success redirect never sets `paid`
 - [ ] **BOOK-06**: On `paid`, the guest receives a booking confirmation email (Resend)
 - [ ] **BOOK-07**: Guest status page shows a live lifecycle timeline and a visible payment record/receipt (proof of prepay)
 
@@ -69,7 +69,7 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 
 ### Platform Health (Admin)
 
-- [ ] **HLTH-01**: `webhook_events` log records idempotency, signature result, and processing outcome for every Stripe event
+- [x] **HLTH-01**: `webhook_events` log records idempotency, signature result, and processing outcome for every Stripe event
 - [ ] **HLTH-02**: A reconciliation sweep (Supabase pg_cron, ~15–30 min) flags Stripe-paid payments with no matching transfer; Vercel cron is a daily backstop only
 - [ ] **HLTH-03**: An email-cap gauge shows usage against the Resend daily cap
 - [ ] **HLTH-04**: Stuck-transfer alerts surface transfers that have not advanced as expected
@@ -131,8 +131,8 @@ Which phases cover which requirements. Populated during roadmap creation.
 | ONBD-06 | Phase 2 — Supply-Side Onboarding | Complete |
 | AUTH-03 | Phase 2 — Supply-Side Onboarding | Complete (pending UAT) |
 | NOTF-04 | Phase 2 — Supply-Side Onboarding | Complete (pending UAT; email send → Phase 7) |
-| BOOK-05 | Phase 3 — Payments Trust Spine | Pending |
-| HLTH-01 | Phase 3 — Payments Trust Spine | Pending |
+| BOOK-05 | Phase 3 — Payments Trust Spine | Complete |
+| HLTH-01 | Phase 3 — Payments Trust Spine | Complete |
 | BOOK-01 | Phase 4 — Transfer Entity + Booking Form | Pending |
 | BOOK-02 | Phase 4 — Transfer Entity + Booking Form | Pending |
 | BOOK-03 | Phase 4 — Transfer Entity + Booking Form | Pending |

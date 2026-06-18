@@ -3,12 +3,12 @@ phase: 03-payments-trust-spine
 plan: 05
 type: gates-evidence
 created: 2026-06-18
-status: partial
+status: passed
 gates:
   schema_apply: passed
   gate_a_forged_spoof: passed     # SC2
   gate_c_single_writer: passed    # SC1
-  gate_b_replay: deferred         # SC3 — needs Stripe CLI + sk_test_/whsec_ keys
+  gate_b_replay: passed           # SC3 — proven live via Stripe CLI resend (2026-06-18)
 target_ref: qyhdogajtmnvxphrslwm   # Balkanity (NEVER Kalvia utyatpadtibqqswsfvtr)
 ---
 
@@ -142,35 +142,59 @@ $ vitest platform/payments/single-writer.test.ts → 2 passed (the canonical gre
 
 ---
 
-## GATE B — Replay → exactly one effect (SC3) — DEFERRED
+## GATE B — Replay → exactly one effect (SC3) — PASSED (2026-06-18)
 
-**Status: NOT RUN (deferred by operator decision 2026-06-18).** SC3 requires the Stripe CLI
-(`stripe listen` / `stripe events resend`) and real TEST-mode keys (`sk_test_` / `whsec_`),
-which are not installed/configured in this environment:
+**Run live against Balkanity in Stripe TEST mode.** Stripe CLI v1.42.13 (installed to
+`~/.local/bin/stripe` from the official GitHub release — no Homebrew/sudo), `stripe login`
+on the **Balkanity Travel** sandbox, API version `2026-05-27.dahlia` (matches the pinned
+SDK version). `STRIPE_SECRET_KEY=sk_test_…` in `.env.local`; `STRIPE_WEBHOOK_SECRET` wired
+into the dev server from `stripe listen --print-secret` (server-only, NOT written to a
+tracked file). A test FK chain (company→property→destination→transfer) was seeded on the
+live DB and removed after the run (see Cleanup).
+
+### Setup
 
 ```
-stripe CLI            → NOT installed
-STRIPE_SECRET_KEY     → not in .env.local (real sk_test_ required)
-STRIPE_WEBHOOK_SECRET → not in .env.local (real whsec_ from `stripe listen` required)
+~/.local/bin/stripe listen --forward-to localhost:3000/api/stripe/webhook
+  → Ready! API Version 2026-05-27.dahlia. whsec_0d181f60…  (matches the dev-server secret)
+seeded wp_transfers id = ae851182-3d39-4f64-ac39-b988ef638005 (status=requested, 5000 EUR cents)
 ```
 
-The DB-level idempotency authority IS in place and verified: the UNIQUE
-`webhook_events_event_id_key` index exists live, and the route is insert-first
-(`route.ts` records `webhook_events` on `event.id` BEFORE any `paid` effect; a duplicate
-`event.id` violates the UNIQUE index → `.maybeSingle()` → null → short-circuit, no second
-effect). What remains is the **live demonstration** via `stripe events resend`.
+### First delivery (signed checkout.session.completed carrying metadata.transfer_id)
 
-### To complete SC3 (runbook: `03-REPLAY-RUNBOOK.md`)
+```
+~/.local/bin/stripe trigger checkout.session.completed \
+  --add "checkout_session:metadata.transfer_id=ae851182-3d39-4f64-ac39-b988ef638005"
+listen log → checkout.session.completed [evt_1TjkgDIVJCasWEpxBXrU3J3y]  <-- [200]
 
-1. `brew install stripe/stripe-cli/stripe && stripe login`  (TEST mode)
-2. Add real `STRIPE_SECRET_KEY=sk_test_…` and `STRIPE_WEBHOOK_SECRET=whsec_…` (from
-   `stripe listen`) to `.env.local` (server-only; never tracked / `NEXT_PUBLIC_`).
-3. Seed a `wp_transfers` row (status `requested`); use its id as `metadata.transfer_id`.
-4. `stripe listen --forward-to localhost:3000/api/stripe/webhook`; trigger a real signed
-   `checkout.session.completed`; capture `evt_…`; `stripe events resend evt_…`.
-5. Assert: exactly ONE `webhook_events` row for that `event_id`; `wp_transfers.paid_at`
-   unchanged on the second delivery; the transfer flipped to `paid` exactly once with
-   `fee_cents` recorded. Append the output here and flip `gate_b_replay: passed`.
+wp_transfers (after):  status=paid, paid_at=2026-06-18 18:28:46.43+00,
+                       stripe_payment_intent_id=pi_3TjkgCIVJCasWEpx0RPNtyy8, fee_cents=null
+webhook_events:        rows=1 for that event_id, outcome=processed, signature_result=valid
+```
+> `fee_cents=null` is expected: the balance transaction is not available at capture time
+> (Pitfall 5) — Phase 8 reconciliation backfills it. The `paid` transition itself is correct.
+
+### Replay (same event.id resent — the SC3 assertion)
+
+```
+paid_at BEFORE resend:  2026-06-18 18:28:46.43+00
+~/.local/bin/stripe events resend evt_1TjkgDIVJCasWEpxBXrU3J3y
+listen log → 21:29:25 checkout.session.completed [evt_1TjkgDIVJCasWEpxBXrU3J3y]  <-- [200]
+
+webhook_events rows for event_id AFTER resend:  1   ← STILL ONE (UNIQUE + insert-first dedup)
+wp_transfers.paid_at AFTER resend:  2026-06-18 18:28:46.43+00   ← UNCHANGED
+wp_transfers.status:  paid
+```
+
+**Result: PASS.** Replaying the same `event.id` produced EXACTLY ONE effect — no second
+`webhook_events` row, `paid_at` unchanged, the transfer marked `paid` exactly once. The
+23505 short-circuit (CR-02 fix) returned 200 `{duplicate:true}` on the resend.
+
+### Cleanup
+
+The seeded test chain and all test-run `webhook_events` audit rows were deleted from the
+live DB after the run (the table was empty before this gate). Dev server + `stripe listen`
+stopped. `STRIPE_WEBHOOK_SECRET` was never persisted to a tracked file.
 
 ---
 
@@ -182,7 +206,7 @@ effect). What remains is the **live demonstration** via `stripe events resend`.
 | Forged/unsigned POST → 400 + zero state change | GATE A | ✅ PASS |
 | Spoofed success-URL never writes `paid` | GATE A | ✅ PASS |
 | Exactly one `paid` writer; full suite green | GATE C | ✅ PASS |
-| Replayed `event.id` → exactly one effect | GATE B | ⏸ DEFERRED (SC3) |
+| Replayed `event.id` → exactly one effect | GATE B | ✅ PASS (live, 2026-06-18) |
 
-**Phase 3 is NOT fully complete:** SC3 (live replay) remains a hard acceptance bar and is
-pending the Stripe CLI + TEST keys. All other acceptance bars are met and evidence-recorded.
+**All Phase 3 acceptance bars are met and evidence-recorded.** SC3 was proven live via
+`stripe events resend` against the Balkanity DB in TEST mode.

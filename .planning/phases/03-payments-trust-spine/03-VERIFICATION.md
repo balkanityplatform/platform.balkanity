@@ -1,21 +1,19 @@
 ---
 phase: 03-payments-trust-spine
 verified: 2026-06-18T21:10:00Z
-status: human_needed
-score: 4/5
+status: passed
+score: 5/5
 overrides_applied: 0
-human_verification:
-  - test: "Stripe CLI live replay demonstration (SC3 end-to-end)"
-    expected: "stripe events resend <evt_…> delivers the same event.id twice; exactly ONE webhook_events row exists for that event_id; wp_transfers.paid_at is unchanged on the second delivery; the transfer flipped to paid exactly once"
-    why_human: "Requires stripe CLI (not installed), a real sk_test_/whsec_ secret key pair from a running stripe listen session, and a seeded wp_transfers row with a real destination_id. Cannot be verified programmatically without those preconditions. The DB-level UNIQUE constraint authority and route-level 23505 branch are proven at the unit level — only the live end-to-end resend demo remains."
+human_verification: []
+sc3_live_verified: "2026-06-18 — stripe events resend evt_1TjkgDIVJCasWEpxBXrU3J3y: exactly one webhook_events row, paid_at unchanged, transfer paid once (see 03-GATES-EVIDENCE.md §GATE B)"
 ---
 
 # Phase 3: Payments Trust Spine — Verification Report
 
 **Phase Goal:** The money path is built and adversarially proven before any claim/booking-UI code: a code-created Stripe Checkout Session, and a signature-verified, raw-body, event.id-idempotent webhook that is the ONLY writer of `paid`, backed by a `webhook_events` log.
-**Verified:** 2026-06-18T21:10:00Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Verified:** 2026-06-18T21:10:00Z (SC3 live replay confirmed 2026-06-18T21:29Z)
+**Status:** passed (5/5)
+**Re-verification:** SC3 closed via live Stripe-CLI `stripe events resend` — see 03-GATES-EVIDENCE.md §GATE B
 
 ---
 
@@ -27,7 +25,7 @@ human_verification:
 |---|-------|--------|----------|
 | 1 | `paid` is set in exactly one code path — signature-verified checkout.session.completed handler, nodejs runtime, raw req.text(), service-role client; grep confirms no other writer | VERIFIED | `grep -RnE "status.*paid"` on app/platform/modules (excl. tests): exactly one hit at `app/api/stripe/webhook/route.ts:151`. `export const runtime = "nodejs"` at line 31; `await req.text()` at line 47; `createAdminClient()` at line 70. `npm run test` 86/86; `npm run typecheck` exit 0. `platform/payments/single-writer.test.ts` passes and names the one file. |
 | 2 | ADVERSARIAL GATE: forged/unsigned POST → 400 + zero state change; spoofed success-URL never writes paid | VERIFIED | `tests/e2e/webhook-forged.spec.ts` 2/2 pass (live Playwright run recorded in 03-GATES-EVIDENCE.md). `tests/e2e/success-spoof.spec.ts` 1/1 pass. Live DB confirmed 0 webhook_events rows for evt_forged, 0 wp_transfers rows with status='paid'. `app/pay/success/page.tsx` contains no `.update()` or `.insert()` call — display-only SELECT only. |
-| 3 | ADVERSARIAL GATE: replaying the same Stripe event.id twice → exactly one effect (UNIQUE webhook_events.event_id + insert-first dedup) | UNCERTAIN | Unit-level: `route.idempotency.test.ts` 4/4 pass — replay (23505 mock) returns 200 {duplicate:true} with ZERO wp_transfers writes. DB-level UNIQUE index `webhook_events_event_id_key` is live on Balkanity (confirmed in 03-GATES-EVIDENCE.md). Route branches explicitly on `insertErr.code === "23505"` (route.ts:91). MISSING: live end-to-end `stripe events resend` demonstration via Stripe CLI (deferred — CLI not installed, no sk_test_/whsec_ in .env.local). |
+| 3 | ADVERSARIAL GATE: replaying the same Stripe event.id twice → exactly one effect (UNIQUE webhook_events.event_id + insert-first dedup) | VERIFIED | LIVE (2026-06-18): `stripe events resend evt_1TjkgDIVJCasWEpxBXrU3J3y` against Balkanity in TEST mode → webhook_events rows for that event_id STILL 1, `wp_transfers.paid_at` UNCHANGED (18:28:46.43+00), transfer paid exactly once. First delivery had marked it paid (outcome=processed). Also unit-proven: `route.idempotency.test.ts` 4/4 (23505 short-circuit, zero wp_transfers writes on replay). Evidence: 03-GATES-EVIDENCE.md §GATE B. |
 | 4 | Every Stripe event recorded in webhook_events with idempotency key, signature result, processing outcome | VERIFIED | Migration 0003 defines: `event_id text not null`, `type text not null`, `signature_result text not null`, `outcome text not null default 'received'`. Route writes all four on every verified event (route.ts:79-86). `platform/rls/payments-schema.test.ts` (all 7 pass) asserts these columns exist in the migration source. Live schema query confirmed all columns present post-apply (03-GATES-EVIDENCE.md). |
 | 5 | Code-created Checkout Session (not dashboard Payment Link) carries metadata.transfer_id; per-transaction processing fee recorded | VERIFIED | `platform/payments/checkout.ts` calls `getStripe().checkout.sessions.create({mode:"payment", metadata:{transfer_id:transferId}, ...})`. `platform/payments/checkout.test.ts` asserts mode, EUR, integer unit_amount, metadata.transfer_id. `platform/payments/fee.ts` returns `balanceTransaction.fee` verbatim. `platform/payments/fee.test.ts` 3/3 pass. Webhook writes `fee_cents: feeCents` at route.ts:154. |
 

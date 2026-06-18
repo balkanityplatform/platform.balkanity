@@ -298,7 +298,7 @@ create policy "wp_transfers_guest_self_read" on public.wp_transfers
 ```
 - Coexists with `wp_transfers_admin_read` — Postgres ORs multiple permissive SELECT policies, so admins still read everything and a guest reads only their row.
 - **PII non-leak:** there is still NO write policy and NO broad read policy; an authenticated *driver* (whose JWT email ≠ guest_email) matches neither policy → zero rows. This is the data-layer guarantee Phase 5 builds on.
-- **Post-claim driver reveal (D-06):** the guest's own row already contains the driver scaffold columns (e.g. `driver_id`, and the status). The status page reads driver first name + phone **only when `status` is at/after `claimed`** — this is a render-time gate on the guest's own already-authorized row, joined to `driver_profiles`. (The driver-side PII reveal — drivers seeing *guest* PII post-claim — is Phase 5; D-06 here is the *reverse* reveal, guest seeing driver contact, which is low-sensitivity and expressible at render from the guest's own row.)
+- **Post-claim driver reveal (D-06):** the guest's own row already contains the driver scaffold columns (e.g. `driver_id`, and the status). The status page reads driver first name + phone **only when `status` is at/after `claimed`** — this is a render-time gate on the guest's own already-authorized row. Because `driver_profiles` carries only an admin-read RLS policy, the reveal reads the driver display fields via a narrow **service-role** read of only `{name, phone}` for the owning transfer's `driver_id` (gated on that already-authorized row). (The driver-side PII reveal — drivers seeing *guest* PII post-claim — is Phase 5; D-06 here is the *reverse* reveal, guest seeing driver contact, which is low-sensitivity and expressible at render from the guest's own row.)
 
 ### Pattern 4: Narrow anon-read for active destination slugs (BOOK-01)
 **What:** `/pickup/<slug>` is public (no auth). The existing `destinations_admin_read` policy only lets admins read. A new policy must allow **anon** to read **active** destinations.
@@ -339,6 +339,7 @@ const { data, error } = await admin.auth.admin.generateLink({
 - **Catching and swallowing `redirect()`'s NEXT_REDIRECT** in the booking action (breaks the Checkout redirect).
 - **Letting the status route fall through to the SW default cache.** Must be NetworkFirst (add to `SENSITIVE_DOCUMENT` regex in `app/sw.ts`).
 - **Parsing the trigger as a substitute for the actor (admin-only cancel).** The trigger validates the *transition*; the admin-only-cancel actor check is an app-layer `getCurrentRole()` gate (Phase 6 UI).
+- **Adding a broad guest SELECT policy on `driver_profiles` for the D-06 reveal.** Keep PII minimal: read only `{name, phone}` via a narrow service-role read gated on the owning transfer row, not a new policy.
 
 ## Don't Hand-Roll
 
@@ -430,6 +431,8 @@ export default async function StatusPage({ params }: { params: Promise<{ id: str
     .eq("id", id)
     .maybeSingle();
   // render StatusDot timeline + fmtEur(amount_cents) receipt + (status>='claimed') driver reveal
+  // driver reveal: createAdminClient().from('driver_profiles').select('name, phone').eq('id', transfer.driver_id)
+  //   — service-role read of ONLY name+phone, gated on the already-RLS-authorized transfer row.
 }
 ```
 
@@ -478,24 +481,16 @@ export async function sendBookingConfirmation(transferId: string, guestEmail: st
 | A1 | `generateLink` returns `properties.action_link` (and `properties.hashed_token`) for `type:'magiclink'` exactly as it does for `type:'invite'` (proven in 02-05). | Pattern 5 / Code Examples | LOW — 02-05 already consumes `data.properties.action_link` from `generateLink`; the return shape is shared across link types. If `hashed_token` is needed for a custom-template link, it is also present (verified via search). |
 | A2 | The webhook can call `sendBookingConfirmation` inside its `processed` branch without violating the single-writer grep gate (the gate forbids `status='paid'` writes, not function calls). | Code Examples (stub) | LOW — the gate is a source grep for paid-status writes; a send-email call adds none. Confirm the new module contains no `status: "paid"` string. |
 | A3 | Adding NULL-able PII/lifecycle columns via ALTER on the existing `wp_transfers` does not break the Phase-3 webhook (which only references `status`, `paid_at`, `stripe_payment_intent_id`, `fee_cents`). | Runtime State Inventory | LOW — additive NULL-able columns are backward-compatible; the webhook's column list is a strict subset. |
-| A4 | `driver_id` + driver reveal columns can be scaffolded NULL in 0004 and populated in Phase 5/6; D-06's reverse reveal reads `driver_profiles` joined on that scaffold. | Pattern 3 / D-06 | MEDIUM — the exact driver FK/column name and whether D-06 joins `driver_profiles` (name+phone) vs duplicates them must be settled in planning; both are expressible. Adversarial PII check (driver-side, Phase 5) is out of scope here. |
+| A4 | `driver_id` + driver reveal columns can be scaffolded NULL in 0004 and populated in Phase 5/6; D-06's reverse reveal reads `driver_profiles` joined on that scaffold. | Pattern 3 / D-06 | MEDIUM — settled in planning (Open Questions Q1 RESOLVED): 0004 scaffolds `driver_id` NULL; the status page reads `driver_profiles` `{name, phone}` via a narrow service-role read (driver_profiles has only admin-read RLS). Adversarial PII check (driver-side, Phase 5) is out of scope here. |
 | A5 | The pilot does not need true real-time status; NetworkFirst fetch-on-load (guest reloads) is sufficient. | Liveness recommendation | LOW — explicitly Claude's discretion; a light poll is the fallback if the pilot wants live. Realtime is gold-plating for ~10 transfers. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Exact driver-reveal data path for D-06.**
-   - What we know: the guest can read their own row (RLS); driver name+phone live in `driver_profiles`.
-   - What's unclear: whether 0004 scaffolds a `driver_id` FK now (recommended, so Phase 5 only adds the claim logic) and whether the status page joins `driver_profiles` or denormalizes name/phone onto the transfer at claim time.
-   - Recommendation: scaffold `driver_id uuid references auth.users(id)` NULL in 0004; status page joins `driver_profiles` and shows name+phone only when `status` ∈ {claimed, en_route, arrived, picked_up, completed}. Confirm in planning.
+1. **Exact driver-reveal data path for D-06.** — RESOLVED: 0004 scaffolds `driver_id uuid references auth.users(id)` NULL (adopted in plan 04-02, Task 1) so Phase 5 only adds the claim logic. The status page (plan 04-04, Task 2) reads driver first name + phone from `driver_profiles` only when `status` ∈ {claimed, en_route, arrived, picked_up, completed}. Because `driver_profiles` carries only an admin-read RLS policy (`is_admin()`), the reveal uses a narrow **service-role** read of EXACTLY `{name, phone}` for the owning transfer's `driver_id`, gated on the already-RLS-authorized transfer row — NOT a broad guest SELECT policy on `driver_profiles` (keeps PII minimal).
 
-2. **`/auth/confirm` `next`-param threading + open-redirect guard.**
-   - What we know: the route currently hardcodes `/` for magiclink; it must support landing on `/status/<id>`.
-   - What's unclear: exact allowlist shape for `next`.
-   - Recommendation: accept `next` only if it matches `^/status/[0-9a-f-]{36}$` (or a small internal allowlist); otherwise default to `/`. Never forward an arbitrary `next` (open-redirect / WR-03 ethos).
+2. **`/auth/confirm` `next`-param threading + open-redirect guard.** — RESOLVED: `/auth/confirm` (plan 04-04, Task 3) accepts `next` only if it matches `^/status/[0-9a-f-]{36}$`; otherwise it defaults to `/`. The validated `next` is applied as the magiclink `verifiedDest` in BOTH the PKCE-code and token_hash branches; an attacker-controlled `next` is never forwarded verbatim (open-redirect / WR-03). The link base is the trusted `NEXT_PUBLIC_SITE_URL`, never Origin (WR-04).
 
-3. **Abandoned `requested` rows + slug-inactive UX.**
-   - What we know: cleanup is Phase 8; inactive-slug handling is Claude's discretion.
-   - Recommendation: `/pickup/<inactive-slug>` shows a neutral "not available" state; abandoned `requested` rows are left for Phase 8 reconciliation. No Phase-4 work beyond the UX state.
+3. **Abandoned `requested` rows + slug-inactive UX.** — RESOLVED: `/pickup/<inactive-slug>` (plan 04-03, Task 2) renders a neutral "not available" state (no crash); the `destinations_public_active_read` anon policy (plan 04-02, Task 3) returns zero rows for inactive slugs. Abandoned `requested` rows are left to Phase 8 reconciliation — no Phase-4 work beyond the neutral UX state.
 
 ## Environment Availability
 
@@ -570,6 +565,7 @@ export async function sendBookingConfirmation(transferId: string, guestEmail: st
 | Tampered booking amount (underpay) | Tampering | Re-read `destinations.price_cents` server-side; never trust FormData amount. |
 | Guest reads another guest's PII via the REST API | Information Disclosure | RLS `(select auth.jwt() ->> 'email') = guest_email` — data-layer boundary, not UI. |
 | Driver reads guest PII pre-claim | Information Disclosure | No matching RLS policy for non-owning authenticated users → zero rows (Phase 5 hardens the masked pool). |
+| Guest D-06 driver reveal over-reads driver PII | Information Disclosure | Narrow service-role read of ONLY `{name, phone}` gated on the owning transfer row; no broad guest SELECT policy on `driver_profiles`. |
 | Open redirect via magic-link `next` param | Tampering | Allowlist `next` to internal `^/status/<uuid>$`; default `/`; never forward verbatim. |
 | Illegal lifecycle jump (e.g. requested→completed) by any writer | Tampering | BEFORE-UPDATE trigger raises on any non-mapped transition (D-08). |
 | Magic link leaks → account takeover scope | Elevation | Magic link grants only the guest session (role `null`/guest), RLS-scoped to their own transfer; no admin/driver capability. |

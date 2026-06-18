@@ -125,3 +125,38 @@ drop trigger if exists wp_transfers_transition_guard on public.wp_transfers;
 create trigger wp_transfers_transition_guard
   before update on public.wp_transfers
   for each row execute function public.wp_enforce_transfer_transition();
+
+-- ============================================================================
+-- 3) RLS SELECT policies — the data-layer PII boundary (UI masking leaks via the
+--    auto-generated REST / supabase-js API, so the boundary MUST live in RLS).
+--    NO write policy is added on wp_transfers — the no-write-policy lock from 0003 holds;
+--    every write stays service-role-only (the single-writer `paid` lock).
+-- ============================================================================
+
+-- (a) Guest-self-read on wp_transfers. Uses the current `auth.jwt() ->> 'email'` form wrapped
+--     in a (select ...) subquery — the deprecated email() auth helper is NOT used, and the
+--     subquery wrap is the initPlan-caching best practice (the claim is evaluated once per query,
+--     not once per row). RLS is already ENABLED on wp_transfers (0003).
+--
+--     Coexistence (T-04-ID1): Postgres ORs permissive SELECT policies, so this coexists with the
+--     existing `wp_transfers_admin_read` (0003) → an admin reads ALL rows; a guest reads ONLY the
+--     row(s) whose guest_email equals their JWT email; a non-owning authenticated driver matches
+--     NEITHER policy → zero rows pre-claim (the data-layer PII boundary Phase 5 hardens with the
+--     masked claim pool). A JWT email that matches no guest_email returns zero rows.
+drop policy if exists "wp_transfers_guest_self_read" on public.wp_transfers;
+create policy "wp_transfers_guest_self_read" on public.wp_transfers
+  for select to authenticated
+  using ( (select auth.jwt() ->> 'email') = guest_email );
+
+-- (b) Narrow active-destination anon read — the public /pickup/<slug> read path 0002 deferred
+--     (Pitfall 1; the 0002 tail note: "Phase 4 will add a NARROW anon/guest SELECT policy for
+--     ACTIVE destination slugs only"). RLS is already ENABLED on destinations (0002).
+--
+--     Coexistence (T-04-ID3): ORs with the existing `destinations_admin_read` (0002) → an admin
+--     reads ALL destinations; anon + authenticated readers see ONLY rows where active = true.
+--     An inactive destination returns zero rows → /pickup/<inactive-slug> renders the neutral
+--     "not available" state rather than leaking secret/disabled destination metadata.
+drop policy if exists "destinations_public_active_read" on public.destinations;
+create policy "destinations_public_active_read" on public.destinations
+  for select to anon, authenticated
+  using ( active = true );

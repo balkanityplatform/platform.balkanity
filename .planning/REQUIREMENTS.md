@@ -24,11 +24,11 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 
 ### Supply-Side Onboarding (Admin, no-code)
 
-- [ ] **ONBD-01**: Admin can create, edit, and list companies
+- [x] **ONBD-01**: Admin can create, edit, and list companies
 - [ ] **ONBD-02**: Admin can create, edit, and list properties under a company
 - [x] **ONBD-03**: Admin can create, edit, and list destinations (slug, label, address, zone, airport, active)
 - [x] **ONBD-04**: Admin sets price + commission per destination with a live "you keep" calculation
-- [ ] **ONBD-05**: Admin can invite drivers from the console
+- [x] **ONBD-05**: Admin can invite drivers from the console
 - [ ] **ONBD-06**: A second company can be onboarded entirely through the UI (no code/DB edits)
 
 ### Booking & Payment (Guest)
@@ -123,11 +123,11 @@ Which phases cover which requirements. Populated during roadmap creation.
 | PLAT-05 | Phase 1 — Platform Foundation | Complete |
 | AUTH-01 | Phase 1 — Platform Foundation | Complete |
 | AUTH-04 | Phase 1 — Platform Foundation | Complete |
-| ONBD-01 | Phase 2 — Supply-Side Onboarding | Pending |
+| ONBD-01 | Phase 2 — Supply-Side Onboarding | Complete |
 | ONBD-02 | Phase 2 — Supply-Side Onboarding | Pending |
 | ONBD-03 | Phase 2 — Supply-Side Onboarding | Complete |
 | ONBD-04 | Phase 2 — Supply-Side Onboarding | Complete |
-| ONBD-05 | Phase 2 — Supply-Side Onboarding | Pending |
+| ONBD-05 | Phase 2 — Supply-Side Onboarding | Complete |
 | ONBD-06 | Phase 2 — Supply-Side Onboarding | Pending |
 | AUTH-03 | Phase 2 — Supply-Side Onboarding | Pending |
 | NOTF-04 | Phase 2 — Supply-Side Onboarding | Pending |

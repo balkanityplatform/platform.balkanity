@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 02-01-PLAN.md
-last_updated: "2026-06-18T13:41:23.529Z"
+last_updated: "2026-06-18T13:59:39.745Z"
 last_activity: 2026-06-18
 progress:
   total_phases: 8
   completed_phases: 1
   total_plans: 10
-  completed_plans: 6
+  completed_plans: 7
   percent: 13
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 02 (supply-side-onboarding) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-06-18
 
-Progress: [██████░░░░] 60%
+Progress: [███████░░░] 70%
 
 ## Handoff (for a new session)
 
@@ -63,6 +63,7 @@ Progress: [██████░░░░] 60%
 | Phase 01 P03 | 30min | 3 tasks | 10 files |
 | Phase 01 P04 | 11min | 3 tasks | 20 files |
 | Phase 02 P01 | 8 | 3 tasks | 9 files |
+| Phase 02 P02 | 22min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [02-01]: Hand-rolled slugify (no lib); Cyrillic-only labels slugify to '' and fall back to 'dest' via nextSlugCandidate (D-08, Pitfall 2)
 - [Phase ?]: [02-01]: Money as integer cents, round-half-up; commission/net/fee display-only and never persisted; Stripe fee is an estimate note (EEA 1.5% + EUR0.25, D-05/D-06/D-07)
 - [Phase ?]: [02-01]: All Phase 2 UI-SPEC copy lives in en.ts/bg.ts behind the tsc Dict parity gate; zod ^4.4 made explicit dependency
+- [Phase ?]: [02-02]: Supply schema live on Balkanity — companies/properties/destinations/driver_profiles UNPREFIXED + admin-only RLS (one SELECT policy each via is_admin() SECURITY DEFINER), no write policy; unique destinations_slug_key (D-09); applied via migration-repair of 0001 (empty remote history reconciled without DDL re-run)
+- [Phase ?]: [02-02]: Companies CRUD pattern — RSC anon RLS read + service-role write behind getCurrentRole() re-gate (two gates); D-12 (no deactivate with active children) enforced in-action + FK on delete restrict backstop
 
 ### Pending Todos
 
@@ -113,6 +116,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-18T13:41:23.523Z
+Last session: 2026-06-18T13:59:33.091Z
 Stopped at: Completed 02-01-PLAN.md
 Resume file: None

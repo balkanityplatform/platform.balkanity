@@ -84,7 +84,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 02-02-PLAN.md — [BLOCKING/SIGN-OFF] migration 0002 (supply tables + admin-only RLS + unique slug) + UI primitives + Companies CRUD
+- [x] 02-02-PLAN.md — [BLOCKING/SIGN-OFF] migration 0002 (supply tables + admin-only RLS + unique slug) + UI primitives + Companies CRUD
 
 **Wave 3** *(blocked on Wave 2; 03 + 05 run in parallel)*
 
@@ -207,7 +207,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
-| 2. Supply-Side Onboarding | 1/5 | In Progress|  |
+| 2. Supply-Side Onboarding | 2/5 | In Progress|  |
 | 3. Payments Trust Spine | 0/TBD | Not started | - |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |
 | 5. Claim Correctness | 0/TBD | Not started | - |

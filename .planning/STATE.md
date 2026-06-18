@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 01-04-PLAN.md
-last_updated: "2026-06-17T14:59:03.961Z"
-last_activity: 2026-06-17
+stopped_at: "Phase 1 built + deployed (balkanityplatformproject.vercel.app); auth reworked magic-link -> email+password; awaiting on-device UAT + /gsd-verify-work 1"
+last_updated: "2026-06-18T00:00:00.000Z"
+last_activity: 2026-06-18
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -25,12 +25,19 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 
 ## Current Position
 
-Phase: 01 (platform-foundation) — EXECUTING
-Plan: 4 of 5
-Status: Ready to execute
-Last activity: 2026-06-17
+Phase: 01 (platform-foundation) — BUILT & DEPLOYED, awaiting verification
+Plan: 5 of 5 complete
+Status: Live at https://balkanityplatformproject.vercel.app. Auth reworked from magic-link to email+password (admin/driver; guests anonymous) — see AUTH-04 + memory [[phase-1-status-and-handoff]]. Remaining to close: on-device PWA install/offline check, then /gsd-verify-work 1. Next: Phase 2 (Supply-Side Onboarding).
+Last activity: 2026-06-18
 
-Progress: [████████░░] 80%
+Progress: [██████████] 100% built (verification pending)
+
+## Handoff (for a new session)
+
+- Live: https://balkanityplatformproject.vercel.app (Vercel team balkanity-platform-s-projects, Git-integration deploy on push to main).
+- Auth: email+password login; /sign-in, /forgot-password, /set-password, /auth/confirm. Test admin: balkanityplatform@gmail.com (Resend test sender only delivers here). Resend custom SMTP configured (test sender onboarding@resend.dev).
+- Access via local creds (NOT MCP): Vercel CLI authed+linked; .env.local holds Supabase keys, DB URL, and the Management access token. See memory files.
+- SECURITY TODO: rotate the sbp_ SUPABASE_ACCESS_TOKEN (pasted in chat) + remove from .env.local.
 
 ## Performance Metrics
 

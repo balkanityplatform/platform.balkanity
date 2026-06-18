@@ -20,7 +20,7 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 - [x] **AUTH-01**: Users have an app role ∈ {admin, driver, guest} enforced across the app
 - [ ] **AUTH-02**: Guest can view their transfer status via a passwordless Supabase magic link
 - [ ] **AUTH-03**: Drivers are admin-invited contractors only (no open signup); invite flow creates a driver account
-- [x] **AUTH-04**: Admin can sign in to the desktop console
+- [x] **AUTH-04**: Admin can sign in to the desktop console via **email + password** (classic credentials). _Decision change 2026-06-18: reverses D-01 (passwordless magic-link) for admin/driver LOGIN → email+password; accounts are admin-created with an invite-to-set-password email + self-service password reset. Magic-link/tokenized access is retained only for guest transfer status (AUTH-02). Role layer (AUTH-01) unchanged._
 
 ### Supply-Side Onboarding (Admin, no-code)
 

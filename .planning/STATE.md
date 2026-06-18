@@ -4,12 +4,12 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 4 UI-SPEC approved
-last_updated: "2026-06-18T19:41:15.873Z"
-last_activity: 2026-06-18 -- Phase 04 planning complete
+last_updated: "2026-06-18T19:47:05.018Z"
+last_activity: 2026-06-18 -- Phase 04 execution started
 progress:
   total_phases: 8
   completed_phases: 3
-  total_plans: 15
+  total_plans: 20
   completed_plans: 15
   percent: 38
 ---
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
-**Current focus:** Phase 03 — payments-trust-spine
+**Current focus:** Phase 04 — transfer-entity-booking-form
 
 ## Current Position
 
-Phase: 4 — transfer-entity-+-booking-form (not started)
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-06-18 -- Phase 04 planning complete
+Phase: 04 (transfer-entity-booking-form) — EXECUTING
+Plan: 1 of 5
+Status: Executing Phase 04
+Last activity: 2026-06-18 -- Phase 04 execution started
 
 Progress: [████████████░░░░░░░░] 38% (3/8 phases)
 

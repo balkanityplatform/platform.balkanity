@@ -151,7 +151,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 04-01-PLAN.md — Wave 0 RED specs (lifecycle/booking/confirmation/guest-status) + TS lifecycle transition map + full EN/BG copy keys
+- [x] 04-01-PLAN.md — Wave 0 RED specs (lifecycle/booking/confirmation/guest-status) + TS lifecycle transition map + full EN/BG copy keys
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -165,6 +165,7 @@ Plans:
 **Wave 4** *(blocked on Wave 3)*
 
 - [ ] 04-05-PLAN.md — [BLOCKING/SIGN-OFF] apply migration 0004 to Balkanity + adversarial DB-trigger/RLS runbook + full booking→pay→confirm→track end-to-end smoke
+
 **Notes**: REVIEW/SIGN-OFF REQUIRED — `wp_transfers` schema migration (lifecycle fields + PII columns) is flagged/irreversible; sign off before applying. Status/booking data must never be served stale from the SW cache (NetworkFirst / Realtime). Confirmation email may call a stubbed wrapper, fully guarded in Phase 7. Avoids Pitfalls 1, 12.
 **UI hint**: yes
 
@@ -245,7 +246,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
 | 3. Payments Trust Spine | 5/5 | Complete    | 2026-06-18 |
-| 4. Transfer Entity + Booking Form | 0/5 | Planned | - |
+| 4. Transfer Entity + Booking Form | 1/5 | In Progress|  |
 | 5. Claim Correctness | 0/TBD | Not started | - |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |
 | 7. Notifications | 0/TBD | Not started | - |

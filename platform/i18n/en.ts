@@ -120,6 +120,86 @@ export const en = {
   inactiveLabel: "Inactive",
   driverNameLabel: "Driver name",
   driverPhoneLabel: "Driver phone",
+
+  // --- Phase 4: booking + status (UI-SPEC Copywriting Contract) ---
+
+  // Booking page — /pickup/<slug> (BOOK-01/02/04). {airport}/{zone}/{amount} interpolated server-side.
+  bookingFareCaption: "Airport transfer · {airport} → {zone}",
+  bookingTotalToPay: "Total to pay",
+  bookingYourDetails: "Your details",
+  bookingFullNameLabel: "Full name",
+  bookingEmailLabel: "Email",
+  bookingPhoneLabel: "Phone number",
+  bookingFlightLabel: "Flight number",
+  bookingArrivalDateLabel: "Arrival date",
+  bookingArrivalTimeLabel: "Arrival time",
+  bookingPassengersLabel: "Passengers",
+  bookingPassengersHelp: "1 to 8",
+  bookingLuggageLabel: "Bags (optional)",
+  bookingNotesLabel: "Notes for your driver (optional)",
+  bookingNotesPlaceholder:
+    "Anything the driver should know — e.g. car seat needed, meeting point.",
+  bookingContinueCta: "Continue to payment",
+  bookingBackCta: "Back",
+
+  // Prepaid & non-refundable disclosure (BOOK-04 — visible BEFORE payment).
+  disclosureHeading: "Prepaid & non-refundable",
+  disclosureBody:
+    "You pay the full fare now. This booking is non-refundable once paid — please double-check your arrival date, time, and flight number before continuing.",
+  disclosureCheckboxLabel:
+    "I understand this booking is prepaid and non-refundable.",
+  disclosureBlockedError:
+    "Please confirm you understand the booking is non-refundable.",
+
+  // Booking validation errors (BOOK-02 — server-side zod, surfaced inline).
+  bookingFieldRequired: "This field is required.",
+  bookingInvalidEmail: "Enter a valid email address.",
+  bookingInvalidPhone: "Enter a valid phone number, including country code.",
+  bookingArrivalPast: "Choose an arrival date and time in the future.",
+  bookingPassengersRange: "Passengers must be between 1 and 8.",
+  bookingFailed:
+    "Couldn't start your payment. Check your connection and try again.",
+
+  // Inactive / unavailable slug.
+  slugUnavailableHeading: "This pickup link isn't available",
+  slugUnavailableBody:
+    "This destination is no longer bookable. Please contact the company that shared this link.",
+
+  // Confirmation email (BOOK-06 — generated this phase, send STUBBED → Phase 7).
+  confirmEmailSubject: "Your airport transfer is confirmed — €{amount} paid",
+  confirmEmailHeading: "Payment received — you're all set",
+  confirmEmailBody:
+    "We've received your payment of €{amount} for your transfer on {arrivalDate}. Track your driver and pickup status any time using the secure link below.",
+  confirmEmailCta: "Track my booking",
+  confirmEmailFooter: "This booking is prepaid and non-refundable.",
+
+  // Status page — /status/<id> (BOOK-07, AUTH-02, SC4).
+  statusTitle: "Booking status",
+  statusYourTrip: "Your trip",
+  statusRouteLine: "{airport} → {zone}",
+  statusArrivalLine: "Arriving {arrivalDate} at {arrivalTime}",
+  statusFlightLine: "Flight {flightNo}",
+  statusPaxLine: "{pax} passenger(s)",
+  statusTimelineHeading: "Status",
+  statusReceiptHeading: "Payment",
+  statusReceiptPaidLine: "Paid €{amount} on {paidDate}",
+  statusReceiptSubNote: "Prepaid · non-refundable",
+  statusDriverHeading: "Your driver",
+  statusDriverLine: "{driverFirstName} · {driverPhone}",
+  statusDriverPreClaimNote:
+    "We'll show your driver's details here as soon as your transfer is claimed.",
+  statusExpired: "This link has expired or isn't valid. Request a fresh link below.",
+  statusExpiredCta: "Get a new link",
+
+  // Track / re-access page — /track (D-07, AUTH-02).
+  trackTitle: "Track your booking",
+  trackBody:
+    "Enter the email you booked with and we'll send you a secure link to your booking status.",
+  trackEmailLabel: "Email",
+  trackSendCta: "Send my booking link",
+  trackSuccessNeutral:
+    "If that email has a booking, we've sent a secure link to it. Check your inbox.",
+  trackError: "Couldn't send the link. Check your connection and try again.",
 } as const;
 
 // The dictionary contract — bg.ts is type-checked against this (parity gate).

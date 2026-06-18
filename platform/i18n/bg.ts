@@ -121,4 +121,84 @@ export const bg: Dict = {
   inactiveLabel: "Неактивен",
   driverNameLabel: "Име на шофьор",
   driverPhoneLabel: "Телефон на шофьор",
+
+  // --- Фаза 4: резервация + статус (UI-SPEC Copywriting Contract) ---
+
+  // Страница за резервация — /pickup/<slug> (BOOK-01/02/04). {airport}/{zone}/{amount} се интерполират сървърно.
+  bookingFareCaption: "Трансфер от летище · {airport} → {zone}",
+  bookingTotalToPay: "Общо за плащане",
+  bookingYourDetails: "Вашите данни",
+  bookingFullNameLabel: "Пълно име",
+  bookingEmailLabel: "Имейл",
+  bookingPhoneLabel: "Телефонен номер",
+  bookingFlightLabel: "Номер на полет",
+  bookingArrivalDateLabel: "Дата на пристигане",
+  bookingArrivalTimeLabel: "Час на пристигане",
+  bookingPassengersLabel: "Пътници",
+  bookingPassengersHelp: "1 до 8",
+  bookingLuggageLabel: "Багаж (по избор)",
+  bookingNotesLabel: "Бележки за вашия шофьор (по избор)",
+  bookingNotesPlaceholder:
+    "Каквото шофьорът трябва да знае — напр. нужно столче за кола, място за среща.",
+  bookingContinueCta: "Продължи към плащане",
+  bookingBackCta: "Назад",
+
+  // Предплатено и невъзстановимо оповестяване (BOOK-04 — видимо ПРЕДИ плащане).
+  disclosureHeading: "Предплатено и невъзстановимо",
+  disclosureBody:
+    "Плащате пълната цена сега. Тази резервация е невъзстановима след плащане — моля, проверете повторно датата, часа на пристигане и номера на полета, преди да продължите.",
+  disclosureCheckboxLabel:
+    "Разбирам, че тази резервация е предплатена и невъзстановима.",
+  disclosureBlockedError:
+    "Моля, потвърдете, че разбирате, че резервацията е невъзстановима.",
+
+  // Грешки при валидиране на резервацията (BOOK-02 — сървърен zod, показани инлайн).
+  bookingFieldRequired: "Това поле е задължително.",
+  bookingInvalidEmail: "Въведете валиден имейл адрес.",
+  bookingInvalidPhone: "Въведете валиден телефонен номер, включително код на държавата.",
+  bookingArrivalPast: "Изберете дата и час на пристигане в бъдещето.",
+  bookingPassengersRange: "Пътниците трябва да са между 1 и 8.",
+  bookingFailed:
+    "Плащането не можа да бъде стартирано. Проверете връзката си и опитайте отново.",
+
+  // Неактивен / недостъпен slug.
+  slugUnavailableHeading: "Този линк за вземане не е достъпен",
+  slugUnavailableBody:
+    "Тази дестинация вече не е достъпна за резервация. Моля, свържете се с компанията, която сподели този линк.",
+
+  // Имейл за потвърждение (BOOK-06 — генериран в тази фаза, изпращането СТЪБНАТО → Фаза 7).
+  confirmEmailSubject: "Вашият трансфер от летището е потвърден — платени €{amount}",
+  confirmEmailHeading: "Плащането е получено — всичко е готово",
+  confirmEmailBody:
+    "Получихме вашето плащане от €{amount} за вашия трансфер на {arrivalDate}. Следете шофьора и статуса на вземането по всяко време чрез защитения линк по-долу.",
+  confirmEmailCta: "Проследи резервацията ми",
+  confirmEmailFooter: "Тази резервация е предплатена и невъзстановима.",
+
+  // Страница за статус — /status/<id> (BOOK-07, AUTH-02, SC4).
+  statusTitle: "Статус на резервацията",
+  statusYourTrip: "Вашето пътуване",
+  statusRouteLine: "{airport} → {zone}",
+  statusArrivalLine: "Пристигане {arrivalDate} в {arrivalTime}",
+  statusFlightLine: "Полет {flightNo}",
+  statusPaxLine: "{pax} пътник(ци)",
+  statusTimelineHeading: "Статус",
+  statusReceiptHeading: "Плащане",
+  statusReceiptPaidLine: "Платени €{amount} на {paidDate}",
+  statusReceiptSubNote: "Предплатено · невъзстановимо",
+  statusDriverHeading: "Вашият шофьор",
+  statusDriverLine: "{driverFirstName} · {driverPhone}",
+  statusDriverPreClaimNote:
+    "Ще покажем данните на вашия шофьор тук веднага щом трансферът ви бъде поет.",
+  statusExpired: "Този линк е изтекъл или не е валиден. Заявете нов линк по-долу.",
+  statusExpiredCta: "Вземи нов линк",
+
+  // Страница за проследяване / повторен достъп — /track (D-07, AUTH-02).
+  trackTitle: "Проследете резервацията си",
+  trackBody:
+    "Въведете имейла, с който направихте резервацията, и ще ви изпратим защитен линк към статуса на резервацията ви.",
+  trackEmailLabel: "Имейл",
+  trackSendCta: "Изпрати ми линк към резервацията",
+  trackSuccessNeutral:
+    "Ако този имейл има резервация, изпратихме защитен линк към него. Проверете входящата си поща.",
+  trackError: "Линкът не можа да бъде изпратен. Проверете връзката си и опитайте отново.",
 };

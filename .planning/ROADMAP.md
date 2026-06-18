@@ -119,7 +119,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1; 02 + 03 run in parallel)*
 
-- [ ] 03-02-PLAN.md — [BLOCKING/SIGN-OFF] migration 0003 (minimal wp_transfers + webhook_events + admin-read RLS + UNIQUE event_id) — file authoring only
+- [x] 03-02-PLAN.md — [BLOCKING/SIGN-OFF] migration 0003 (minimal wp_transfers + webhook_events + admin-read RLS + UNIQUE event_id) — file authoring only
 - [ ] 03-03-PLAN.md — platform/payments seam: server-only stripe.ts (apiVersion pin) + checkout.ts (EUR/metadata session) + fee.ts (balance-transaction fee)
 
 **Wave 3** *(blocked on Wave 2)*
@@ -226,7 +226,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
-| 3. Payments Trust Spine | 1/5 | In Progress|  |
+| 3. Payments Trust Spine | 2/5 | In Progress|  |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |
 | 5. Claim Correctness | 0/TBD | Not started | - |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |

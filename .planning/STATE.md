@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 3 context gathered
-last_updated: "2026-06-18T17:18:57.564Z"
+last_updated: "2026-06-18T17:23:26.112Z"
 last_activity: 2026-06-18
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 15
-  completed_plans: 11
+  completed_plans: 12
   percent: 25
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 03 (payments-trust-spine) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-06-18
 
-Progress: [███████░░░] 73%
+Progress: [████████░░] 80%
 
 ## Handoff (for a new session)
 
@@ -68,6 +68,7 @@ Progress: [███████░░░] 73%
 | Phase 02 P04 | 5min | 3 tasks | 7 files |
 | Phase 02 P05 | continuation | 3 tasks | 6 files |
 | Phase 03 P01 | 9min | 3 tasks tasks | 10 files files |
+| Phase 03 P02 | 3min | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -99,6 +100,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [03-01]: 7 Nyquist payment-contract scaffolds land RED first (single paid writer, nodejs+raw-body webhook, migration-0003 RLS/UNIQUE, EUR/integer checkout, real-fee, forged-400 + success-spoof); targets in Plans 02-05 turn them GREEN
 - [Phase ?]: [03-01]: stripe@^22.2.1 installed (official SDK, empty postinstall, no @stripe/stripe-js); apiVersion '2026-05-27.dahlia' type-checks against v22 typings (no cast)
 - [Phase ?]: [03-01]: checkout/fee contract tests use runtime-string dynamic import + typed cast so they tsc-clean before the impl exists while staying RED at runtime
+- [Phase 03-02]: Migration 0003 authored — wp_transfers (minimal money-spine, D-03) + webhook_events (UNIQUE event_id idempotency, HLTH-01/SC3); both RLS admin-read/no-write reusing 0002 is_admin(); EUR/integer-cents; FILE ONLY, live apply deferred to Plan 05 (Balkanity ref qyhdogajtmnvxphrslwm, never Kalvia)
 
 ### Pending Todos
 
@@ -130,6 +132,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-18T17:18:36.585Z
+Last session: 2026-06-18T17:22:45.721Z
 Stopped at: Phase 3 context gathered
 Resume file: None

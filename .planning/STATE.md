@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-06-18T20:09:57.891Z"
+last_updated: "2026-06-18T20:19:38.861Z"
 last_activity: 2026-06-18
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 20
-  completed_plans: 18
+  completed_plans: 19
   percent: 38
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 04 (transfer-entity-booking-form) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-06-18
 
-Progress: [█████████░] 90%
+Progress: [██████████] 95%
 
 ## Handoff (for a new session)
 
@@ -73,6 +73,7 @@ Progress: [█████████░] 90%
 | Phase 03 P04 | 4 | 2 tasks | 4 files |
 | Phase 04 P02 | 2min | 3 tasks | 1 files |
 | Phase 04 P03 | 3min | 3 tasks | 4 files |
+| Phase 04 P04 | 10m | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -115,6 +116,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [04-02]: RLS guest-self-read uses (select auth.jwt() ->> 'email') = guest_email (never deprecated email() helper); destinations_public_active_read (active=true, to anon) unblocks /pickup (BOOK-01); no-write-policy lock preserved
 - [Phase ?]: Booking is a public server-action surface (no getCurrentRole gate); zod schema + server-re-read amount are the only gates (04-03)
 - [Phase ?]: Server-trusted amount: createBooking re-reads destinations.price_cents by slug for both the row and the Checkout Session; the booking form submits no amount input (04-03, Pitfall 5)
+- [Phase ?]: Status page reads the guest's own transfer via cookie/anon RLS + getUser; driver name+phone revealed post-claim via a narrow service-role {name,phone} read (driver_profiles join on user_id)
+- [Phase ?]: Confirmation + /track re-access emails stubbed (generateLink magic link revealed/logged); Resend send deferred to Phase 7 — function signature is the stable seam
 
 ### Pending Todos
 
@@ -146,6 +149,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-18T20:09:34.750Z
+Last session: 2026-06-18T20:19:25.975Z
 Stopped at: Completed 04-02-PLAN.md
 Resume file: None

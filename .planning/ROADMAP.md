@@ -147,7 +147,24 @@ Plans:
   4. Guest can view a passwordless magic-link status page showing a live lifecycle timeline (coloured dot + label for every state incl. `en_route`) and a visible payment record/receipt ("Paid EUR X on {date}")
   5. The transfer advances only through the locked lifecycle requested → paid → claimed → en_route → arrived → picked_up → completed (+ cancelled), enforced by server-side transition guards; the success page is display-only and never writes `paid`
 
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+**Wave 1**
+
+- [ ] 04-01-PLAN.md — Wave 0 RED specs (lifecycle/booking/confirmation/guest-status) + TS lifecycle transition map + full EN/BG copy keys
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 04-02-PLAN.md — [FLAGGED] migration 0004 file authoring: wp_transfers PII+lifecycle ALTER + BEFORE-UPDATE transition trigger + guest-self-read RLS (auth.jwt email) + active-destination anon read
+
+**Wave 3** *(blocked on Wave 2; 03 + 04 run in parallel)*
+
+- [ ] 04-03-PLAN.md — Booking slice: /pickup/[slug] page + BookingForm + PaxStepper + createBooking action → Stripe Checkout (BOOK-01/02/03/04)
+- [ ] 04-04-PLAN.md — Status/track slice: confirmation-email stub off paid + LifecycleTimeline + /status/[id] RLS read + /track + /auth/confirm next-threading + sw.ts NetworkFirst (BOOK-06/07, AUTH-02)
+
+**Wave 4** *(blocked on Wave 3)*
+
+- [ ] 04-05-PLAN.md — [BLOCKING/SIGN-OFF] apply migration 0004 to Balkanity + adversarial DB-trigger/RLS runbook + full booking→pay→confirm→track end-to-end smoke
 **Notes**: REVIEW/SIGN-OFF REQUIRED — `wp_transfers` schema migration (lifecycle fields + PII columns) is flagged/irreversible; sign off before applying. Status/booking data must never be served stale from the SW cache (NetworkFirst / Realtime). Confirmation email may call a stubbed wrapper, fully guarded in Phase 7. Avoids Pitfalls 1, 12.
 **UI hint**: yes
 
@@ -228,7 +245,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
 | 3. Payments Trust Spine | 5/5 | Complete    | 2026-06-18 |
-| 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |
+| 4. Transfer Entity + Booking Form | 0/5 | Planned | - |
 | 5. Claim Correctness | 0/TBD | Not started | - |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |
 | 7. Notifications | 0/TBD | Not started | - |

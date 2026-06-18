@@ -124,7 +124,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2)*
 
-- [ ] 03-04-PLAN.md — Stripe webhook route (the single idempotent paid writer, nodejs/raw-body) + minimal checkout trigger + display-only success/cancel pages
+- [x] 03-04-PLAN.md — Stripe webhook route (the single idempotent paid writer, nodejs/raw-body) + minimal checkout trigger + display-only success/cancel pages
 
 **Wave 4** *(blocked on Wave 3)*
 
@@ -226,7 +226,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
-| 3. Payments Trust Spine | 3/5 | In Progress|  |
+| 3. Payments Trust Spine | 4/5 | In Progress|  |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |
 | 5. Claim Correctness | 0/TBD | Not started | - |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 3 context gathered
-last_updated: "2026-06-18T17:29:43.027Z"
+stopped_at: "Completed 03-03-PLAN.md (payments seam: stripe.ts/checkout.ts/fee.ts)"
+last_updated: "2026-06-18T17:38:09.956Z"
 last_activity: 2026-06-18
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 15
-  completed_plans: 13
+  completed_plans: 14
   percent: 25
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 03 (payments-trust-spine) — EXECUTING
-Plan: 4 of 5
-Status: Completed 03-03 (payments seam); ready for 03-04
+Plan: 5 of 5
+Status: Ready to execute
 Last activity: 2026-06-18
 
-Progress: [█████████░] 87%
+Progress: [█████████░] 93%
 
 ## Handoff (for a new session)
 
@@ -70,6 +70,7 @@ Progress: [█████████░] 87%
 | Phase 03 P01 | 9min | 3 tasks tasks | 10 files files |
 | Phase 03 P02 | 3min | 1 tasks | 1 files |
 | Phase 03 P03 | 14min | 2 tasks | 4 files |
+| Phase 03 P04 | 4 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -105,6 +106,8 @@ Recent decisions affecting current work:
 - [Phase 03-03]: Payments seam — stripe.ts is server-only (import "server-only" first line, build-fail key-leak guard) and pins apiVersion '2026-05-27.dahlia' (type-checks against stripe@22.2.1 directly, no cast)
 - [Phase 03-03]: createCheckoutSession({transferId,amountCents}) follows the Plan-01 unit contract — integer unit_amount passed straight to Stripe (EUR, mode 'payment'), metadata.transfer_id mirrored onto payment_intent_data.metadata; success/cancel from trusted NEXT_PUBLIC_SITE_URL (never Origin, WR-04); DB row resolution/persistence deferred to the caller (no in-helper admin read)
 - [Phase 03-03]: recordedFeeCents(pi) is the verbatim integer balance_transaction.fee (D-05 recorded truth), null-guarded on unexpanded/absent (Pitfall 5) — distinct from commission.ts estStripeFeeCents display estimate; no 'paid' writer introduced (single-writer gate stays RED until Plan 04 webhook)
+- [Phase ?]: Webhook avoids NextResponse.json() (responses via JSON.stringify) so the contract gate's zero-dot-json rule passes while req.text() stays the only body read
+- [Phase ?]: app/pay/start gated by NODE_ENV not production (404 in prod), enabling Plan 05 TEST-mode gates without an admin session (T-03-START)
 
 ### Pending Todos
 
@@ -136,6 +139,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-18T17:29:24.679Z
+Last session: 2026-06-18T17:37:45.813Z
 Stopped at: Completed 03-03-PLAN.md (payments seam: stripe.ts/checkout.ts/fee.ts)
 Resume file: None

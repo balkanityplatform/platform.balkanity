@@ -45,10 +45,20 @@ export async function GET(request: NextRequest) {
       ? rawType
       : null;
 
+  // Allowlist the `next` param at this auth trust boundary — an attacker-controlled
+  // `next` must NEVER be forwarded verbatim (open-redirect / WR-03, threat T-04-TMP4).
+  // Only an internal status path (a UUID-shaped /status/<id>) is accepted; anything
+  // else falls back to `/`. This is the booking-confirmation / re-access landing target
+  // (AUTH-02 / BOOK-06 / D-07).
+  const STATUS_NEXT_RE = /^\/status\/[0-9a-f-]{36}$/;
+  const rawNext = searchParams.get("next");
+  const validatedNext = rawNext && STATUS_NEXT_RE.test(rawNext) ? rawNext : "/";
+
   // recovery/invite sessions must land on the set-password screen; passwordless
-  // links continue to `/` (role-routes). Computed from the validated `type`.
+  // links (email/magiclink) land on the validated `next` (the guest status page) or
+  // `/` (role-routes) when no valid next was supplied.
   const verifiedDest =
-    type === "recovery" || type === "invite" ? "/set-password" : "/";
+    type === "recovery" || type === "invite" ? "/set-password" : validatedNext;
 
   const supabase = await createClient();
 
@@ -56,14 +66,17 @@ export async function GET(request: NextRequest) {
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      // Session cookies are set; let `/` resolve the role and redirect (D-03).
-      return NextResponse.redirect(new URL("/", origin));
+      // Session cookies are set. magiclink guests honour the validated `next` (the
+      // status page); other flows fall back to `/` which role-routes (D-03). recovery/
+      // invite never reach the code branch with a status `next`, so `validatedNext`
+      // is `/` for them unless explicitly a /status path — safe either way.
+      return NextResponse.redirect(new URL(validatedNext, origin));
     }
   } else if (token_hash && type) {
     // (b) Custom-template token_hash flow.
     const { error } = await supabase.auth.verifyOtp({ token_hash, type });
     if (!error) {
-      // recovery/invite → /set-password; email/magiclink → / (see verifiedDest).
+      // recovery/invite → /set-password; email/magiclink → validated `next` (or /).
       return NextResponse.redirect(new URL(verifiedDest, origin));
     }
   }

@@ -2,7 +2,7 @@
 phase: 3
 slug: payments-trust-spine
 status: draft
-nyquist_compliant: false
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-06-18
 ---
@@ -68,6 +68,8 @@ created: 2026-06-18
 - [ ] CLI replay harness (documented runbook, not a unit test) — `stripe listen` + `stripe events resend` for SC3
 - [ ] Framework install: none needed (Vitest + Playwright already configured); `npm install stripe@^22.2`
 
+> All 7 Wave 0 test files above are planned in Plan 03-01 (the Wave 0 / test-scaffold plan). They are PLANNED, not yet executed — hence `wave_0_complete: false`. Every downstream task that depends on these scaffolds references them as its `<automated>` / Wave-0 dependency.
+
 ---
 
 ## Manual-Only Verifications
@@ -81,11 +83,13 @@ created: 2026-06-18
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 30s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 30s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+> Planning-time sign-off: the six items above are satisfied by the plan set as written (all Wave 0 scaffolds planned in 03-01; every downstream task carries an automated/Wave-0 verify; no watch-mode; quick-run latency ~30s). `wave_0_complete` flips to `true` only after Plan 03-01 executes and the scaffolds exist red on disk.
+
+**Approval:** 2026-06-18 (planning-time)

@@ -71,9 +71,10 @@ export async function POST(req: NextRequest) {
 
   // INVARIANT 4: insert-first idempotency. Record the verified event BEFORE applying
   // any effect. The UNIQUE webhook_events.event_id index is the race-safe replay
-  // authority — a replayed event.id violates it (Postgres 23505), so .maybeSingle()
-  // resolves to null and we short-circuit without touching wp_transfers (SC3).
-  const { data: inserted } = await admin
+  // authority — a replayed event.id violates it (Postgres 23505). We branch EXPLICITLY
+  // on that error code so a genuine replay (→ 200 short-circuit, exactly one effect, SC3)
+  // is never confused with a transient failure (→ 5xx so Stripe RETRIES; CR-01/CR-02).
+  const { data: inserted, error: insertErr } = await admin
     .from("webhook_events")
     .insert({
       event_id: event.id,
@@ -85,9 +86,20 @@ export async function POST(req: NextRequest) {
     .select("event_id")
     .maybeSingle();
 
+  if (insertErr) {
+    // 23505 = duplicate event_id → genuine replay; short-circuit with exactly one effect (SC3).
+    if (insertErr.code === "23505") {
+      return jsonResponse({ received: true, duplicate: true });
+    }
+    // Any other error is transient (connection drop, statement timeout, project cold-start).
+    // Return 5xx WITHOUT applying any effect so Stripe retries the verified event (CR-01).
+    return jsonResponse({ error: "audit insert failed" }, 500);
+  }
+
   if (!inserted) {
-    // Replay of an already-recorded event.id → exactly one effect overall (SC3).
-    return jsonResponse({ received: true, duplicate: true });
+    // Defensive: no error but also no row (should not happen for a successful insert).
+    // Treat as a transient anomaly and let Stripe retry rather than silently dropping.
+    return jsonResponse({ error: "audit insert returned no row" }, 500);
   }
 
   // The ONLY money-bearing event we act on. Everything else is recorded-and-ignored.
@@ -133,7 +145,7 @@ export async function POST(req: NextRequest) {
     // INVARIANT 1 (the single-writer gate): the ONLY `status: "paid"` write in the repo.
     // `.neq("status", "paid")` is the idempotency backstop on top of the insert-first
     // dedup — even a duplicate that somehow reached here cannot re-stamp paid_at.
-    const { data: paidRows } = await admin
+    const { data: paidRows, error: paidErr } = await admin
       .from("wp_transfers")
       .update({
         status: "paid",
@@ -144,6 +156,18 @@ export async function POST(req: NextRequest) {
       .eq("id", transferId)
       .neq("status", "paid")
       .select("id");
+
+    if (paidErr) {
+      // CR-01: a transient failure on the money-bearing write must NOT be mistaken for
+      // "no matching transfer". Record outcome=write_failed (distinct from the absent-row
+      // case so reconciliation can tell them apart) and return 5xx so Stripe RETRIES —
+      // a charged customer is never silently left unpaid.
+      await admin
+        .from("webhook_events")
+        .update({ outcome: "write_failed" })
+        .eq("event_id", event.id);
+      return jsonResponse({ error: "paid write failed" }, 500);
+    }
 
     if (!paidRows || paidRows.length === 0) {
       // No row matched the transfer id (absent, or already paid) → audit and 200.

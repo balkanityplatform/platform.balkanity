@@ -18,7 +18,7 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 ### Authentication & Roles
 
 - [x] **AUTH-01**: Users have an app role ∈ {admin, driver, guest} enforced across the app
-- [ ] **AUTH-02**: Guest can view their transfer status via a passwordless Supabase magic link
+- [x] **AUTH-02**: Guest can view their transfer status via a passwordless Supabase magic link
 - [x] **AUTH-03**: Drivers are admin-invited contractors only (no open signup); invite flow creates a driver account _(code + project config shipped in 02-05; complete-pending-UAT — one signed-in production walkthrough open: admin → /admin/drivers → invite → action_link resolves to /set-password → driver role)_
 - [x] **AUTH-04**: Admin can sign in to the desktop console via **email + password** (classic credentials). _Decision change 2026-06-18: reverses D-01 (passwordless magic-link) for admin/driver LOGIN → email+password; accounts are admin-created with an invite-to-set-password email + self-service password reset. Magic-link/tokenized access is retained only for guest transfer status (AUTH-02). Role layer (AUTH-01) unchanged._
 
@@ -33,7 +33,7 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 
 ### Booking & Payment (Guest)
 
-- [ ] **BOOK-01**: Guest opens a per-destination slug page (`/pickup/<slug>`) showing the destination and fare
+- [x] **BOOK-01**: Guest opens a per-destination slug page (`/pickup/<slug>`) showing the destination and fare
 - [ ] **BOOK-02**: Guest completes a short booking form (email required; phone, flight no., pax, luggage, notes as applicable) — guestless checkout
 - [ ] **BOOK-03**: Booking creates a transfer in `requested` and a code-created Stripe Checkout Session (not a dashboard Payment Link)
 - [ ] **BOOK-04**: Checkout clearly states the booking is prepaid & non-refundable before payment
@@ -43,7 +43,7 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 
 ### Transfer Lifecycle & Driver Claim
 
-- [ ] **XFER-01**: Transfer follows the locked lifecycle: requested → paid → claimed → en_route → arrived → picked_up → completed (+ cancelled)
+- [x] **XFER-01**: Transfer follows the locked lifecycle: requested → paid → claimed → en_route → arrived → picked_up → completed (+ cancelled)
 - [ ] **CLAIM-01**: Invited driver signs in and sees a limited-detail pool of `paid`, unclaimed transfers (date, arrival time, airport, destination zone/area — NOT exact address — fare, pax, luggage)
 - [ ] **CLAIM-02**: Driver claims a transfer via an atomic conditional update (first-to-claim wins; loser gets "already claimed") — 0 double-claims under concurrency
 - [ ] **CLAIM-03**: Full guest PII (name, contact, exact address, flight no., notes) unlocks only for the claiming driver and admin, enforced at the data layer (RLS + masked view/RPC), not UI-only
@@ -133,14 +133,14 @@ Which phases cover which requirements. Populated during roadmap creation.
 | NOTF-04 | Phase 2 — Supply-Side Onboarding | Complete (pending UAT; email send → Phase 7) |
 | BOOK-05 | Phase 3 — Payments Trust Spine | Complete |
 | HLTH-01 | Phase 3 — Payments Trust Spine | Complete |
-| BOOK-01 | Phase 4 — Transfer Entity + Booking Form | Pending |
+| BOOK-01 | Phase 4 — Transfer Entity + Booking Form | Complete |
 | BOOK-02 | Phase 4 — Transfer Entity + Booking Form | Pending |
 | BOOK-03 | Phase 4 — Transfer Entity + Booking Form | Pending |
 | BOOK-04 | Phase 4 — Transfer Entity + Booking Form | Pending |
 | BOOK-06 | Phase 4 — Transfer Entity + Booking Form | Pending |
 | BOOK-07 | Phase 4 — Transfer Entity + Booking Form | Pending |
-| XFER-01 | Phase 4 — Transfer Entity + Booking Form | Pending |
-| AUTH-02 | Phase 4 — Transfer Entity + Booking Form | Pending |
+| XFER-01 | Phase 4 — Transfer Entity + Booking Form | Complete |
+| AUTH-02 | Phase 4 — Transfer Entity + Booking Form | Complete |
 | CLAIM-02 | Phase 5 — Claim Correctness | Pending |
 | CLAIM-03 | Phase 5 — Claim Correctness | Pending |
 | CLAIM-01 | Phase 6 — Driver & Admin Views | Pending |

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 4 UI-SPEC approved
-last_updated: "2026-06-18T19:47:05.018Z"
-last_activity: 2026-06-18 -- Phase 04 execution started
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-06-18T20:03:03.357Z"
+last_activity: 2026-06-18
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 20
-  completed_plans: 15
+  completed_plans: 17
   percent: 38
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 04 (transfer-entity-booking-form) — EXECUTING
-Plan: 1 of 5
-Status: Executing Phase 04
-Last activity: 2026-06-18 -- Phase 04 execution started
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-06-18
 
-Progress: [████████████░░░░░░░░] 38% (3/8 phases)
+Progress: [█████████░] 85%
 
 ## Handoff (for a new session)
 
@@ -71,6 +71,7 @@ Progress: [████████████░░░░░░░░] 38% (3/
 | Phase 03 P02 | 3min | 1 tasks | 1 files |
 | Phase 03 P03 | 14min | 2 tasks | 4 files |
 | Phase 03 P04 | 4 | 2 tasks | 4 files |
+| Phase 04 P02 | 2min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,9 @@ Recent decisions affecting current work:
 - [Phase 03-03]: recordedFeeCents(pi) is the verbatim integer balance_transaction.fee (D-05 recorded truth), null-guarded on unexpanded/absent (Pitfall 5) — distinct from commission.ts estStripeFeeCents display estimate; no 'paid' writer introduced (single-writer gate stays RED until Plan 04 webhook)
 - [Phase ?]: Webhook avoids NextResponse.json() (responses via JSON.stringify) so the contract gate's zero-dot-json rule passes while req.text() stays the only body read
 - [Phase ?]: app/pay/start gated by NODE_ENV not production (404 in prod), enabling Plan 05 TEST-mode gates without an admin session (T-03-START)
+- [Phase ?]: [04-02]: Migration 0004 authored (FILE ONLY, apply deferred to Plan 05) — wp_transfers ALTER adds NULL-able guest PII + lifecycle + driver_id scaffold (D-06); existing Phase-3 seed rows survive (additive, no NOT NULL/defaults)
+- [Phase ?]: [04-02]: BEFORE-UPDATE trigger wp_enforce_transfer_transition encodes the full 8-state map mirroring platform/transfers/lifecycle.ts exactly; permits requested->paid (Pitfall 4); raises check_violation on illegal jumps; fires on service-role webhook (D-08, triggers not bypassed)
+- [Phase ?]: [04-02]: RLS guest-self-read uses (select auth.jwt() ->> 'email') = guest_email (never deprecated email() helper); destinations_public_active_read (active=true, to anon) unblocks /pickup (BOOK-01); no-write-policy lock preserved
 
 ### Pending Todos
 
@@ -139,6 +143,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-18T19:08:24.612Z
-Stopped at: Phase 4 UI-SPEC approved
-Resume file: .planning/phases/04-transfer-entity-booking-form/04-UI-SPEC.md
+Last session: 2026-06-18T20:03:03.351Z
+Stopped at: Completed 04-02-PLAN.md
+Resume file: None

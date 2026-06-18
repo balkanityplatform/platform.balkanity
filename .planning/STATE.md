@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 3 context gathered
-last_updated: "2026-06-18T17:23:26.112Z"
+last_updated: "2026-06-18T17:29:43.027Z"
 last_activity: 2026-06-18
 progress:
   total_phases: 8
   completed_phases: 2
   total_plans: 15
-  completed_plans: 12
+  completed_plans: 13
   percent: 25
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 03 (payments-trust-spine) — EXECUTING
-Plan: 3 of 5
-Status: Ready to execute
+Plan: 4 of 5
+Status: Completed 03-03 (payments seam); ready for 03-04
 Last activity: 2026-06-18
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 87%
 
 ## Handoff (for a new session)
 
@@ -69,6 +69,7 @@ Progress: [████████░░] 80%
 | Phase 02 P05 | continuation | 3 tasks | 6 files |
 | Phase 03 P01 | 9min | 3 tasks tasks | 10 files files |
 | Phase 03 P02 | 3min | 1 tasks | 1 files |
+| Phase 03 P03 | 14min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -101,6 +102,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [03-01]: stripe@^22.2.1 installed (official SDK, empty postinstall, no @stripe/stripe-js); apiVersion '2026-05-27.dahlia' type-checks against v22 typings (no cast)
 - [Phase ?]: [03-01]: checkout/fee contract tests use runtime-string dynamic import + typed cast so they tsc-clean before the impl exists while staying RED at runtime
 - [Phase 03-02]: Migration 0003 authored — wp_transfers (minimal money-spine, D-03) + webhook_events (UNIQUE event_id idempotency, HLTH-01/SC3); both RLS admin-read/no-write reusing 0002 is_admin(); EUR/integer-cents; FILE ONLY, live apply deferred to Plan 05 (Balkanity ref qyhdogajtmnvxphrslwm, never Kalvia)
+- [Phase 03-03]: Payments seam — stripe.ts is server-only (import "server-only" first line, build-fail key-leak guard) and pins apiVersion '2026-05-27.dahlia' (type-checks against stripe@22.2.1 directly, no cast)
+- [Phase 03-03]: createCheckoutSession({transferId,amountCents}) follows the Plan-01 unit contract — integer unit_amount passed straight to Stripe (EUR, mode 'payment'), metadata.transfer_id mirrored onto payment_intent_data.metadata; success/cancel from trusted NEXT_PUBLIC_SITE_URL (never Origin, WR-04); DB row resolution/persistence deferred to the caller (no in-helper admin read)
+- [Phase 03-03]: recordedFeeCents(pi) is the verbatim integer balance_transaction.fee (D-05 recorded truth), null-guarded on unexpanded/absent (Pitfall 5) — distinct from commission.ts estStripeFeeCents display estimate; no 'paid' writer introduced (single-writer gate stays RED until Plan 04 webhook)
 
 ### Pending Todos
 
@@ -132,6 +136,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-18T17:22:45.721Z
-Stopped at: Phase 3 context gathered
+Last session: 2026-06-18T17:29:24.679Z
+Stopped at: Completed 03-03-PLAN.md (payments seam: stripe.ts/checkout.ts/fee.ts)
 Resume file: None

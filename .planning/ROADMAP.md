@@ -76,7 +76,24 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. Admin invites a driver from the console; the driver receives an invite, signs in via magic link, and lands with the driver role assigned (no open signup exists)
   5. Company/property/destination records are readable/writable only by admins (admin-only RLS), and a unique URL-safe slug resolves to its destination
 
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — slugify + commission utilities (Wave 0 TDD) + full EN/BG dictionary keys
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 02-02-PLAN.md — [BLOCKING/SIGN-OFF] migration 0002 (supply tables + admin-only RLS + unique slug) + UI primitives + Companies CRUD
+
+**Wave 3** *(blocked on Wave 2; 03 + 05 run in parallel)*
+
+- [ ] 02-03-PLAN.md — Properties CRUD under a company (D-12 bottom-up deactivation)
+- [ ] 02-05-PLAN.md — [SIGN-OFF] Driver invite (generateLink, no email) + Redirect-URLs allowlist checkpoint
+
+**Wave 4** *(blocked on Wave 3 / 02-03)*
+
+- [ ] 02-04-PLAN.md — Destinations CRUD (slug auto-fill + "you keep" panel) + second-company e2e (ONBD-06)
 **Notes**: REVIEW/SIGN-OFF REQUIRED — schema migration (platform companies/properties/destinations + invite handling) and admin-only RLS policies. Keep these tables platform-generic (no transfer-specific columns). Driver-invite email send may be stubbed here and fully wired to the Resend wrapper in Phase 7.
 **UI hint**: yes
 
@@ -190,7 +207,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
-| 2. Supply-Side Onboarding | 0/TBD | Not started | - |
+| 2. Supply-Side Onboarding | 0/5 | Planned | - |
 | 3. Payments Trust Spine | 0/TBD | Not started | - |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |
 | 5. Claim Correctness | 0/TBD | Not started | - |

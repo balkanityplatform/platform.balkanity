@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 02 UI-SPEC approved
-last_updated: "2026-06-18T13:29:01.139Z"
-last_activity: 2026-06-18 -- Phase 02 planning complete
+status: executing
+stopped_at: Completed 02-01-PLAN.md
+last_updated: "2026-06-18T13:41:23.529Z"
+last_activity: 2026-06-18
 progress:
   total_phases: 8
   completed_phases: 1
-  total_plans: 5
-  completed_plans: 5
+  total_plans: 10
+  completed_plans: 6
   percent: 13
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
-**Current focus:** Phase 01 — platform-foundation
+**Current focus:** Phase 02 — supply-side-onboarding
 
 ## Current Position
 
-Phase: 01 (platform-foundation) — BUILT & DEPLOYED, awaiting verification
-Plan: 5 of 5 complete
-Status: Live at https://balkanityplatformproject.vercel.app. Auth reworked from magic-link to email+password (admin/driver; guests anonymous) — see AUTH-04 + memory [[phase-1-status-and-handoff]]. Remaining to close: on-device PWA install/offline check, then /gsd-verify-work 1. Next: Phase 2 (Supply-Side Onboarding).
-Last activity: 2026-06-18 -- Phase 02 planning complete
+Phase: 02 (supply-side-onboarding) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-06-18
 
-Progress: [██████████] 100% built (verification pending)
+Progress: [██████░░░░] 60%
 
 ## Handoff (for a new session)
 
@@ -62,6 +62,7 @@ Progress: [██████████] 100% built (verification pending)
 | Phase 01 P01 | 12 | 3 tasks | 16 files |
 | Phase 01 P03 | 30min | 3 tasks | 10 files |
 | Phase 01 P04 | 11min | 3 tasks | 20 files |
+| Phase 02 P01 | 8 | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,9 @@ Recent decisions affecting current work:
 - [Phase ?]: 01-03: Guest at / bounces to /sign-in (Phase 4 uses /pickup/<slug>); driver at / → /driver (reserved); Supabase magic-link email template must be {{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email
 - [Phase 01]: Dict widens dictionary values to string (not as-const literals) so BG translations differ from EN while a missing key still fails tsc
 - [Phase 01]: sign-in page is a Server Component shell + SignInForm client island so dictionary copy resolves server-side (no-flash SSR)
+- [Phase ?]: [02-01]: Hand-rolled slugify (no lib); Cyrillic-only labels slugify to '' and fall back to 'dest' via nextSlugCandidate (D-08, Pitfall 2)
+- [Phase ?]: [02-01]: Money as integer cents, round-half-up; commission/net/fee display-only and never persisted; Stripe fee is an estimate note (EEA 1.5% + EUR0.25, D-05/D-06/D-07)
+- [Phase ?]: [02-01]: All Phase 2 UI-SPEC copy lives in en.ts/bg.ts behind the tsc Dict parity gate; zod ^4.4 made explicit dependency
 
 ### Pending Todos
 
@@ -109,6 +113,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-18T12:57:57.084Z
-Stopped at: Phase 02 UI-SPEC approved
-Resume file: .planning/phases/02-supply-side-onboarding/02-UI-SPEC.md
+Last session: 2026-06-18T13:41:23.523Z
+Stopped at: Completed 02-01-PLAN.md
+Resume file: None

@@ -80,7 +80,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — slugify + commission utilities (Wave 0 TDD) + full EN/BG dictionary keys
+- [x] 02-01-PLAN.md — slugify + commission utilities (Wave 0 TDD) + full EN/BG dictionary keys
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -207,7 +207,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
-| 2. Supply-Side Onboarding | 0/5 | Planned | - |
+| 2. Supply-Side Onboarding | 1/5 | In Progress|  |
 | 3. Payments Trust Spine | 0/TBD | Not started | - |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |
 | 5. Claim Correctness | 0/TBD | Not started | - |

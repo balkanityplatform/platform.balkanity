@@ -36,3 +36,4 @@ supabase/.temp/
 # committed under public/icons, public/brand, platform/ui/pictograms). Trailing
 # space in the folder name is intentional — matches the real directory.
 Branding /
+.vercel

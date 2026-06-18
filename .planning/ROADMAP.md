@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Platform Foundation** - Platform/module seam, auth & roles, typed Supabase clients, design system, EN/BG toggle, installable PWA shell (completed 2026-06-17)
 - [x] **Phase 2: Supply-Side Onboarding** - Admin no-code CRUD for companies/properties/destinations + price/commission, slug links, and driver invites
-- [ ] **Phase 3: Payments Trust Spine** - Code-created Checkout Session + signature-verified idempotent webhook as the sole `paid` author, with webhook_events log
+- [x] **Phase 3: Payments Trust Spine** - Code-created Checkout Session + signature-verified idempotent webhook as the sole `paid` author, with webhook_events log (completed 2026-06-18)
 - [ ] **Phase 4: Transfer Entity + Booking Form** - Guest books & prepays via slug link, lifecycle state machine, confirmation email, and magic-link status page
 - [ ] **Phase 5: Claim Correctness** - Masked pool view, atomic claim RPC (0 double-claims), and data-layer PII gating via RLS
 - [ ] **Phase 6: Driver & Admin Views** - Driver pool/my-run/detail and admin transfers list/detail with assign/reassign/cancel/refund
@@ -94,6 +94,7 @@ Plans:
 **Wave 4** *(blocked on Wave 3 / 02-03)*
 
 - [x] 02-04-PLAN.md — Destinations CRUD (slug auto-fill + "you keep" panel) + second-company e2e (ONBD-06)
+
 **Notes**: REVIEW/SIGN-OFF REQUIRED — schema migration (platform companies/properties/destinations + invite handling) and admin-only RLS policies. Keep these tables platform-generic (no transfer-specific columns). Driver-invite email send may be stubbed here and fully wired to the Resend wrapper in Phase 7.
 **UI hint**: yes
 
@@ -128,7 +129,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3)*
 
-- [ ] 03-05-PLAN.md — [BLOCKING/SIGN-OFF] apply migration 0003 to Balkanity + the three TEST-mode adversarial gates (forged→400, replay→one effect, success-spoof→no paid) + grep single-writer gate
+- [x] 03-05-PLAN.md — [BLOCKING/SIGN-OFF] apply migration 0003 to Balkanity + the three TEST-mode adversarial gates (forged→400, replay→one effect, success-spoof→no paid) + grep single-writer gate
 
 **Notes**: REVIEW/SIGN-OFF REQUIRED — payment path and `webhook_events` schema migration. Stripe API version pinned `2026-05-27.dahlia`; `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` server-only, never `NEXT_PUBLIC_`. Verify Next 16 App Router raw-body handling with the forged-POST test before marking done. Settlement currency (EUR vs BGN) must be decided before this phase. Avoids Pitfalls 1, 2, 3, 11.
 
@@ -226,7 +227,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
-| 3. Payments Trust Spine | 4/5 | In Progress|  |
+| 3. Payments Trust Spine | 5/5 | Complete   | 2026-06-18 |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |
 | 5. Claim Correctness | 0/TBD | Not started | - |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |

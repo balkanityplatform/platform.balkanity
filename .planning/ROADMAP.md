@@ -111,7 +111,25 @@ Plans:
   4. Every Stripe event is recorded in `webhook_events` with its idempotency key, signature result, and processing outcome
   5. A code-created Checkout Session (not a dashboard Payment Link) carries `metadata.transfer_id`; the per-transaction processing fee is recorded (EUR 0.25 fixed for EEA cards), with refund non-recovery noted
 
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Wave 0 test baseline (5 vitest + 2 Playwright specs) + install stripe@^22.2 + replay runbook
+
+**Wave 2** *(blocked on Wave 1; 02 + 03 run in parallel)*
+
+- [ ] 03-02-PLAN.md — [BLOCKING/SIGN-OFF] migration 0003 (minimal wp_transfers + webhook_events + admin-read RLS + UNIQUE event_id) — file authoring only
+- [ ] 03-03-PLAN.md — platform/payments seam: server-only stripe.ts (apiVersion pin) + checkout.ts (EUR/metadata session) + fee.ts (balance-transaction fee)
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 03-04-PLAN.md — Stripe webhook route (the single idempotent paid writer, nodejs/raw-body) + minimal checkout trigger + display-only success/cancel pages
+
+**Wave 4** *(blocked on Wave 3)*
+
+- [ ] 03-05-PLAN.md — [BLOCKING/SIGN-OFF] apply migration 0003 to Balkanity + the three TEST-mode adversarial gates (forged→400, replay→one effect, success-spoof→no paid) + grep single-writer gate
+
 **Notes**: REVIEW/SIGN-OFF REQUIRED — payment path and `webhook_events` schema migration. Stripe API version pinned `2026-05-27.dahlia`; `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` server-only, never `NEXT_PUBLIC_`. Verify Next 16 App Router raw-body handling with the forged-POST test before marking done. Settlement currency (EUR vs BGN) must be decided before this phase. Avoids Pitfalls 1, 2, 3, 11.
 
 ### Phase 4: Transfer Entity + Booking Form
@@ -208,7 +226,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 |-------|----------------|--------|-----------|
 | 1. Platform Foundation | 5/5 | Complete   | 2026-06-17 |
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
-| 3. Payments Trust Spine | 0/TBD | Not started | - |
+| 3. Payments Trust Spine | 0/5 | Planned | - |
 | 4. Transfer Entity + Booking Form | 0/TBD | Not started | - |
 | 5. Claim Correctness | 0/TBD | Not started | - |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |

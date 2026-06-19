@@ -47,6 +47,22 @@ describe("0005 claim-correctness schema contract (source-level)", () => {
     // The view/read must never SELECT guest_name / guest_email / guest_phone — structural
     // masking, not select-then-hide. (flight_no IS permitted — operational, D-02.)
     expect(CODE).not.toMatch(/\bguest_(name|email|phone)\b/);
+
+    // WR-01: also assert the JOINED-table PII columns are not pulled. The pool joins
+    // destinations (d) and selects only the coarse d.airport / d.zone — the EXACT address
+    // (d.address) and the free-text notes (t.notes) must never be selected. We assert the
+    // QUALIFIED forms so we match only an actual SELECT reference, not the unqualified
+    // words "address"/"notes" that appear inside COMMENT-ON string literals.
+    //
+    // NOTE: CODE only strips lines that START with `--`; a TRAILING inline comment (e.g.
+    //   `d.zone, -- AREA only, NEVER d.address`) survives in CODE and would false-fail a
+    // bare `/\bd\.address\b/` match. So we strip trailing inline comments here before
+    // asserting on the column references — keeping the assertion bound to real SELECT text.
+    const CODE_NO_INLINE = CODE.split("\n")
+      .map((line) => line.replace(/--.*$/, ""))
+      .join("\n");
+    expect(CODE_NO_INLINE).not.toMatch(/\bt\.notes\b/i);
+    expect(CODE_NO_INLINE).not.toMatch(/\bd\.address\b/i);
   });
 
   it("hardens the SECURITY DEFINER claim RPC with an empty search_path (Pitfall 4)", () => {
@@ -73,9 +89,16 @@ describe("0005 claim-correctness schema contract (source-level)", () => {
   it("adds NO write policy on wp_transfers (the no-write-policy lock from 0002/0003/0004 holds)", () => {
     // The claim write goes through the SECURITY DEFINER RPC only; no permissive
     // INSERT/UPDATE/DELETE policy is granted on wp_transfers.
-    expect(CODE).not.toMatch(/for update/);
-    expect(CODE).not.toMatch(/for insert/);
-    expect(CODE).not.toMatch(/for delete/);
+    //
+    // Structure-aware, statement-bounded: forbid a write RLS POLICY specifically. The
+    // `[^;]*` keeps the match inside a single SQL statement so it can NEVER span from a
+    // `create policy` across the `;` into the RPC's sanctioned `UPDATE ...` DML — the old
+    // substring `/for update/` could not tell a dangerous write policy from the RPC's
+    // UPDATE and passed only by luck. `create policy ... for select` (the masked-read
+    // policy) stays allowed: the alternation forbids update|insert|delete only.
+    expect(CODE).not.toMatch(
+      /create\s+policy\b[^;]*\bfor\s+(update|insert|delete)\b/i,
+    );
   });
 
   it("carries the Balkanity-only infra guardrail in the header (Pitfall 6)", () => {

@@ -19,6 +19,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   hasLiveEnv,
   makeCallerClient,
+  PII_SENTINELS,
   seedDrivers,
   seedPaidTransfer,
   teardown,
@@ -59,6 +60,24 @@ describeLive("CLAIM-03 / SC3, SC4 — non-claiming-driver zero-PII gate (live)",
       }
       // flight_no is operational, EXPECTED present — NOT a gate failure (D-02).
       expect(Object.keys(row)).toContain("flight_no");
+    }
+
+    // WR-03: KEY-absence alone is insufficient — an aliased leak (e.g.
+    // `select guest_name as airport`) smuggles a PII VALUE under a non-PII KEY and would slip
+    // past the loop above. So ALSO assert VALUE-absence: serialize the whole payload and
+    // confirm none of the EXACT seeded sentinel PII values appears as a substring. The static
+    // sentinels come from PII_SENTINELS; guest_email is per-seed (uuid) so we use the value
+    // this run actually seeded (transfer.guestEmail). The coarse zone/airport/flight_no are
+    // intentionally present and are deliberately NOT asserted absent.
+    const haystack = JSON.stringify(pool ?? []);
+    for (const value of [
+      PII_SENTINELS.guestName,
+      PII_SENTINELS.guestPhone,
+      PII_SENTINELS.address,
+      PII_SENTINELS.notes,
+      transfer.guestEmail,
+    ]) {
+      expect(haystack).not.toContain(value);
     }
   });
 

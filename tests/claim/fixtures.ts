@@ -50,6 +50,25 @@ function requireLiveEnv(): {
   return { url: SUPABASE_URL, serviceRoleKey: SERVICE_ROLE_KEY, anonKey: ANON_KEY };
 }
 
+// ---- Sentinel PII values (WR-03) --------------------------------------------------------
+
+/**
+ * The STATIC sentinel PII the seed plants on the paid row, lifted into one exported source
+ * of truth so the PII gate can assert VALUE-absence (not just KEY-absence) against the EXACT
+ * seeded strings — an aliased leak (e.g. `select guest_name as airport`) smuggles a PII VALUE
+ * under a non-PII KEY and would slip past a keys-only check. The seed inserts reference these
+ * constants so the seeded values and the asserted values can never drift apart.
+ *
+ * guest_email is NOT here — it is generated per-seed (uuid) and is returned from
+ * seedPaidTransfer() so the gate references that run's exact address instead.
+ */
+export const PII_SENTINELS = {
+  guestName: "Adversarial Guest",
+  guestPhone: "+359888000111",
+  address: "12 Secret Exact Address St",
+  notes: "Leave a note here that must never leak to a non-claiming driver.",
+} as const;
+
 // ---- Types ------------------------------------------------------------------------------
 
 export interface SeededTransfer {
@@ -57,6 +76,12 @@ export interface SeededTransfer {
   destinationId: string;
   propertyId: string;
   companyId: string;
+  /**
+   * The dynamically-generated (uuid) guest_email actually seeded on the paid row, returned so
+   * the PII gate can assert this exact value never leaks — the static sentinels live in
+   * PII_SENTINELS, but guest_email varies per seed (WR-03).
+   */
+  guestEmail: string;
 }
 
 export interface SeededDriver {
@@ -110,7 +135,7 @@ export async function seedPaidTransfer(): Promise<SeededTransfer> {
       property_id: property.id,
       slug: `claim-gate-${crypto.randomUUID()}`,
       label: "Claim Gate Destination",
-      address: "12 Secret Exact Address St", // PII — must NEVER reach the pool/non-claiming driver
+      address: PII_SENTINELS.address, // PII — must NEVER reach the pool/non-claiming driver
       zone: "Sunny Beach Area", // AREA only — this is the pool-safe coarse field (D-01)
       airport: "BOJ",
       price_cents: 4500,
@@ -122,6 +147,10 @@ export async function seedPaidTransfer(): Promise<SeededTransfer> {
   if (destErr || !destination) {
     throw new Error(`seed: destination insert failed: ${destErr?.message}`);
   }
+
+  // The per-seed guest_email is dynamic (uuid) — captured here so it is BOTH inserted and
+  // returned, letting the PII gate assert this exact value never leaks (WR-03).
+  const guestEmail = `guest-${crypto.randomUUID()}@example.test`;
 
   // ONE paid, unclaimed transfer with full PII set (the gate's target).
   const { data: transfer, error: transferErr } = await admin
@@ -138,10 +167,10 @@ export async function seedPaidTransfer(): Promise<SeededTransfer> {
       pax: 2,
       luggage_count: 3,
       // --- the four PII fields the masked pool MUST omit and RLS MUST gate (D-01) ---
-      guest_name: "Adversarial Guest",
-      guest_email: `guest-${crypto.randomUUID()}@example.test`,
-      guest_phone: "+359888000111",
-      notes: "Leave a note here that must never leak to a non-claiming driver.",
+      guest_name: PII_SENTINELS.guestName,
+      guest_email: guestEmail,
+      guest_phone: PII_SENTINELS.guestPhone,
+      notes: PII_SENTINELS.notes,
     })
     .select("id")
     .single();
@@ -154,6 +183,7 @@ export async function seedPaidTransfer(): Promise<SeededTransfer> {
     destinationId: destination.id,
     propertyId: property.id,
     companyId: company.id,
+    guestEmail,
   };
 }
 

@@ -23,6 +23,10 @@
 //   6. The actual Stripe fee (recordedFeeCents, read from the expanded balance
 //      transaction — the recorded truth D-05) is persisted on the paid transition.
 import { type NextRequest, NextResponse } from "next/server";
+import { getDictFor } from "@/platform/i18n/dictionary";
+import { sendEmail } from "@/platform/notifications/send-email";
+import { buildAdminBookingEmail } from "@/platform/notifications/templates";
+import { insertNotification } from "@/platform/notifications/notify";
 import { recordedFeeCents } from "@/platform/payments/fee";
 import { getStripe } from "@/platform/payments/stripe";
 import { createAdminClient } from "@/platform/supabase/admin";
@@ -198,6 +202,83 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         console.error("[BOOK-06] confirmation send failed (continuing)", err);
       }
+    }
+
+    // NOTF-03 paid fan-out — three INDEPENDENT log-and-continue blocks hanging off the
+    // verified `paid` transition. NONE is a second `paid` writer (each writes ZERO
+    // wp_transfers rows — single-writer.test.ts stays green) and NONE may change the HTTP
+    // status of the money-bearing write above. Each catch logs the error OBJECT ONLY,
+    // never the recipient address / PII (threat T-07-FO5), and continues.
+
+    // Resolve admin recipient(s) once (Open Q2 — the forward-compatible app_users query
+    // over a single ADMIN_ALERT_EMAIL env). A failure here is swallowed so the driver
+    // pool fan-out below still runs.
+    let admins: { id: string; email: string | null }[] = [];
+    try {
+      const { data } = await admin
+        .from("app_users")
+        .select("id, email")
+        .eq("role", "admin");
+      admins = (data ?? []) as { id: string; email: string | null }[];
+    } catch (err) {
+      console.error("[NOTF-03] admin recipient resolution failed (continuing)", err);
+    }
+
+    // 1) Admin booking-alert email (best_effort, D-09) — soft-cap eligible (the in-app
+    //    notification below carries the same signal for free). EN-only, no guest/driver PII.
+    for (const a of admins) {
+      if (!a.email) continue;
+      try {
+        const { subject, html } = buildAdminBookingEmail({ to: a.email });
+        await sendEmail({
+          to: a.email,
+          subject,
+          html,
+          tier: "best_effort",
+          idempotencyKey: `admin-alert:${transferId}`,
+        });
+      } catch (err) {
+        console.error("[NOTF-03] admin alert send failed (continuing)", err);
+      }
+    }
+
+    // 2) Admin `new_paid_booking` in-app notification (D-03) — the title is the
+    //    pre-rendered EN dictionary copy (the row stores the title string, not a key).
+    const adminTitle = getDictFor("en").notifNewBookingTitle;
+    for (const a of admins) {
+      try {
+        await insertNotification({
+          recipientId: a.id,
+          type: "new_paid_booking",
+          entityType: "transfer",
+          entityId: transferId,
+          title: adminTitle,
+        });
+      } catch (err) {
+        console.error("[NOTF-03] admin notification failed (continuing)", err);
+      }
+    }
+
+    // 3) Driver `new_paid_pool` in-app notifications to ALL drivers (D-02) — a new paid
+    //    transfer entered the claimable pool. These are DB inserts, NOT Resend calls, so
+    //    they never count against the email cap (Pitfall 3). Title is pre-rendered EN copy.
+    try {
+      const { data: drivers } = await admin
+        .from("app_users")
+        .select("id")
+        .eq("role", "driver");
+      const poolTitle = getDictFor("en").notifNewPoolTitle;
+      for (const d of (drivers ?? []) as { id: string }[]) {
+        await insertNotification({
+          recipientId: d.id,
+          type: "new_paid_pool",
+          entityType: "transfer",
+          entityId: transferId,
+          title: poolTitle,
+        });
+      }
+    } catch (err) {
+      console.error("[NOTF-03] driver pool fan-out failed (continuing)", err);
     }
   }
 

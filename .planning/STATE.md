@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
+status: verifying
 stopped_at: Phase 05 context gathered
-last_updated: "2026-06-19T06:57:46.825Z"
+last_updated: "2026-06-19T07:27:00.793Z"
 last_activity: 2026-06-19
 progress:
   total_phases: 8
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 23
-  completed_plans: 22
-  percent: 50
+  completed_plans: 23
+  percent: 63
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 
 Phase: 05 (claim-correctness) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-06-19
 
-Progress: [██████████] 96%
+Progress: [██████████] 100%
 
 ## Handoff (for a new session)
 
@@ -76,6 +76,7 @@ Progress: [██████████] 96%
 | Phase 04 P04 | 10m | 3 tasks | 10 files |
 | Phase 05 P01 | 7min | 3 tasks | 5 files |
 | Phase 05 P02 | 2 | 2 tasks | 2 files |
+| Phase 05 P03 | 9min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [05-01]: Two-identity test split — service-role confined to seed/teardown, caller-auth (anon key + driver JWT) is the only claim/read identity (D-04, T-05-03); claim-schema contract accepts security_invoker view OR SECURITY DEFINER pool read (Open Q1 -> Plan 02)
 - [Phase ?]: Plan 05-02: masked pool wp_pool() implemented as a SECURITY DEFINER read (Open Q1 = option b), not a security_invoker view — base table stays 0-rows for non-claiming drivers (SC4)
 - [Phase ?]: Plan 05-02: claim_transfer is a SECURITY DEFINER RPC deciding the race with ONE atomic conditional UPDATE; single driver-self RLS policy; migration 0005 authored NOT applied (live apply = Plan 03)
+- [Phase ?]: [05-03]: Migration 0005 applied LIVE to Balkanity (qyhdogajtmnvxphrslwm) via Management API after approve-apply sign-off (Open-Q1 = SECURITY DEFINER masked read); both adversarial gates GREEN live (one winner under N=20xK=5; zero PII to non-claiming driver); single-writer intact; zero residue left on live DB
+- [Phase ?]: [05-03]: wp_pool is a SECURITY DEFINER function (not a relation) consumed via .rpc('wp_pool'); PostgREST 42501 anon-deny confirms exposure with EXECUTE revoked from anon (D-06)
 
 ### Pending Todos
 
@@ -155,6 +158,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T06:57:30.255Z
+Last session: 2026-06-19T07:26:21.153Z
 Stopped at: Phase 05 context gathered
 Resume file: None

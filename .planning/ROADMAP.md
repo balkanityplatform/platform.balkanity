@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Supply-Side Onboarding** - Admin no-code CRUD for companies/properties/destinations + price/commission, slug links, and driver invites
 - [x] **Phase 3: Payments Trust Spine** - Code-created Checkout Session + signature-verified idempotent webhook as the sole `paid` author, with webhook_events log; migration 0003 live on Balkanity, all 5 success criteria verified incl. live Stripe-CLI replay (completed 2026-06-18)
 - [x] **Phase 4: Transfer Entity + Booking Form** - Guest books & prepays via slug link, lifecycle state machine, confirmation email, and magic-link status page (completed 2026-06-18)
-- [ ] **Phase 5: Claim Correctness** - Masked pool view, atomic claim RPC (0 double-claims), and data-layer PII gating via RLS
+- [x] **Phase 5: Claim Correctness** - Masked pool view, atomic claim RPC (0 double-claims), and data-layer PII gating via RLS (completed 2026-06-19)
 - [ ] **Phase 6: Driver & Admin Views** - Driver pool/my-run/detail and admin transfers list/detail with assign/reassign/cancel/refund
 - [ ] **Phase 7: Notifications** - In-app feed/bell, Resend wrapper with cap guardrails + email_log, guest/admin emails, opt-in driver digest
 - [ ] **Phase 8: Platform Health** - Reconciliation sweep (catches dropped webhook), email-cap gauge, stuck-transfer alerts, keep-alive
@@ -194,7 +194,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2)*
 
-- [ ] 05-03-PLAN.md — [BLOCKING/SIGN-OFF] apply 0005 to Balkanity (Management API) + both live adversarial gates (N-parallel → one winner; non-claiming-JWT → zero PII) + 05-GATES-EVIDENCE.md
+- [x] 05-03-PLAN.md — [BLOCKING/SIGN-OFF] apply 0005 to Balkanity (Management API) + both live adversarial gates (N-parallel → one winner; non-claiming-JWT → zero PII) + 05-GATES-EVIDENCE.md
 
 **Notes**: REVIEW/SIGN-OFF REQUIRED — `wp_pool` view + RLS policies + `claim_transfer()` SECURITY DEFINER RPC schema migration. Crown-jewel phase: both adversarial gates MUST pass before the phase closes. The claim RPC is called with the user's auth context (never the service-role key). Open Q1 resolved: the masked pool is implemented as a SECURITY DEFINER read (not a security_invoker view) so the base table stays 0-rows for non-claiming drivers (SC4) — confirmed at the FLAGGED sign-off. Avoids Pitfalls 4, 5, 6.
 
@@ -260,7 +260,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
 | 3. Payments Trust Spine | 5/5 | Complete    | 2026-06-18 |
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
-| 5. Claim Correctness | 2/3 | In Progress|  |
+| 5. Claim Correctness | 3/3 | Complete   | 2026-06-19 |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |
 | 7. Notifications | 0/TBD | Not started | - |
 | 8. Platform Health | 0/TBD | Not started | - |

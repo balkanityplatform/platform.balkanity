@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
+status: verifying
 stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-06-19T12:25:26.260Z"
+last_updated: "2026-06-19T12:48:44.576Z"
 last_activity: 2026-06-19
 progress:
   total_phases: 8
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 28
-  completed_plans: 27
-  percent: 63
+  completed_plans: 28
+  percent: 75
 ---
 
 # Project State
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 
 Phase: 06 (driver-admin-views) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-06-19
 
-Progress: [██████████] 96%
+Progress: [██████████] 100%
 
 ## Handoff (for a new session)
 
@@ -82,6 +82,7 @@ Progress: [██████████] 96%
 | Phase 06 P02 | 4min | 2 tasks tasks | 5 files files |
 | Phase 06 P04 | 4min | 2 tasks | 5 files |
 | Phase 06 P03 | 4min | 2 tasks tasks | 4 files files |
+| Phase 06 P05 | 20min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -142,6 +143,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Admin transfers list/detail read unmasked rows via wp_transfers_admin_read on the anon cookie-bound client (never service-role); needsAttention uses simple D-09 pilot constants; URL-searchParams drive server-side re-query (OPS-01/OPS-02).
 - [Phase ?]: [06-03]: advanceStatus is a D-13 gated service-role driver write (role + driver_id===auth.uid() ownership + ALLOWED_TRANSITIONS next edge + .eq(status,current) optimistic guard) — NOT a new RLS write policy, NOT a client write (Pitfall 1)
 - [Phase ?]: [06-03]: driver My run + detail read on the caller-auth client (claiming-driver RLS scopes rows to the owner); full PII legitimate only post-claim; completed drops to a Completed today partition; no un-claim control anywhere (CLAIM-04/05/06)
+- [Phase ?]: [06-05]: Migration 0006 applied LIVE to Balkanity via Management API after 'approved' sign-off — claimed->paid release edge (D-14, claimed-only) + last_action_* audit columns (D-15); ref guardrail confirmed Kalvia absent; history row inserted in the same BEGIN..COMMIT txn; no-write-policy lock intact (only SELECT policies on wp_transfers)
+- [Phase ?]: [06-05]: release is the ONE narrow gated status='paid' writer (D-15) guarded by .eq('status','claimed'); single-writer gate GREEN with exactly {webhook, admin transfers actions}; refund records last_action_* only and never sets paid (D-12); cancel never auto-refunds, only offers the refund shortcut (D-11); last_action_by is the acting admin's verified JWT uid
 
 ### Pending Todos
 
@@ -173,6 +176,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T12:25:08.228Z
+Last session: 2026-06-19T12:48:44.570Z
 Stopped at: Completed 06-01-PLAN.md
 Resume file: None

@@ -216,7 +216,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — [SIGN-OFF] Dictionary keys + lifecycle release edge (claimed->paid) + author migration 0006 (file only) + Wave-0 Nyquist RED specs + single-writer widening
+- [x] 06-01-PLAN.md — [SIGN-OFF] Dictionary keys + lifecycle release edge (claimed->paid) + author migration 0006 (file only) + Wave-0 Nyquist RED specs + single-writer widening
 
 **Wave 2** *(blocked on Wave 1; 02 + 04 run in parallel)*
 
@@ -275,6 +275,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. Payments Trust Spine | 5/5 | Complete    | 2026-06-18 |
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
 | 5. Claim Correctness | 3/3 | Complete    | 2026-06-19 |
-| 6. Driver & Admin Views | 0/5 | Not started | - |
+| 6. Driver & Admin Views | 1/5 | In Progress|  |
 | 7. Notifications | 0/TBD | Not started | - |
 | 8. Platform Health | 0/TBD | Not started | - |

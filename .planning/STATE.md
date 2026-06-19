@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 6 UI-SPEC approved
-last_updated: "2026-06-19T11:47:28.401Z"
-last_activity: 2026-06-19 -- Phase 06 planning complete
+stopped_at: Completed 06-01-PLAN.md
+last_updated: "2026-06-19T12:02:16.210Z"
+last_activity: 2026-06-19
 progress:
   total_phases: 8
   completed_phases: 5
-  total_plans: 23
-  completed_plans: 23
-  percent: 63
+  total_plans: 28
+  completed_plans: 24
+  percent: 86
 ---
 
 # Project State
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
-**Current focus:** Phase 05 — claim-correctness
+**Current focus:** Phase 06 — driver-admin-views
 
 ## Current Position
 
-Phase: 6
-Plan: Not started
+Phase: 06 (driver-admin-views) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-06-19 -- Phase 06 planning complete
+Last activity: 2026-06-19
 
-Progress: [██████████] 100%
+Progress: [█████████░] 86%
 
 ## Handoff (for a new session)
 
@@ -78,6 +78,7 @@ Progress: [██████████] 100%
 | Phase 05 P01 | 7min | 3 tasks | 5 files |
 | Phase 05 P02 | 2 | 2 tasks | 2 files |
 | Phase 05 P03 | 9min | 3 tasks | 4 files |
+| Phase 06 P01 | 8min | 4 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -128,6 +129,10 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 05-02: claim_transfer is a SECURITY DEFINER RPC deciding the race with ONE atomic conditional UPDATE; single driver-self RLS policy; migration 0005 authored NOT applied (live apply = Plan 03)
 - [Phase ?]: [05-03]: Migration 0005 applied LIVE to Balkanity (qyhdogajtmnvxphrslwm) via Management API after approve-apply sign-off (Open-Q1 = SECURITY DEFINER masked read); both adversarial gates GREEN live (one winner under N=20xK=5; zero PII to non-claiming driver); single-writer intact; zero residue left on live DB
 - [Phase ?]: [05-03]: wp_pool is a SECURITY DEFINER function (not a relation) consumed via .rpc('wp_pool'); PostgREST 42501 anon-deny confirms exposure with EXECUTE revoked from anon (D-06)
+- [Phase ?]: [06-01]: claimed->paid is the ONLY new lifecycle edge (D-14 release, claimed-only); mirrored in lifecycle.ts + authored migration 0006; 8x8 pin-test GREEN
+- [Phase ?]: [06-01]: Migration 0006 authored NOT applied (release trigger edge + last_action_* audit columns); live apply deferred to Plan 05 via Management API (never MCP/db push, Balkanity-only)
+- [Phase ?]: [06-01]: single-writer gate widened to writers subset of {webhook, admin transfers actions} (D-15 release exception) — GREEN now, RED on any third paid writer
+- [Phase ?]: [06-01]: 7 Wave-0 RED specs are source-level RED-by-absence (candidate-file grep); Plans 02-05 consume them as CLAIM-01/04/05/06 + OPS-01/03/04 gates
 
 ### Pending Todos
 
@@ -159,6 +164,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T10:41:34.006Z
-Stopped at: Phase 6 UI-SPEC approved
-Resume file: .planning/phases/06-driver-admin-views/06-UI-SPEC.md
+Last session: 2026-06-19T12:02:16.204Z
+Stopped at: Completed 06-01-PLAN.md
+Resume file: None

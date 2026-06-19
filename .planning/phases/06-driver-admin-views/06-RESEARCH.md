@@ -445,21 +445,23 @@ export async function refundTransfer(_prev, formData): Promise<RefundState> {
 | A4 | The refund `reason` enum maps to Stripe's `requested_by_customer` for admin-initiated refunds | Pattern 5, refund example | Stripe only accepts `duplicate`/`fraudulent`/`requested_by_customer`. The D-10 free-text "reason (recorded)" is stored locally for audit; it is NOT the Stripe `reason` param. Planner should keep them distinct. |
 | A5 | No new DB column is needed to record the refund/cancel/release reason for audit | Runtime State, Pattern 5 | If audit requires persistence, an `audit`/reason column or table is a **schema change** (sign-off). CONTEXT says "do NOT design new schema" — so for the pilot, the reason may be logged/emailed (Phase 7) rather than persisted, OR a minimal audit column is flagged for sign-off. Planner must decide where the D-10 "recorded reason" actually lands. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **`release` lifecycle target state (BLOCKING for the release action only)**
+> All three open questions were resolved during `/gsd-discuss-phase` (CONTEXT.md D-14/D-15) and in Phase-6 planning. Annotations record where each resolution landed.
+
+1. **`release` lifecycle target state (BLOCKING for the release action only)** — **RESOLVED by D-14 (CONTEXT.md).**
    - What we know: assign/reassign/cancel map cleanly onto existing columns + trigger edges. `wp_pool()` requires `status='paid' AND driver_id IS NULL`.
    - What's unclear: releasing a `claimed` transfer back to the pool requires `status` to return to `paid` (so it re-appears in `wp_pool()`), but `claimed→paid` is not a trigger-legal edge and `paid` is the webhook's sole-writer status.
-   - Recommendation: Decide between (a) a trigger-legal backward edge for `claimed/en_route → paid` (schema change, sign-off) added as a tiny migration, or (b) restrict release to `claimed` only with an explicit, signed-off `claimed→paid` edge, or (c) a `release_transfer` SECURITY DEFINER RPC mirroring `claim_transfer`. Flag to discuss-phase/planner; do not guess.
+   - **Resolution (D-14):** Option (b) chosen — restrict release to `status='claimed'` only and add an explicit, sign-off-gated trigger-legal `claimed→paid` backward edge via the minimal migration `0006_release_and_audit.sql`. A gated service-role release action clears `driver_id` and sets `status='paid'` (the row reappears in `wp_pool()`); the single-`paid`-writer contract is widened to exactly {webhook, the gated release action} (D-15). Planned in 06-01 (author migration + lifecycle edge + single-writer widening) and 06-05 (live apply + the release action). Implemented, not open.
 
-2. **Where does the D-10 "recorded reason" persist?**
+2. **Where does the D-10 "recorded reason" persist?** — **RESOLVED by D-15 (CONTEXT.md).**
    - What we know: D-10 requires a reason note for cancel/refund/reassign/release "(audit trail of why)". No audit column/table exists.
    - What's unclear: persisting it is a schema change; CONTEXT forbids new schema in this phase.
-   - Recommendation: Either flag a minimal `audit`/`last_action_reason` column for sign-off, defer audit persistence to Phase 7/8, or store via an existing mechanism. Planner decision.
+   - **Resolution (D-15):** A minimal new `last_action_reason text` (+ `last_action_by uuid`, `last_action_at timestamptz`) column set is added to `wp_transfers` in the SAME sign-off-gated migration `0006` as the release edge. Cancel/refund/reassign/release persist the reason here; `paid` is still only ever set by the webhook (the release edge is the sole, narrow exception, written by the gated service-role action — never a client). Planned in 06-01 (author the columns in migration 0006) and 06-05 (live apply + the admin actions write the audit fields). Implemented, not open.
 
-3. **Stripe test-mode coverage before real-money pilot**
+3. **Stripe test-mode coverage before real-money pilot** — **RESOLVED: covered by a plan task (06-05).**
    - What we know: refunds touch the live Stripe account.
-   - Recommendation: Plan a Stripe-CLU/test-mode refund verification task before the real-money pilot (also relevant to Validation Architecture below).
+   - **Resolution:** A Stripe **test-mode** refund smoke is now an explicit acceptance criterion on the refund-hook task in `06-05-PLAN.md` (Task 1): using a Stripe **test** secret key, create a test PaymentIntent and assert `stripe.refunds.create` returns a refund with `status: 'succeeded'` (full + partial), with the `idempotencyKey` verified to prevent a double-refund — and this MUST pass BEFORE the live migration apply / any real-money refund. Q3 is therefore covered by a plan, not left dangling. (Validation Architecture above lists `platform/payments/refund.test.ts` as the home for the hook-shape/idempotency assertions; the test-mode smoke is the live-key complement gated on the Stripe TEST env.)
 
 ## Environment Availability
 

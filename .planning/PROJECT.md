@@ -12,7 +12,7 @@ A guest can prepay an airport transfer via a destination link, and a driver can 
 
 ### Validated
 
-(None yet — ship to validate)
+- Claim-correctness **data layer** (CLAIM-02, CLAIM-03) — adversarially proven live in Phase 5: exactly one driver wins any claim under concurrency (atomic `claim_transfer` RPC), and full guest PII is invisible to non-claiming drivers in the API payload itself (masked `wp_pool` SECURITY DEFINER read + RLS, not UI masking). Evidence: `phases/05-claim-correctness/05-GATES-EVIDENCE.md`. The user-observable driver pool/claim UI atop this layer ships in Phase 6.
 
 ### Active
 
@@ -97,4 +97,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-17 after initialization*
+*Last updated: 2026-06-19 after Phase 5 (claim-correctness) completion*

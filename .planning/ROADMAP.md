@@ -212,7 +212,21 @@ Plans:
   4. Admin sees a transfers list with filter and search (stuck/unclaimed highlighted in coral) and opens a transfer detail with lifecycle and trip/payment details
   5. Admin can assign, reassign, release, and cancel a transfer, and issue a manual Stripe refund from the detail page with a clear "this does not recover the ~EUR X processing fee" disclosure
 
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+**Wave 1**
+
+- [ ] 06-01-PLAN.md — [SIGN-OFF] Dictionary keys + lifecycle release edge (claimed->paid) + author migration 0006 (file only) + Wave-0 Nyquist RED specs + single-writer widening
+
+**Wave 2** *(blocked on Wave 1; 02 + 04 run in parallel)*
+
+- [ ] 06-02-PLAN.md — Driver pool slice: /driver masked wp_pool read + claim (win->detail / lose->neutral toast) + focus/poll refresh + Toast + NetworkFirst
+- [ ] 06-04-PLAN.md — Admin transfers list (filter/search/coral triage) + detail page + console nav (OPS-01/02)
+
+**Wave 3** *(blocked on Wave 2; 03 + 05 run in parallel)*
+
+- [ ] 06-03-PLAN.md — Driver "My run": sorted active claims + inline advance CTA (D-13 gated service-role advanceStatus) + Completed today + driver detail (CLAIM-04/05/06)
+- [ ] 06-05-PLAN.md — [BLOCKING/SIGN-OFF] apply migration 0006 LIVE + admin assign/reassign/release/cancel + server-only refund hook + refund form (OPS-03/04)
 **Notes**: Brand rules apply — status is always coloured dot + text label, ≥44px hit targets, warm light surfaces (driver), slate console (admin). Claim/status data is NetworkFirst (never SW-cached). No read-then-write anywhere on the claim path. Refund uses the platform payments hook. Avoids Pitfalls 4, 11, 12.
 **UI hint**: yes
 
@@ -261,6 +275,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. Payments Trust Spine | 5/5 | Complete    | 2026-06-18 |
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
 | 5. Claim Correctness | 3/3 | Complete    | 2026-06-19 |
-| 6. Driver & Admin Views | 0/TBD | Not started | - |
+| 6. Driver & Admin Views | 0/5 | Not started | - |
 | 7. Notifications | 0/TBD | Not started | - |
 | 8. Platform Health | 0/TBD | Not started | - |

@@ -163,7 +163,7 @@ None yet.
 - Companion docs PRD.md / PRD-BG.md referenced in PROJECT.md are not yet in the repo — ingest if available.
 - Infra guardrail: all Supabase/Vercel work targets Balkanity only (ref `qyhdogajtmnvxphrslwm`), never Kalvia (`utyatpadtibqqswsfvtr`).
 - Review gate standing: schema / auth / RLS / payment changes require sign-off before applying (Phases 1, 2, 3, 4, 5, 7, 8 all touch flagged areas).
-- SECURITY: .env.local.example (tracked) holds REAL live secrets (anon+service-role keys, DB password for qyhdogajtmnvxphrslwm) — pre-existing, NOT from 01-03. Revert to empty placeholders + rotate service-role key & DB password.
+- SECURITY: `.env.local.example` (tracked) verified CLEAN 2026-06-19 — all values are empty placeholders, no real secrets. (Prior concern resolved.) `.env.local` is gitignored. Remaining hygiene: `SUPABASE_ACCESS_TOKEN` rotated 2026-06-19 (old revoke is the user's action); DB password was exposed in chat via `SUPABASE_DB_URL` during Phase 06 UAT — reset before pilot.
 
 ## Deferred Items
 

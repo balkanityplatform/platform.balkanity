@@ -49,8 +49,8 @@ Declared values (all multiples of 4 — matches the in-codebase convention exact
 | Token | Value | Usage in this phase |
 |-------|-------|---------------------|
 | xs | 4px | Badge↔glyph gap, stacked feed-item metadata gap (`gap-[4px]`) |
-| sm | 8px | Feed-item action cluster, toggle↔label (`gap-[8px]`) |
-| md | 16px | Feed-item padding (`px-[16px] py-[12px]`), feed-item row gap (`gap-[16px]`) |
+| sm | 8px | Feed-item vertical padding (`py-[8px]`), feed-item action cluster, toggle↔label (`gap-[8px]`) |
+| md | 16px | Feed-item horizontal padding (`px-[16px]`), feed-item row gap (`gap-[16px]`) |
 | lg | 24px | `Card` padding (digest-preference card `p-[24px]`), header padding |
 | xl | 32px | Section gaps inside the preference card (`gap-[32px]`) |
 | 2xl | 48px | Page vertical rhythm where a dedicated feed/settings page exists (`py-[48px]`) |
@@ -151,7 +151,7 @@ All copy lives in `platform/i18n/en.ts` + `bg.ts` behind the tsc Dict-parity gat
 | Card description | `digestPrefBody` | "Get one morning email with the day's claimable transfers and your runs. Off by default." |
 | Opt-in toggle label | `digestEnableLabel` | "Email me a daily digest" |
 | Send-time select label | `digestTimeLabel` | "Send at" |
-| Save CTA | `digestSaveCta` | "Save" |
+| Save CTA | `digestSaveCta` | "Save digest settings" |
 | Save success toast (neutral) | `digestSavedToast` | "Digest preferences saved" |
 | Save error (genuine failure only) | `digestSaveFailed` | "Couldn't save. Check your connection and try again." |
 

@@ -41,10 +41,91 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getCurrentRole } from "@/platform/auth/role";
-import { getDict } from "@/platform/i18n/dictionary";
+import { getDict, getDictFor } from "@/platform/i18n/dictionary";
+import { sendEmail } from "@/platform/notifications/send-email";
+import { buildAssignedEmail } from "@/platform/notifications/templates";
+import { insertNotification } from "@/platform/notifications/notify";
 import { refundPayment } from "@/platform/payments/refund";
 import { createAdminClient } from "@/platform/supabase/admin";
 import { createClient } from "@/platform/supabase/server";
+
+// First token of a display name — the guest "driver assigned" email carries the driver
+// FIRST name + phone only (D-16), mirroring app/driver/actions.ts firstName().
+function firstName(name: string): string {
+  return name.trim().split(/\s+/)[0] ?? name;
+}
+
+// Pre-rendered EN notification titles (the notifications row stores the title STRING,
+// not a key — research Pattern 1). Resolved once via the cookie-free accessor.
+const notif = () => getDictFor("en");
+
+// Fan-out a driver run-notification — log-and-continue (a notify failure NEVER rolls back
+// the lifecycle write). title is the pre-rendered EN dictionary copy.
+async function notifyDriver(
+  driverId: string,
+  type: string,
+  title: string,
+  transferId: string,
+): Promise<void> {
+  try {
+    await insertNotification({
+      recipientId: driverId,
+      type,
+      entityType: "transfer",
+      entityId: transferId,
+      title,
+    });
+  } catch (err) {
+    console.error(`[NOTF] ${type} notification failed (continuing)`, err);
+  }
+}
+
+// Send the guest "driver assigned" email (name+phone of the assigned driver, D-16) —
+// the SAME builder as claimAction. `to:` is ALWAYS the row's guest_email (Pitfall 5).
+// Narrow service-role read of {name,phone} + {guest_email,locale}. Log-and-continue.
+async function sendAssignedEmail(
+  admin: ReturnType<typeof createAdminClient>,
+  transferId: string,
+  driverId: string,
+): Promise<void> {
+  try {
+    const { data: transferRow } = await admin
+      .from("wp_transfers")
+      .select("guest_email, locale")
+      .eq("id", transferId)
+      .maybeSingle();
+    const tr = transferRow as {
+      guest_email?: string | null;
+      locale?: string | null;
+    } | null;
+    const guestEmail = tr?.guest_email ?? null;
+    if (!guestEmail) return;
+
+    const { data: profile } = await admin
+      .from("driver_profiles")
+      .select("name, phone")
+      .eq("user_id", driverId)
+      .maybeSingle();
+    const p = profile as { name?: string | null; phone?: string | null } | null;
+    if (!p?.name) return;
+
+    const { subject, html } = buildAssignedEmail({
+      locale: tr?.locale ?? null,
+      guestEmail,
+      driverName: firstName(p.name),
+      driverPhone: p.phone ?? "",
+    });
+    await sendEmail({
+      to: guestEmail,
+      subject,
+      html,
+      tier: "best_effort",
+      idempotencyKey: `assigned:${transferId}`,
+    });
+  } catch (err) {
+    console.error("[NOTF-02] admin assigned email failed (continuing)", err);
+  }
+}
 
 export type TransferActionState = {
   status: "idle" | "error" | "success";
@@ -140,6 +221,17 @@ export async function assign(
     return { status: "error", message: t.saveFailed };
   }
 
+  // NOTF-02/03 assign fan-out (log-and-continue — never rolls back the write above):
+  // guest "driver assigned" email (name+phone, to=guest_email) + assigned driver
+  // run_assigned in-app notification.
+  await sendAssignedEmail(admin, parsed.data.id, parsed.data.driverId);
+  await notifyDriver(
+    parsed.data.driverId,
+    "run_assigned",
+    notif().notifRunAssignedTitle,
+    parsed.data.id,
+  );
+
   revalidatePath(`/admin/transfers/${parsed.data.id}`);
   return { status: "success" };
 }
@@ -174,6 +266,21 @@ export async function reassign(
   }
 
   const admin = createAdminClient();
+
+  // Capture the previously-claiming driver BEFORE the swap so we can notify them too
+  // (run_reassigned) if it differs from the newly-assigned driver. Best-effort read.
+  let previousDriverId: string | null = null;
+  try {
+    const { data: prior } = await admin
+      .from("wp_transfers")
+      .select("driver_id")
+      .eq("id", parsed.data.id)
+      .maybeSingle();
+    previousDriverId = (prior as { driver_id?: string | null } | null)?.driver_id ?? null;
+  } catch {
+    previousDriverId = null;
+  }
+
   const { data, error } = await admin
     .from("wp_transfers")
     .update({
@@ -192,6 +299,24 @@ export async function reassign(
   // Zero rows updated → the row was not in an active claimed state (paid/cancelled/completed).
   if (!data || data.length === 0) {
     return { status: "error", message: t.saveFailed };
+  }
+
+  // NOTF-03 reassign fan-out (log-and-continue): notify the newly-assigned driver, and
+  // the previously-claiming driver too if it differs.
+  const reassignedTitle = notif().notifRunReassignedTitle;
+  await notifyDriver(
+    parsed.data.driverId,
+    "run_reassigned",
+    reassignedTitle,
+    parsed.data.id,
+  );
+  if (previousDriverId && previousDriverId !== parsed.data.driverId) {
+    await notifyDriver(
+      previousDriverId,
+      "run_reassigned",
+      reassignedTitle,
+      parsed.data.id,
+    );
   }
 
   revalidatePath(`/admin/transfers/${parsed.data.id}`);
@@ -224,6 +349,20 @@ export async function release(
   }
 
   const admin = createAdminClient();
+
+  // Capture the releasing driver BEFORE the write so we can notify them (run_released).
+  let releasedDriverId: string | null = null;
+  try {
+    const { data: prior } = await admin
+      .from("wp_transfers")
+      .select("driver_id")
+      .eq("id", parsed.data.id)
+      .maybeSingle();
+    releasedDriverId = (prior as { driver_id?: string | null } | null)?.driver_id ?? null;
+  } catch {
+    releasedDriverId = null;
+  }
+
   // .eq("status","claimed") is the concurrency-safe guard (D-14): the row only releases if it
   // is STILL claimed at write time — never an en_route/arrived/etc. row. The 0006 trigger is the
   // hard legality backstop (claimed->paid only).
@@ -246,6 +385,30 @@ export async function release(
   // Zero rows updated → the row was not in 'claimed' (already released/advanced/cancelled).
   if (!data || data.length === 0) {
     return { status: "error", message: t.saveFailed };
+  }
+
+  // NOTF-03 release fan-out (log-and-continue): notify the previously-claiming driver
+  // (run_released), and re-announce to ALL drivers that the row re-entered the claimable
+  // pool (new_paid_pool — these are DB inserts, never cap-counted Resend calls).
+  if (releasedDriverId) {
+    await notifyDriver(
+      releasedDriverId,
+      "run_released",
+      notif().notifRunReleasedTitle,
+      parsed.data.id,
+    );
+  }
+  try {
+    const { data: drivers } = await admin
+      .from("app_users")
+      .select("id")
+      .eq("role", "driver");
+    const poolTitle = notif().notifNewPoolTitle;
+    for (const d of (drivers ?? []) as { id: string }[]) {
+      await notifyDriver(d.id, "new_paid_pool", poolTitle, parsed.data.id);
+    }
+  } catch (err) {
+    console.error("[NOTF-03] release pool re-announce failed (continuing)", err);
   }
 
   revalidatePath(`/admin/transfers/${parsed.data.id}`);
@@ -276,6 +439,20 @@ export async function cancel(
   }
 
   const admin = createAdminClient();
+
+  // Capture the assigned driver (if any) BEFORE the write so we can notify them on cancel.
+  let cancelledDriverId: string | null = null;
+  try {
+    const { data: prior } = await admin
+      .from("wp_transfers")
+      .select("driver_id")
+      .eq("id", parsed.data.id)
+      .maybeSingle();
+    cancelledDriverId = (prior as { driver_id?: string | null } | null)?.driver_id ?? null;
+  } catch {
+    cancelledDriverId = null;
+  }
+
   const { error } = await admin
     .from("wp_transfers")
     .update({
@@ -288,6 +465,17 @@ export async function cancel(
 
   if (error) {
     return { status: "error", message: t.saveFailed };
+  }
+
+  // NOTF-03 cancel fan-out (log-and-continue): if the row HAD a driver, notify them
+  // (run_cancelled). An unclaimed (paid) row had no driver — nothing to notify.
+  if (cancelledDriverId) {
+    await notifyDriver(
+      cancelledDriverId,
+      "run_cancelled",
+      notif().notifRunCancelledTitle,
+      parsed.data.id,
+    );
   }
 
   revalidatePath(`/admin/transfers/${parsed.data.id}`);

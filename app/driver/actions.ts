@@ -18,6 +18,11 @@
 import { revalidatePath } from "next/cache";
 import { getCurrentRole } from "@/platform/auth/role";
 import { getDict } from "@/platform/i18n/dictionary";
+import { sendEmail } from "@/platform/notifications/send-email";
+import {
+  buildArrivedEmail,
+  buildAssignedEmail,
+} from "@/platform/notifications/templates";
 import { createClient } from "@/platform/supabase/server";
 import { createAdminClient } from "@/platform/supabase/admin";
 import { ALLOWED_TRANSITIONS } from "@/platform/transfers/lifecycle";
@@ -28,11 +33,65 @@ import type { PoolRow } from "./PoolView";
 // Typed result for the driver advance write (mirrors the admin action-state shape).
 export type AdvanceState = { ok: boolean };
 
-// Thin pass-through to the caller-auth claim wrapper. The typed result is returned unchanged:
-// ok=true + the winner's full row in `transfer`; ok=false + reason='already_claimed' for a
-// graceful loser; ok=false + a transport reason for a genuine error (D-03).
+// First token of a display name (the guest "driver assigned" email carries the driver
+// FIRST name + phone per D-16 — never the full name).
+function firstName(name: string): string {
+  return name.trim().split(/\s+/)[0] ?? name;
+}
+
+// Thin pass-through to the caller-auth claim wrapper (claim.ts stays a PURE pass-through —
+// the narrow {name,phone} read for the guest email lives HERE in the action, not there).
+// The typed result is returned unchanged: ok=true + the winner's full row in `transfer`;
+// ok=false + reason='already_claimed' for a graceful loser; ok=false + a transport reason
+// for a genuine error (D-03).
 export async function claimAction(transferId: string): Promise<ClaimResult> {
-  return claimTransfer(transferId);
+  const result = await claimTransfer(transferId);
+
+  // NOTF-02 claimed fan-out (self-claim): on a SUCCESSFUL claim, send the guest the
+  // "driver assigned" email carrying the claiming driver's first name + phone (D-16).
+  // Log-and-continue — a send failure NEVER changes the claim result (the race already
+  // resolved in the DB; the driver owns the run regardless of the email). The `to:` is
+  // ALWAYS the row's guest_email (Pitfall 5) — never a driver/admin channel.
+  if (result.ok && result.transfer) {
+    try {
+      const row = result.transfer as {
+        driver_id?: string | null;
+        guest_email?: string | null;
+        locale?: string | null;
+      };
+      const guestEmail = row.guest_email ?? null;
+      const driverId = row.driver_id ?? null;
+      if (guestEmail && driverId) {
+        // Narrow service-role read of the claiming driver's display profile ONLY.
+        const admin = createAdminClient();
+        const { data: profile } = await admin
+          .from("driver_profiles")
+          .select("name, phone")
+          .eq("user_id", driverId)
+          .maybeSingle();
+        const p = profile as { name?: string | null; phone?: string | null } | null;
+        if (p?.name) {
+          const { subject, html } = buildAssignedEmail({
+            locale: row.locale ?? null,
+            guestEmail,
+            driverName: firstName(p.name),
+            driverPhone: p.phone ?? "",
+          });
+          await sendEmail({
+            to: guestEmail,
+            subject,
+            html,
+            tier: "best_effort",
+            idempotencyKey: `assigned:${transferId}`,
+          });
+        }
+      }
+    } catch (err) {
+      console.error("[NOTF-02] assigned email send failed (continuing)", err);
+    }
+  }
+
+  return result;
 }
 
 // Re-read the masked pool for the live poll (focus-refetch + interval). Same wp_pool() RPC
@@ -86,7 +145,7 @@ export async function advanceStatus(transferId: string): Promise<AdvanceState> {
   const admin = createAdminClient();
   const { data: row } = await admin
     .from("wp_transfers")
-    .select("status,driver_id")
+    .select("status,driver_id,guest_email,locale")
     .eq("id", transferId)
     .eq("driver_id", user.id) // OWNERSHIP scope — a non-owner read returns no row (Pitfall 1).
     .single();
@@ -113,6 +172,32 @@ export async function advanceStatus(transferId: string): Promise<AdvanceState> {
     .eq("status", current);
   if (error) {
     return { ok: false };
+  }
+
+  // NOTF-02 arrived fan-out: ONLY when the new status is `arrived`, send the guest a
+  // "driver arrived" heads-up email (best_effort, NO driver info per D-16). `en_route`
+  // (and every other transition) fires NO email — there is deliberately no `en_route:`
+  // send wiring (advance.notify.test.ts pins this). Log-and-continue: a send failure
+  // NEVER rolls back the advance write above. `to:` is ALWAYS the row's guest_email.
+  if (next === "arrived") {
+    try {
+      const guestEmail = (row as { guest_email?: string | null }).guest_email ?? null;
+      if (guestEmail) {
+        const { subject, html } = buildArrivedEmail({
+          locale: (row as { locale?: string | null }).locale ?? null,
+          guestEmail,
+        });
+        await sendEmail({
+          to: guestEmail,
+          subject,
+          html,
+          tier: "best_effort",
+          idempotencyKey: `arrived:${transferId}`,
+        });
+      }
+    } catch (err) {
+      console.error("[NOTF-02] arrived email send failed (continuing)", err);
+    }
   }
 
   revalidatePath("/driver/run");

@@ -11,6 +11,11 @@
 // the server page (dictionary-resolved → no flash, PLAT-04).
 import Image from "next/image";
 import { LanguageToggle } from "@/platform/ui/LanguageToggle";
+import {
+  NotificationBell,
+  type NotificationBellCopy,
+} from "@/platform/ui/NotificationBell";
+import type { NotificationRow } from "@/platform/notifications/feed";
 import { InviteDriverForm, type InviteDriverCopy } from "./InviteDriverForm";
 
 export type DriverRow = {
@@ -32,10 +37,14 @@ export function DriversView({
   drivers,
   lang,
   copy,
+  bellInitial,
+  bellCopy,
 }: {
   drivers: DriverRow[];
   lang: "en" | "bg";
   copy: DriversViewCopy;
+  bellInitial: NotificationRow[];
+  bellCopy: NotificationBellCopy;
 }) {
   const formCopy: InviteDriverCopy = {
     emailLabel: copy.emailLabel,
@@ -61,11 +70,19 @@ export function DriversView({
             className="h-[28px] w-auto"
           />
         </span>
-        <LanguageToggle
-          current={lang}
-          label={copy.langToggle}
-          className="text-white"
-        />
+        {/* Alerts bell — admin slate chrome, header-right (reuses the driver bell, D-08). */}
+        <span className="inline-flex items-center gap-[8px] text-white">
+          <NotificationBell
+            initial={bellInitial}
+            lang={lang}
+            copy={bellCopy}
+          />
+          <LanguageToggle
+            current={lang}
+            label={copy.langToggle}
+            className="text-white"
+          />
+        </span>
       </header>
 
       <section className="mx-auto flex max-w-2xl flex-col gap-[32px] px-[24px] py-[48px]">

@@ -20,8 +20,13 @@ import Image from "next/image";
 import { Button } from "@/platform/ui/Button";
 import { LifecycleTimeline } from "@/platform/ui/LifecycleTimeline";
 import { LanguageToggle } from "@/platform/ui/LanguageToggle";
+import {
+  NotificationBell,
+  type NotificationBellCopy,
+} from "@/platform/ui/NotificationBell";
 import { Toast } from "@/platform/ui/Toast";
 import type { TransferState } from "@/platform/ui/StatusDot";
+import type { NotificationRow } from "@/platform/notifications/feed";
 import { ALLOWED_TRANSITIONS } from "@/platform/transfers/lifecycle";
 import { advanceStatus } from "../actions";
 
@@ -99,11 +104,15 @@ export function RunView({
   completed,
   lang,
   copy,
+  bellInitial,
+  bellCopy,
 }: {
   active: RunRow[];
   completed: RunRow[];
   lang: "en" | "bg";
   copy: RunViewCopy;
+  bellInitial: NotificationRow[];
+  bellCopy: NotificationBellCopy;
 }) {
   const [pending, startTransition] = useTransition();
   const [advancingId, setAdvancingId] = useState<string | null>(null);
@@ -149,7 +158,15 @@ export function RunView({
             className="h-[28px] w-auto"
           />
         </span>
-        <LanguageToggle current={lang} label={copy.langToggle} />
+        <span className="inline-flex items-center gap-[8px]">
+          {/* Alerts bell — driver warm-light chrome, header-right (D-01: drivers see it). */}
+          <NotificationBell
+            initial={bellInitial}
+            lang={lang}
+            copy={bellCopy}
+          />
+          <LanguageToggle current={lang} label={copy.langToggle} />
+        </span>
       </header>
 
       <section className="mx-auto flex max-w-2xl flex-col gap-[24px] px-[24px] py-[24px]">

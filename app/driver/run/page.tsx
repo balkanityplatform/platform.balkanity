@@ -15,6 +15,7 @@ import { redirect } from "next/navigation";
 import { getCurrentRole } from "@/platform/auth/role";
 import { getDict, getLang } from "@/platform/i18n/dictionary";
 import { createClient } from "@/platform/supabase/server";
+import { readOwnNotifications } from "@/platform/notifications/feed";
 import { RunView, type RunRow } from "./RunView";
 
 const ACTIVE_STATES = ["claimed", "en_route", "arrived", "picked_up"] as const;
@@ -42,6 +43,9 @@ export default async function MyRunPage() {
   );
   const completed = rows.filter((r) => r.status === "completed");
 
+  // Role-gated own-rows-only seed for the Alerts bell (caller-auth RLS — never service-role).
+  const bellInitial = await readOwnNotifications();
+
   return (
     <RunView
       active={active}
@@ -58,6 +62,16 @@ export default async function MyRunPage() {
         advanceToPickedUpCta: t.advanceToPickedUpCta,
         advanceToCompletedCta: t.advanceToCompletedCta,
         advanceFailedToast: t.advanceFailedToast,
+      }}
+      bellInitial={bellInitial}
+      bellCopy={{
+        alertsTrigger: t.alertsTrigger,
+        alertsTriggerAria: t.alertsTriggerAria,
+        alertsPanelTitle: t.alertsPanelTitle,
+        markAllReadCta: t.markAllReadCta,
+        alertsEmptyHeading: t.alertsEmptyHeading,
+        alertsEmptyBody: t.alertsEmptyBody,
+        alertsLoadFailed: t.alertsLoadFailed,
       }}
     />
   );

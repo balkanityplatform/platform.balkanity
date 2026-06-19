@@ -12,6 +12,8 @@ import { redirect } from "next/navigation";
 import { getCurrentRole } from "@/platform/auth/role";
 import { getDict, getLang } from "@/platform/i18n/dictionary";
 import { LanguageToggle } from "@/platform/ui/LanguageToggle";
+import { NotificationBell } from "@/platform/ui/NotificationBell";
+import { readOwnNotifications } from "@/platform/notifications/feed";
 
 export default async function AdminPage() {
   const role = await getCurrentRole();
@@ -21,6 +23,9 @@ export default async function AdminPage() {
   }
 
   const [t, lang] = await Promise.all([getDict(), getLang()]);
+
+  // Role-gated own-rows-only seed for the Alerts bell (caller-auth RLS — never service-role).
+  const bellInitial = await readOwnNotifications();
 
   return (
     <main className="min-h-dvh bg-white">
@@ -37,7 +42,25 @@ export default async function AdminPage() {
             className="h-[28px] w-auto"
           />
         </span>
-        <LanguageToggle current={lang} label={t.langToggle} className="text-white" />
+        {/* Alerts bell — admin slate chrome, header-right. Reuses the SAME driver bell
+            component (D-08 discretion — identical own-rows read shape). text-white keeps the
+            "Alerts" label legible on slate. */}
+        <span className="inline-flex items-center gap-[8px] text-white">
+          <NotificationBell
+            initial={bellInitial}
+            lang={lang}
+            copy={{
+              alertsTrigger: t.alertsTrigger,
+              alertsTriggerAria: t.alertsTriggerAria,
+              alertsPanelTitle: t.alertsPanelTitle,
+              markAllReadCta: t.markAllReadCta,
+              alertsEmptyHeading: t.alertsEmptyHeading,
+              alertsEmptyBody: t.alertsEmptyBody,
+              alertsLoadFailed: t.alertsLoadFailed,
+            }}
+          />
+          <LanguageToggle current={lang} label={t.langToggle} className="text-white" />
+        </span>
       </header>
 
       <section className="mx-auto max-w-2xl px-[24px] py-[48px]">

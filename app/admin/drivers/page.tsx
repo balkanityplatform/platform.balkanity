@@ -15,6 +15,7 @@ import { redirect } from "next/navigation";
 import { getCurrentRole } from "@/platform/auth/role";
 import { getDict, getLang } from "@/platform/i18n/dictionary";
 import { createClient } from "@/platform/supabase/server";
+import { readOwnNotifications } from "@/platform/notifications/feed";
 import { DriversView, type DriverRow } from "./DriversView";
 
 export default async function DriversPage() {
@@ -46,10 +47,23 @@ export default async function DriversPage() {
     email: emailById.get(p.user_id as string) ?? null,
   }));
 
+  // Role-gated own-rows-only seed for the Alerts bell (caller-auth RLS — never service-role).
+  const bellInitial = await readOwnNotifications();
+
   return (
     <DriversView
       drivers={drivers}
       lang={lang}
+      bellInitial={bellInitial}
+      bellCopy={{
+        alertsTrigger: t.alertsTrigger,
+        alertsTriggerAria: t.alertsTriggerAria,
+        alertsPanelTitle: t.alertsPanelTitle,
+        markAllReadCta: t.markAllReadCta,
+        alertsEmptyHeading: t.alertsEmptyHeading,
+        alertsEmptyBody: t.alertsEmptyBody,
+        alertsLoadFailed: t.alertsLoadFailed,
+      }}
       copy={{
         langToggle: t.langToggle,
         driversTitle: t.driversTitle,

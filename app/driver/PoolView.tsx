@@ -24,7 +24,12 @@ import Image from "next/image";
 import { Button } from "@/platform/ui/Button";
 import { StatusDot } from "@/platform/ui/StatusDot";
 import { LanguageToggle } from "@/platform/ui/LanguageToggle";
+import {
+  NotificationBell,
+  type NotificationBellCopy,
+} from "@/platform/ui/NotificationBell";
 import { Toast, type ToastTone } from "@/platform/ui/Toast";
+import type { NotificationRow } from "@/platform/notifications/feed";
 import { fmtEur } from "@/platform/money/commission";
 import { claimAction, refetchPool } from "./actions";
 
@@ -72,10 +77,14 @@ export function PoolView({
   pool,
   lang,
   copy,
+  bellInitial,
+  bellCopy,
 }: {
   pool: PoolRow[];
   lang: "en" | "bg";
   copy: PoolViewCopy;
+  bellInitial: NotificationRow[];
+  bellCopy: NotificationBellCopy;
 }) {
   const router = useRouter();
   const [rows, setRows] = useState<PoolRow[]>(pool);
@@ -149,7 +158,15 @@ export function PoolView({
             className="h-[28px] w-auto"
           />
         </span>
-        <LanguageToggle current={lang} label={copy.langToggle} />
+        <span className="inline-flex items-center gap-[8px]">
+          {/* Alerts bell — driver warm-light chrome, header-right (D-01: drivers see it). */}
+          <NotificationBell
+            initial={bellInitial}
+            lang={lang}
+            copy={bellCopy}
+          />
+          <LanguageToggle current={lang} label={copy.langToggle} />
+        </span>
       </header>
 
       <section className="mx-auto flex max-w-2xl flex-col gap-[16px] px-[24px] py-[24px]">

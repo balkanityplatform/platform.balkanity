@@ -64,6 +64,9 @@ vi.mock("@/platform/i18n/dictionary", () => ({
     bookingInvalidPhone: "INVALID_PHONE",
     bookingFailed: "BOOKING_FAILED",
   })),
+  // D-17: createBooking now also captures the booking language via getLang()
+  // to persist wp_transfers.locale. Stub it so the action runs in the test env.
+  getLang: vi.fn(async () => "en"),
 }));
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));

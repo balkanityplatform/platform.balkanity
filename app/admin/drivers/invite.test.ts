@@ -4,7 +4,9 @@
 //   • a valid invite calls generateLink({type:'invite'}) (NEVER the email-sending
 //     inviteUserByEmail — D-03), writes app_users with the literal role:'driver'
 //     (mass-assignment defense, T-02-EOP5), stores name+phone in driver_profiles
-//     (D-02), and returns { status:"ok", actionLink } so the form reveals it (D-04);
+//     (D-02), and EMAILS the set-password link via the single sendEmail call-site
+//     (critical tier, key invite:<userId>) returning only { status:"ok" } — the link
+//     is never revealed/copied in the admin UI (D-14 supersedes the old D-04 reveal);
 //   • a non-admin caller is rejected BEFORE any auth-user creation (re-gate,
 //     T-02-EOP5) — generateLink is never called;
 //   • a re-invite (generateLink reports the user already exists) returns the generic
@@ -52,6 +54,21 @@ vi.mock("@/platform/i18n/dictionary", () => ({
 
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 
+// D-14: the invite EMAILS the set-password link via the single sendEmail call-site
+// instead of returning it. Mock the sender + template builder so the behavioral
+// assertions can prove the link is emailed (critical tier) and never revealed.
+const sendEmail = vi.fn(async (..._args: unknown[]) => ({ status: "sent" as const }));
+vi.mock("@/platform/notifications/send-email", () => ({
+  sendEmail: (...args: unknown[]) => sendEmail(...args),
+}));
+const buildInviteEmailFromLink = vi.fn((..._args: unknown[]) => ({
+  subject: "INVITE_SUBJECT",
+  html: "INVITE_HTML",
+}));
+vi.mock("./invite-email", () => ({
+  buildInviteEmailFromLink: (...args: unknown[]) => buildInviteEmailFromLink(...args),
+}));
+
 import { inviteDriver } from "./actions";
 
 function formWith(entries: Record<string, string>): FormData {
@@ -89,17 +106,33 @@ describe("inviteDriver (ONBD-05 / AUTH-03 / NOTF-04)", () => {
     }
   });
 
-  it("creates the auth user via generateLink (no email), writes role=driver + profile, and returns the action_link", async () => {
+  it("creates the auth user via generateLink, writes role=driver + profile, and EMAILS the set-password link (D-14 — no inline reveal)", async () => {
     const result = await inviteDriver(
       { status: "idle" },
       formWith({ email: "Driver@Example.com", name: "Ivan", phone: "+359888123456" }),
     );
 
-    // The set-password link is revealed to the admin (D-04).
-    expect(result).toEqual({
-      status: "ok",
-      actionLink: "https://balkanity.example/auth/confirm?token=abc&type=invite",
+    // D-14: email-only — the action returns ONLY status:ok; the set-password link
+    // is emailed (below), never returned/revealed to the admin UI.
+    expect(result).toEqual({ status: "ok" });
+    expect(result).not.toHaveProperty("actionLink");
+
+    // The link is handed to the template builder and emailed via the single
+    // sendEmail call-site at the critical tier with a stable per-user idempotency key.
+    expect(buildInviteEmailFromLink).toHaveBeenCalledWith({
+      to: "Driver@Example.com",
+      link: "https://balkanity.example/auth/confirm?token=abc&type=invite",
     });
+    expect(sendEmail).toHaveBeenCalledTimes(1);
+    expect(sendEmail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: "Driver@Example.com",
+        subject: "INVITE_SUBJECT",
+        html: "INVITE_HTML",
+        tier: "critical",
+        idempotencyKey: "invite:drv-1",
+      }),
+    );
 
     // generateLink is the invite path — and it is type:'invite' with the trusted
     // base redirectTo (WR-04 / Pitfall 1).

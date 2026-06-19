@@ -20,6 +20,10 @@ export default defineConfig({
       "modules/**/*.test.{ts,tsx}",
       // Co-located route-handler/action unit tests (e.g. companies lifecycle, D-12).
       "app/**/*.test.{ts,tsx}",
+      // Phase 5 live adversarial gates (concurrency one-winner, non-claiming-driver
+      // zero-PII). Node-run against the live TEST DB; live-env-gated (skip when absent).
+      // NOT tests/e2e/** (Playwright's testDir, which stays excluded below).
+      "tests/claim/**/*.test.{ts,tsx}",
     ],
     exclude: ["tests/e2e/**", "node_modules/**", ".next/**"],
   },

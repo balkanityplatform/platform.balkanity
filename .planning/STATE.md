@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 05 context gathered
-last_updated: "2026-06-19T06:52:43.222Z"
+last_updated: "2026-06-19T06:57:46.825Z"
 last_activity: 2026-06-19
 progress:
   total_phases: 8
   completed_phases: 4
   total_plans: 23
-  completed_plans: 21
+  completed_plans: 22
   percent: 50
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 05 (claim-correctness) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-19
 
-Progress: [█████████░] 91%
+Progress: [██████████] 96%
 
 ## Handoff (for a new session)
 
@@ -75,6 +75,7 @@ Progress: [█████████░] 91%
 | Phase 04 P03 | 3min | 3 tasks | 4 files |
 | Phase 04 P04 | 10m | 3 tasks | 10 files |
 | Phase 05 P01 | 7min | 3 tasks | 5 files |
+| Phase 05 P02 | 2 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Confirmation + /track re-access emails stubbed (generateLink magic link revealed/logged); Resend send deferred to Phase 7 — function signature is the stable seam
 - [Phase ?]: [05-01]: Nyquist RED baseline for Phase 5 — source-level claim-schema contract + concurrency one-winner gate + non-claiming-driver zero-PII gate + shared service-role seed/caller-auth fixtures, all RED by design; migration 0005 is Plan 02, live apply Plan 03
 - [Phase ?]: [05-01]: Two-identity test split — service-role confined to seed/teardown, caller-auth (anon key + driver JWT) is the only claim/read identity (D-04, T-05-03); claim-schema contract accepts security_invoker view OR SECURITY DEFINER pool read (Open Q1 -> Plan 02)
+- [Phase ?]: Plan 05-02: masked pool wp_pool() implemented as a SECURITY DEFINER read (Open Q1 = option b), not a security_invoker view — base table stays 0-rows for non-claiming drivers (SC4)
+- [Phase ?]: Plan 05-02: claim_transfer is a SECURITY DEFINER RPC deciding the race with ONE atomic conditional UPDATE; single driver-self RLS policy; migration 0005 authored NOT applied (live apply = Plan 03)
 
 ### Pending Todos
 
@@ -152,6 +155,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T06:52:24.712Z
+Last session: 2026-06-19T06:57:30.255Z
 Stopped at: Phase 05 context gathered
 Resume file: None

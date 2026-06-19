@@ -16,9 +16,13 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // --- Resend mock (the ONLY resend client in the test; never a live send) ---
+// Resend must be NEW-able (the SDK is `new Resend(key)`); a `class` mock is constructable
+// under vitest v4 (a `vi.fn(() => obj)` arrow is not — "is not a constructor").
 const emailsSend = vi.fn(async () => ({ data: { id: "re_mock" }, error: null }));
 vi.mock("resend", () => ({
-  Resend: vi.fn(() => ({ emails: { send: emailsSend } })),
+  Resend: class {
+    emails = { send: emailsSend };
+  },
 }));
 
 // --- service-role admin client mock: a from()-chain over email_log ---

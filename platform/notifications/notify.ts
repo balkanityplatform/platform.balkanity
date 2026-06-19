@@ -22,6 +22,15 @@ import "server-only";
 // MONEY LOCK (threat T-07-SE5): ZERO `wp_transfers` writes here.
 import { createAdminClient } from "@/platform/supabase/admin";
 import { createClient } from "@/platform/supabase/server";
+import { readOwnNotifications, type NotificationRow } from "./feed";
+
+// Re-exported here so the bell's read seam lives next to its write seam (markRead/markAllRead),
+// and so the own-rows-only contract is pinned by notifications-rls.test.ts on THIS module.
+// It is a thin delegate to feed.ts's single caller-auth read — the poll cannot widen the
+// surface because it reuses the exact RSC read (threat T-07-BELL1).
+export async function refetchNotifications(): Promise<NotificationRow[]> {
+  return readOwnNotifications();
+}
 
 // Service-role insert of a polymorphic notification row. Wrapped so a failed insert is
 // non-fatal to the caller's lifecycle write (callers also log-and-continue, but this is

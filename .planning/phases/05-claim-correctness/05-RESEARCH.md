@@ -444,7 +444,7 @@ expect(MIGRATION).toContain("Kalvia (utyatpadtibqqswsfvtr)");
 | A4 | The live migration applies via the Management API `/database/query` endpoint with `SUPABASE_ACCESS_TOKEN`, exactly as Phase 3 did; MCP/direct-host are unavailable for Balkanity. | Don't Hand-Roll; Pitfall 6 | LOW — directly evidenced in 03-GATES-EVIDENCE.md and project memory. |
 | A5 | No generated Supabase TS types are committed in the repo (grep found none), so type regeneration is optional/deferred. | Runtime State Inventory | LOW — if types ARE used elsewhere, regenerate post-apply. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Pre-claim base-table read path for the `security_invoker` pool view (the load-bearing design decision).**
    - What we know: `security_invoker = on` checks the underlying `wp_transfers` RLS as the *driver*. Today the only permissive SELECT policies are `wp_transfers_admin_read` (is_admin) and `wp_transfers_guest_self_read` (JWT email = guest_email). A non-admin driver matches neither → the view returns them 0 rows.

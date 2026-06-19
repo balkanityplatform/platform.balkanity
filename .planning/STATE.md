@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-06-19T12:10:08.251Z"
+last_updated: "2026-06-19T12:17:27.695Z"
 last_activity: 2026-06-19
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 28
-  completed_plans: 25
+  completed_plans: 26
   percent: 63
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 06 (driver-admin-views) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-06-19
 
-Progress: [█████████░] 89%
+Progress: [█████████░] 93%
 
 ## Handoff (for a new session)
 
@@ -80,6 +80,7 @@ Progress: [█████████░] 89%
 | Phase 05 P03 | 9min | 3 tasks | 4 files |
 | Phase 06 P01 | 8min | 4 tasks | 13 files |
 | Phase 06 P02 | 4min | 2 tasks tasks | 5 files files |
+| Phase 06 P04 | 4min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -137,6 +138,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [06-02]: Driver pool reads the masked wp_pool() RPC only (caller-auth); zero guest-PII keys on the pool path (CLAIM-01/CLAIM-03, Pitfall 11)
 - [Phase ?]: [06-02]: claimAction is a thin caller-auth claimTransfer wrapper (never service-role, D-04); win -> /driver/run/<id> renders from the RPC's returned row (no follow-up PII fetch), lose -> neutral toast + card removal (D-03); no un-claim control (CLAIM-04)
 - [Phase ?]: [06-02]: /driver pool DATA path forced NetworkFirst in app/sw.ts (non-document rule alongside the document rule) so live claim state is never SW-cached (Pitfall 4, T-06-STALE)
+- [Phase ?]: Admin transfers list/detail read unmasked rows via wp_transfers_admin_read on the anon cookie-bound client (never service-role); needsAttention uses simple D-09 pilot constants; URL-searchParams drive server-side re-query (OPS-01/OPS-02).
 
 ### Pending Todos
 
@@ -168,6 +170,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T12:09:42.737Z
+Last session: 2026-06-19T12:17:21.934Z
 Stopped at: Completed 06-01-PLAN.md
 Resume file: None

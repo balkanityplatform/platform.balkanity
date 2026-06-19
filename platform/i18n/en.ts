@@ -210,6 +210,55 @@ export const en = {
   paySuccessConfirming: "Payment received — we're confirming it.",
   paySuccessTrackCta: "View your booking status",
   paySuccessTrackFallback: "Or request a fresh link by email.",
+
+  // --- Phase 6: driver PWA + admin transfers console (UI-SPEC Copywriting Contract) ---
+
+  // Driver PWA — pool / claim / run (CLAIM-01/04/05/06, D-03/D-04/D-06)
+  claimTransferCta: "Claim",
+  poolEmptyHeading: "No transfers to claim",
+  poolEmptyBody:
+    "New paid transfers appear here automatically. Pull to refresh or check back shortly.",
+  claimLostToast: "Just claimed by another driver",
+  claimFailedToast: "Couldn't claim. Check your connection and try again.",
+  myRunTitle: "My run",
+  runEmptyHeading: "No active transfers",
+  runEmptyBody: "Claim a transfer from the pool to start your run.",
+  // Advance-status CTA — label resolves per the next legal edge via lifecycle.ts (D-04/D-05)
+  advanceToEnRouteCta: "Start driving",
+  advanceToArrivedCta: "Mark arrived",
+  advanceToPickedUpCta: "Mark picked up",
+  advanceToCompletedCta: "Mark completed",
+  completedTodayTitle: "Completed today",
+  advanceFailedToast: "Couldn't update. Check your connection and try again.",
+
+  // Admin transfers console — list / detail / ops actions (OPS-01/02/03/04, D-07..D-12)
+  transfersTitle: "Transfers",
+  filterByStatusLabel: "Status",
+  needsAttentionFilterCta: "Needs attention",
+  transferSearchPlaceholder: "Search name, flight no. or destination",
+  transfersEmptyHeading: "No transfers yet",
+  transfersEmptyBody: "Paid bookings appear here as guests complete checkout.",
+  transfersNoMatchBody: "No transfers match your filters.",
+  needsAttentionBadge: "Needs attention",
+  assignDriverCta: "Assign driver",
+  reassignDriverCta: "Reassign",
+  releaseTransferCta: "Release",
+  cancelTransferCta: "Cancel transfer",
+  refundTransferCta: "Refund",
+  actionReasonLabel: "Reason (recorded)",
+  refundAmountLabel: "Refund amount",
+  // {fee}/{amount} tokens stay LITERAL — the consuming component substitutes them (D-12).
+  refundFeeDisclosure:
+    "The ~€{fee} Stripe processing fee is NOT recovered by this refund.",
+  cancelOfferRefundCta: "Also issue a refund?",
+  // Destructive confirmations (D-10/D-11) — cancel never auto-refunds; reason required.
+  cancelTransferConfirm:
+    "Cancel this transfer? The guest is not automatically refunded — use Refund separately if needed. Enter a reason to continue.",
+  refundConfirm:
+    "Issue a €{amount} refund? The ~€{fee} processing fee is not recovered. Enter a reason to continue.",
+  reassignConfirm: "Reassign this transfer to another driver?",
+  releaseConfirm:
+    "Release this transfer back to the pool? It becomes claimable again. Enter a reason to continue.",
 } as const;
 
 // The dictionary contract — bg.ts is type-checked against this (parity gate).

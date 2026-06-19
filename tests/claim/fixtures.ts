@@ -186,7 +186,7 @@ export async function seedDrivers(n: number): Promise<SeededDriver[]> {
 
     const { error: appUserErr } = await admin
       .from("app_users")
-      .insert({ id: userId, role: "driver" });
+      .insert({ id: userId, email, role: "driver" });
     if (appUserErr) {
       throw new Error(`seed: app_users insert failed: ${appUserErr.message}`);
     }
@@ -199,14 +199,30 @@ export async function seedDrivers(n: number): Promise<SeededDriver[]> {
     }
 
     // Sign in under the anon key to mint a real session/access_token (caller-auth identity).
+    // The GoTrue token endpoint is IP-rate-limited; seeding many drivers across K rounds can
+    // trip it. Retry with exponential backoff on the transient "rate limit" error so the gate
+    // still mints a genuine per-driver JWT (the concurrency invariant is unchanged).
     const signInClient = createClient(url, anonKey);
-    const { data: session, error: signInErr } =
-      await signInClient.auth.signInWithPassword({ email, password });
-    if (signInErr || !session?.session?.access_token) {
-      throw new Error(`seed: driver sign-in failed: ${signInErr?.message}`);
+    let accessToken: string | undefined;
+    let lastErr: string | undefined;
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const { data: session, error: signInErr } =
+        await signInClient.auth.signInWithPassword({ email, password });
+      if (session?.session?.access_token) {
+        accessToken = session.session.access_token;
+        break;
+      }
+      lastErr = signInErr?.message;
+      const isRateLimit = /rate limit/i.test(signInErr?.message ?? "");
+      if (!isRateLimit) break;
+      // 2s, 4s, 8s, 16s, 32s backoff — clears the GoTrue 5-min token window.
+      await new Promise((r) => setTimeout(r, 2_000 * 2 ** attempt));
+    }
+    if (!accessToken) {
+      throw new Error(`seed: driver sign-in failed: ${lastErr}`);
     }
 
-    drivers.push({ userId, email, accessToken: session.session.access_token });
+    drivers.push({ userId, email, accessToken });
   }
 
   return drivers;

@@ -48,8 +48,10 @@ describeLive("CLAIM-03 / SC3, SC4 — non-claiming-driver zero-PII gate (live)",
 
     const client = makeCallerClient(driver.accessToken);
 
-    // (a) The masked pool — structurally cannot carry PII (the view physically omits it).
-    const { data: pool } = await client.from("wp_pool").select("*");
+    // (a) The masked pool — structurally cannot carry PII (the SECURITY DEFINER read
+    //     function physically omits it). Per the resolved Open-Q1 (option b), wp_pool is a
+    //     definer FUNCTION, so it is invoked via PostgREST as an RPC, not a queryable relation.
+    const { data: pool } = await client.rpc("wp_pool");
     expect(pool).not.toBeNull();
     for (const row of pool ?? []) {
       for (const key of PII_KEYS) {

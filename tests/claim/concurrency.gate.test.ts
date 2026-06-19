@@ -85,5 +85,5 @@ describeLive("CLAIM-02 / SC2 — concurrency one-winner gate (live)", () => {
       await teardown(pending);
       pending = null;
     }
-  });
+  }, 180_000); // live remote seeding (K rounds × N driver auth users) far exceeds the 5s default.
 });

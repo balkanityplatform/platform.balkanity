@@ -261,7 +261,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3; shares DriversView with 07-03)*
 
-- [ ] 07-04-PLAN.md — Lifecycle fan-out + un-stub seams: confirmation (un-stub) + email-only invite (D-14) + paid/claimed/arrived/admin-ops emails & in-app notifications, all log-and-continue (NOTF-02/03/04)
+- [x] 07-04-PLAN.md — Lifecycle fan-out + un-stub seams: confirmation (un-stub) + email-only invite (D-14) + paid/claimed/arrived/admin-ops emails & in-app notifications, all log-and-continue (NOTF-02/03/04)
 
 **Wave 5** *(blocked on Wave 4)*
 
@@ -298,5 +298,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
 | 5. Claim Correctness | 3/3 | Complete    | 2026-06-19 |
 | 6. Driver & Admin Views | 5/5 | UAT pending | - |
-| 7. Notifications | 4/6 | In Progress|  |
+| 7. Notifications | 5/6 | In Progress|  |
 | 8. Platform Health | 0/TBD | Not started | - |

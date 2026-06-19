@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 07-05-PLAN.md
-last_updated: "2026-06-19T16:29:04.170Z"
+last_updated: "2026-06-19T16:40:24.101Z"
 last_activity: 2026-06-19
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 34
-  completed_plans: 32
+  completed_plans: 33
   percent: 75
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 07 (notifications) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-06-19
 
-Progress: [█████████░] 94%
+Progress: [██████████] 97%
 
 ## Handoff (for a new session)
 
@@ -87,6 +87,7 @@ Progress: [█████████░] 94%
 | Phase 07 P02 | 3min | 2 tasks | 4 files |
 | Phase 07 P03 | 7min | 3 tasks | 11 files |
 | Phase 07 P05 | 3min | 2 tasks | 4 files |
+| Phase 07 P04 | 7min | 3 tasks | 12 files |
 
 ## Accumulated Context
 
@@ -157,6 +158,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 07-03: refetchNotifications exported from notify.ts (delegating to feed.ts readOwnNotifications) to satisfy the notifications-rls Wave-0 spec; admin reuses the driver NotificationBell (D-08); guests get no bell (D-01).
 - [Phase 07]: buildDigest returns rendered {subject, html} via buildDigestEmail (binding digest.test.ts contract over the draft action prose)
 - [Phase 07]: Digest send-hour handled as UTC now; per-driver local-hour scheduling deferred to the Phase 8 cron trigger (D-08 seam)
+- [Phase ?]: 07-04: invite is email-only (D-14) — set-password link emailed via sendEmail (critical), no inline copy-paste reveal
+- [Phase ?]: 07-04: lifecycle fan-out (paid/claimed/arrived/assign/reassign/release/cancel) is log-and-continue off the existing transition — never a second paid writer; guest emails always to=guest_email, driver name+phone revealed only to the guest (D-16)
 
 ### Pending Todos
 
@@ -188,6 +191,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T16:29:04.164Z
+Last session: 2026-06-19T16:40:08.586Z
 Stopped at: Completed 07-05-PLAN.md
 Resume file: None

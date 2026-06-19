@@ -46,13 +46,33 @@ const authNetworkFirst: RuntimeCaching = {
   }),
 };
 
+// Pitfall 4: the driver pool DATA path (RSC payloads / Server-Action POSTs under /driver)
+// carries LIVE claim state. A stale pool served from the SW cache could show a transfer
+// another driver already claimed, or hide a fresh one — an integrity hazard (T-06-STALE).
+// Force every same-origin /driver request that is NOT a document (the data fetches: RSC
+// payloads, server-action POSTs, JSON) NetworkFirst so the network is always tried first;
+// the graceful already_claimed branch is the second line of defence.
+const driverPoolDataNetworkFirst: RuntimeCaching = {
+  matcher({ request, url, sameOrigin }) {
+    return (
+      sameOrigin &&
+      request.destination !== "document" &&
+      /^\/driver(\/|$)/.test(url.pathname)
+    );
+  },
+  handler: new NetworkFirst({
+    cacheName: "driver-pool-network-first",
+    networkTimeoutSeconds: 5,
+  }),
+};
+
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
   skipWaiting: true,
   clientsClaim: true,
   navigationPreload: true,
-  // Auth/admin/confirm NetworkFirst rule FIRST, then the Serwist defaults.
-  runtimeCaching: [authNetworkFirst, ...defaultCache],
+  // Auth/admin/confirm + driver-pool-data NetworkFirst rules FIRST, then Serwist defaults.
+  runtimeCaching: [authNetworkFirst, driverPoolDataNetworkFirst, ...defaultCache],
   fallbacks: {
     entries: [
       {

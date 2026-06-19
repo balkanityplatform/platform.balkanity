@@ -220,7 +220,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1; 02 + 04 run in parallel)*
 
-- [ ] 06-02-PLAN.md — Driver pool slice: /driver masked wp_pool read + claim (win->detail / lose->neutral toast) + focus/poll refresh + Toast + NetworkFirst
+- [x] 06-02-PLAN.md — Driver pool slice: /driver masked wp_pool read + claim (win->detail / lose->neutral toast) + focus/poll refresh + Toast + NetworkFirst
 - [ ] 06-04-PLAN.md — Admin transfers list (filter/search/coral triage) + detail page + console nav (OPS-01/02)
 
 **Wave 3** *(blocked on Wave 2; 03 + 05 run in parallel)*
@@ -275,6 +275,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. Payments Trust Spine | 5/5 | Complete    | 2026-06-18 |
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
 | 5. Claim Correctness | 3/3 | Complete    | 2026-06-19 |
-| 6. Driver & Admin Views | 1/5 | In Progress|  |
+| 6. Driver & Admin Views | 2/5 | In Progress|  |
 | 7. Notifications | 0/TBD | Not started | - |
 | 8. Platform Health | 0/TBD | Not started | - |

@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-06-19T12:02:16.210Z"
+last_updated: "2026-06-19T12:10:08.251Z"
 last_activity: 2026-06-19
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 28
-  completed_plans: 24
-  percent: 86
+  completed_plans: 25
+  percent: 63
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 06 (driver-admin-views) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-06-19
 
-Progress: [█████████░] 86%
+Progress: [█████████░] 89%
 
 ## Handoff (for a new session)
 
@@ -79,6 +79,7 @@ Progress: [█████████░] 86%
 | Phase 05 P02 | 2 | 2 tasks | 2 files |
 | Phase 05 P03 | 9min | 3 tasks | 4 files |
 | Phase 06 P01 | 8min | 4 tasks | 13 files |
+| Phase 06 P02 | 4min | 2 tasks tasks | 5 files files |
 
 ## Accumulated Context
 
@@ -133,6 +134,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [06-01]: Migration 0006 authored NOT applied (release trigger edge + last_action_* audit columns); live apply deferred to Plan 05 via Management API (never MCP/db push, Balkanity-only)
 - [Phase ?]: [06-01]: single-writer gate widened to writers subset of {webhook, admin transfers actions} (D-15 release exception) — GREEN now, RED on any third paid writer
 - [Phase ?]: [06-01]: 7 Wave-0 RED specs are source-level RED-by-absence (candidate-file grep); Plans 02-05 consume them as CLAIM-01/04/05/06 + OPS-01/03/04 gates
+- [Phase ?]: [06-02]: Driver pool reads the masked wp_pool() RPC only (caller-auth); zero guest-PII keys on the pool path (CLAIM-01/CLAIM-03, Pitfall 11)
+- [Phase ?]: [06-02]: claimAction is a thin caller-auth claimTransfer wrapper (never service-role, D-04); win -> /driver/run/<id> renders from the RPC's returned row (no follow-up PII fetch), lose -> neutral toast + card removal (D-03); no un-claim control (CLAIM-04)
+- [Phase ?]: [06-02]: /driver pool DATA path forced NetworkFirst in app/sw.ts (non-document rule alongside the document rule) so live claim state is never SW-cached (Pitfall 4, T-06-STALE)
 
 ### Pending Todos
 
@@ -164,6 +168,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T12:02:16.204Z
+Last session: 2026-06-19T12:09:42.737Z
 Stopped at: Completed 06-01-PLAN.md
 Resume file: None

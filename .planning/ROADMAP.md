@@ -182,8 +182,21 @@ Plans:
   3. ADVERSARIAL GATE: calling the pool endpoint with a non-claiming driver's JWT returns a payload containing zero PII keys (PII = name, contact, exact address, notes — flight no. is operational, not PII)
   4. Full guest PII (name, contact, exact address, notes) is readable only by the claiming driver (`driver_id = auth.uid()`) and admins, enforced by RLS on `wp_transfers`; the winning driver receives the full row atomically via the claim RPC's `RETURNING *`
 
-**Plans**: TBD
-**Notes**: REVIEW/SIGN-OFF REQUIRED — `wp_pool` view + RLS policies + `claim_transfer()` SECURITY DEFINER RPC schema migration. Crown-jewel phase: both adversarial gates MUST pass before the phase closes. The claim RPC is called with the user's auth context (never the service-role key). Avoids Pitfalls 4, 5, 6.
+**Plans**: 3 plans
+Plans:
+**Wave 1**
+
+- [ ] 05-01-PLAN.md — Nyquist baseline: source-level 0005 contract test + N-parallel concurrency gate + non-claiming-driver PII gate + service-role seed/teardown fixtures (all RED)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 05-02-PLAN.md — [FLAGGED] author migration 0005 (masked wp_pool SECURITY DEFINER read + atomic claim_transfer() RPC + claiming-driver RLS) — file authoring only — + thin caller-auth claim wrapper
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 05-03-PLAN.md — [BLOCKING/SIGN-OFF] apply 0005 to Balkanity (Management API) + both live adversarial gates (N-parallel → one winner; non-claiming-JWT → zero PII) + 05-GATES-EVIDENCE.md
+
+**Notes**: REVIEW/SIGN-OFF REQUIRED — `wp_pool` view + RLS policies + `claim_transfer()` SECURITY DEFINER RPC schema migration. Crown-jewel phase: both adversarial gates MUST pass before the phase closes. The claim RPC is called with the user's auth context (never the service-role key). Open Q1 resolved: the masked pool is implemented as a SECURITY DEFINER read (not a security_invoker view) so the base table stays 0-rows for non-claiming drivers (SC4) — confirmed at the FLAGGED sign-off. Avoids Pitfalls 4, 5, 6.
 
 ### Phase 6: Driver & Admin Views
 
@@ -247,7 +260,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
 | 3. Payments Trust Spine | 5/5 | Complete    | 2026-06-18 |
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
-| 5. Claim Correctness | 0/TBD | Not started | - |
+| 5. Claim Correctness | 0/3 | Planned | - |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |
 | 7. Notifications | 0/TBD | Not started | - |
 | 8. Platform Health | 0/TBD | Not started | - |

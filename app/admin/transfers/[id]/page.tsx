@@ -49,6 +49,19 @@ export default async function TransferDetailPage({
     releaseTransferCta: t.releaseTransferCta,
     cancelTransferCta: t.cancelTransferCta,
     refundTransferCta: t.refundTransferCta,
+    actionReasonLabel: t.actionReasonLabel,
+    refundAmountLabel: t.refundAmountLabel,
+    refundFeeDisclosure: t.refundFeeDisclosure,
+    cancelOfferRefundCta: t.cancelOfferRefundCta,
+    cancelTransferConfirm: t.cancelTransferConfirm,
+    refundConfirm: t.refundConfirm,
+    reassignConfirm: t.reassignConfirm,
+    releaseConfirm: t.releaseConfirm,
+    transferDriverIdLabel: t.transferDriverIdLabel,
+    confirmActionCta: t.confirmActionCta,
+    cancelCta: t.cancelCta,
+    fieldRequired: t.fieldRequired,
+    saveFailed: t.saveFailed,
   };
 
   if (!data) {

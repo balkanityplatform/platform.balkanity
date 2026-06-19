@@ -259,4 +259,6 @@ export const bg: Dict = {
   reassignConfirm: "Да преназнача ли този трансфер на друг шофьор?",
   releaseConfirm:
     "Да освободя ли този трансфер обратно в пула? Той става отново достъпен за поемане. Въведете причина, за да продължите.",
+  transferDriverIdLabel: "ID на шофьор",
+  confirmActionCta: "Потвърди",
 };

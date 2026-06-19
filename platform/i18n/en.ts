@@ -259,6 +259,10 @@ export const en = {
   reassignConfirm: "Reassign this transfer to another driver?",
   releaseConfirm:
     "Release this transfer back to the pool? It becomes claimable again. Enter a reason to continue.",
+  // Assign/reassign target the driver by id (the admin pastes/enters the driver's id) and a
+  // generic confirm CTA closes each destructive dialog (the dismiss CTA reuses cancelCta).
+  transferDriverIdLabel: "Driver id",
+  confirmActionCta: "Confirm",
 } as const;
 
 // The dictionary contract — bg.ts is type-checked against this (parity gate).

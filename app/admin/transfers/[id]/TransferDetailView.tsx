@@ -1,22 +1,37 @@
 "use client";
-// app/admin/transfers/[id]/TransferDetailView.tsx — admin transfer detail island (OPS-02, D-02).
+// app/admin/transfers/[id]/TransferDetailView.tsx — admin transfer detail + ops island (OPS-02/03/04).
 //
-// Slate console chrome. Renders the transfer's lifecycle (LifecycleTimeline, the platform-wide
-// dot+label timeline — colour is NEVER the sole signal, WCAG 1.4.1) plus the trip facts (guest
-// name/phone/email, arrival, airport, zone, EXACT address from the join, flight no., pax,
-// luggage, notes) and the payment facts (fare from amount_cents, paid_at, the recorded Stripe
-// fee, the payment-intent reference). The FIVE ops action controls (assign/reassign/release/
-// cancel/refund) are laid out as LABEL-only placeholders here — their onClick/server-action
-// wiring is Plan 05 (this slice is read-only). Destructive labels use the coral token.
+// Slate console chrome. Renders the transfer's lifecycle (LifecycleTimeline) + trip/payment facts,
+// then the FIVE wired ops controls (Plan 05):
+//   • assign  — one-tap: a small inline form (driver id) posting to `assign`; NO reason (D-10).
+//   • reassign/release/cancel — each behind a CONFIRM DIALOG that requires the D-10 reason note
+//     (the *Confirm copy is the dialog prompt). The destructive three use the coral token.
+//   • cancel additionally offers the cancelOfferRefundCta shortcut that OPENS the RefundForm — it
+//     never auto-refunds (D-11).
+//   • refund — opens the RefundForm (amount pre-filled full, editable down; always-shown fee
+//     disclosure — D-12).
 //
-// T-06-STALE: this /admin navigation is NetworkFirst at the SW layer (app/sw.ts authNetworkFirst
-// matches /admin/*), so status/detail data is never stale-served from cache (Pitfall 4).
+// Each reason action is a useActionState form inside its dialog; the submit is disabled while
+// pending. Server-side, every action re-gates getCurrentRole()==='admin' (the real authz gate —
+// service-role bypasses RLS). The migration-0004/0006 trigger is the state-legality backstop.
+//
+// T-06-STALE: this /admin navigation is NetworkFirst at the SW layer so status/detail data is
+// never stale-served from cache (Pitfall 4).
 import Image from "next/image";
 import Link from "next/link";
+import { useActionState, useEffect, useState } from "react";
 import { LanguageToggle } from "@/platform/ui/LanguageToggle";
 import { LifecycleTimeline } from "@/platform/ui/LifecycleTimeline";
 import { fmtEur } from "@/platform/money/commission";
 import type { TransferState } from "@/platform/ui/StatusDot";
+import {
+  type TransferActionState,
+  assign,
+  cancel,
+  reassign,
+  release,
+} from "../actions";
+import { RefundForm } from "./RefundForm";
 
 export type TransferDetail = {
   id: string;
@@ -52,6 +67,20 @@ export type TransferDetailCopy = {
   releaseTransferCta: string;
   cancelTransferCta: string;
   refundTransferCta: string;
+  // Ops dialog copy (D-10/D-11/D-12).
+  actionReasonLabel: string;
+  refundAmountLabel: string;
+  refundFeeDisclosure: string;
+  cancelOfferRefundCta: string;
+  cancelTransferConfirm: string;
+  refundConfirm: string;
+  reassignConfirm: string;
+  releaseConfirm: string;
+  transferDriverIdLabel: string;
+  confirmActionCta: string;
+  cancelCta: string;
+  fieldRequired: string;
+  saveFailed: string;
 };
 
 function fmtDateTime(iso: string | null, lang: "en" | "bg"): string {
@@ -76,6 +105,143 @@ function Fact({ label, value }: { label: string; value: string | null }) {
   );
 }
 
+const initialState: TransferActionState = { status: "idle" };
+
+// A confirm dialog that REQUIRES the D-10 reason note before submitting a reason-action
+// (reassign/release/cancel). `extraField` lets reassign add the driver-id input. The submit is
+// disabled while pending (no double-submit). On success the dialog closes.
+function ReasonDialog({
+  action,
+  transferId,
+  prompt,
+  reasonLabel,
+  confirmCta,
+  dismissCta,
+  destructive,
+  extraField,
+  onDone,
+}: {
+  action: (
+    prev: TransferActionState,
+    formData: FormData,
+  ) => Promise<TransferActionState>;
+  transferId: string;
+  prompt: string;
+  reasonLabel: string;
+  confirmCta: string;
+  dismissCta: string;
+  destructive: boolean;
+  extraField?: React.ReactNode;
+  onDone: () => void;
+}) {
+  const [state, formAction, pending] = useActionState(action, initialState);
+
+  // Close on success (the revalidatePath in the action refreshes the row). Run in an effect so
+  // we never call the parent's setState during this component's render.
+  useEffect(() => {
+    if (state.status === "success") onDone();
+  }, [state.status, onDone]);
+
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="flex flex-col gap-[12px] rounded-md border border-grey/30 bg-white p-[16px]"
+    >
+      <p className="text-[16px] leading-[1.5] text-slate">{prompt}</p>
+      <form action={formAction} className="flex flex-col gap-[12px]">
+        <input type="hidden" name="id" value={transferId} />
+        {extraField}
+        <label className="flex flex-col gap-[8px]">
+          <span className="text-[14px] font-semibold leading-[1.4] text-slate">
+            {reasonLabel}
+          </span>
+          <input
+            name="reason"
+            type="text"
+            required
+            className="h-[52px] rounded-md border border-grey/40 px-[16px] text-[16px] text-slate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+          />
+        </label>
+        <div className="flex flex-wrap gap-[8px]">
+          <button
+            type="submit"
+            disabled={pending}
+            className={`inline-flex min-h-[52px] items-center rounded-md px-[16px] text-[16px] font-semibold text-white disabled:opacity-50 ${
+              destructive ? "bg-coral" : "bg-teal"
+            }`}
+          >
+            {confirmCta}
+          </button>
+          <button
+            type="button"
+            onClick={onDone}
+            className="inline-flex min-h-[52px] items-center rounded-md border border-grey/30 px-[16px] text-[16px] font-semibold text-slate"
+          >
+            {dismissCta}
+          </button>
+        </div>
+        {state.status === "error" && state.message ? (
+          <p role="alert" className="text-[14px] leading-[1.4] text-coral">
+            {state.message}
+          </p>
+        ) : null}
+      </form>
+    </div>
+  );
+}
+
+// One-tap assign: a small inline form (driver id) posting to `assign`. No reason (D-10).
+function AssignForm({
+  transferId,
+  driverIdLabel,
+  confirmCta,
+  copy,
+}: {
+  transferId: string;
+  driverIdLabel: string;
+  confirmCta: string;
+  copy: TransferDetailCopy;
+}) {
+  const [state, formAction, pending] = useActionState(assign, initialState);
+  return (
+    <form action={formAction} className="flex flex-wrap items-end gap-[8px]">
+      <input type="hidden" name="id" value={transferId} />
+      <label className="flex flex-col gap-[8px]">
+        <span className="text-[14px] font-semibold leading-[1.4] text-slate">
+          {driverIdLabel}
+        </span>
+        <input
+          name="driverId"
+          type="text"
+          required
+          className="h-[52px] rounded-md border border-grey/40 px-[16px] text-[16px] text-slate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+        />
+      </label>
+      <button
+        type="submit"
+        disabled={pending}
+        className="inline-flex min-h-[52px] items-center rounded-md bg-teal px-[16px] text-[16px] font-semibold text-white disabled:opacity-50"
+      >
+        {confirmCta}
+      </button>
+      {state.status === "error" && state.message ? (
+        <p role="alert" className="w-full text-[14px] leading-[1.4] text-coral">
+          {state.message}
+        </p>
+      ) : null}
+    </form>
+  );
+}
+
+type OpenPanel =
+  | "none"
+  | "assign"
+  | "reassign"
+  | "release"
+  | "cancel"
+  | "refund";
+
 export function TransferDetailView({
   row,
   lang,
@@ -85,6 +251,12 @@ export function TransferDetailView({
   lang: "en" | "bg";
   copy: TransferDetailCopy;
 }) {
+  const [panel, setPanel] = useState<OpenPanel>("none");
+  const close = () => setPanel("none");
+
+  const recordedFeeEur = row?.fee_cents != null ? fmtEur(row.fee_cents) : "0.00";
+  const fullAmountEur = row ? fmtEur(row.amount_cents) : "0.00";
+
   return (
     <main className="min-h-dvh bg-white">
       {/* Slate console chrome. */}
@@ -159,49 +331,132 @@ export function TransferDetailView({
             <Fact label="Payment intent" value={row.stripe_payment_intent_id} />
           </dl>
 
-          {/* Ops action placeholders (LABELS only — onClick/server-action wiring is Plan 05).
-              Buttons are disabled here so the read-only slice cannot mutate state. Destructive
-              labels (cancel/refund/release) use the coral token. */}
-          <div
-            className="flex flex-wrap gap-[8px]"
-            aria-label="Transfer actions (wiring arrives in a later step)"
-          >
+          {/* Ops actions (Plan 05 wiring). Destructive controls use the coral token; the
+              reason-gated three open a confirm dialog requiring the D-10 reason note. */}
+          <div className="flex flex-wrap gap-[8px]" aria-label="Transfer actions">
             <button
               type="button"
-              disabled
-              className="inline-flex min-h-[52px] items-center rounded-md bg-teal px-[16px] text-[16px] font-semibold text-white opacity-50"
+              onClick={() => setPanel(panel === "assign" ? "none" : "assign")}
+              className="inline-flex min-h-[52px] items-center rounded-md bg-teal px-[16px] text-[16px] font-semibold text-white"
             >
               {copy.assignDriverCta}
             </button>
             <button
               type="button"
-              disabled
-              className="inline-flex min-h-[52px] items-center rounded-md border border-grey/30 px-[16px] text-[16px] font-semibold text-slate opacity-50"
+              onClick={() => setPanel(panel === "reassign" ? "none" : "reassign")}
+              className="inline-flex min-h-[52px] items-center rounded-md border border-grey/30 px-[16px] text-[16px] font-semibold text-slate"
             >
               {copy.reassignDriverCta}
             </button>
             <button
               type="button"
-              disabled
-              className="inline-flex min-h-[52px] items-center rounded-md border border-grey/30 px-[16px] text-[16px] font-semibold text-slate opacity-50"
+              onClick={() => setPanel(panel === "release" ? "none" : "release")}
+              className="inline-flex min-h-[52px] items-center rounded-md border border-grey/30 px-[16px] text-[16px] font-semibold text-slate"
             >
               {copy.releaseTransferCta}
             </button>
             <button
               type="button"
-              disabled
-              className="inline-flex min-h-[52px] items-center rounded-md border border-coral px-[16px] text-[16px] font-semibold text-coral opacity-50"
+              onClick={() => setPanel(panel === "cancel" ? "none" : "cancel")}
+              className="inline-flex min-h-[52px] items-center rounded-md border border-coral px-[16px] text-[16px] font-semibold text-coral"
             >
               {copy.cancelTransferCta}
             </button>
             <button
               type="button"
-              disabled
-              className="inline-flex min-h-[52px] items-center rounded-md border border-coral px-[16px] text-[16px] font-semibold text-coral opacity-50"
+              onClick={() => setPanel(panel === "refund" ? "none" : "refund")}
+              className="inline-flex min-h-[52px] items-center rounded-md border border-coral px-[16px] text-[16px] font-semibold text-coral"
             >
               {copy.refundTransferCta}
             </button>
           </div>
+
+          {/* Open panel (one at a time). */}
+          {panel === "assign" ? (
+            <AssignForm
+              transferId={row.id}
+              driverIdLabel={copy.transferDriverIdLabel}
+              confirmCta={copy.assignDriverCta}
+              copy={copy}
+            />
+          ) : null}
+
+          {panel === "reassign" ? (
+            <ReasonDialog
+              action={reassign}
+              transferId={row.id}
+              prompt={copy.reassignConfirm}
+              reasonLabel={copy.actionReasonLabel}
+              confirmCta={copy.confirmActionCta}
+              dismissCta={copy.cancelCta}
+              destructive={false}
+              extraField={
+                <label className="flex flex-col gap-[8px]">
+                  <span className="text-[14px] font-semibold leading-[1.4] text-slate">
+                    {copy.transferDriverIdLabel}
+                  </span>
+                  <input
+                    name="driverId"
+                    type="text"
+                    required
+                    className="h-[52px] rounded-md border border-grey/40 px-[16px] text-[16px] text-slate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+                  />
+                </label>
+              }
+              onDone={close}
+            />
+          ) : null}
+
+          {panel === "release" ? (
+            <ReasonDialog
+              action={release}
+              transferId={row.id}
+              prompt={copy.releaseConfirm}
+              reasonLabel={copy.actionReasonLabel}
+              confirmCta={copy.confirmActionCta}
+              dismissCta={copy.cancelCta}
+              destructive={false}
+              onDone={close}
+            />
+          ) : null}
+
+          {panel === "cancel" ? (
+            <div className="flex flex-col gap-[12px]">
+              <ReasonDialog
+                action={cancel}
+                transferId={row.id}
+                prompt={copy.cancelTransferConfirm}
+                reasonLabel={copy.actionReasonLabel}
+                confirmCta={copy.confirmActionCta}
+                dismissCta={copy.cancelCta}
+                destructive
+                onDone={close}
+              />
+              {/* D-11: cancel NEVER auto-refunds — it only OFFERS the refund shortcut. */}
+              <button
+                type="button"
+                onClick={() => setPanel("refund")}
+                className="inline-flex min-h-[44px] w-fit items-center rounded-md border border-coral px-[16px] text-[16px] font-semibold text-coral"
+              >
+                {copy.cancelOfferRefundCta}
+              </button>
+            </div>
+          ) : null}
+
+          {panel === "refund" ? (
+            <RefundForm
+              transferId={row.id}
+              fullAmountEur={fullAmountEur}
+              recordedFeeEur={recordedFeeEur}
+              copy={{
+                refundAmountLabel: copy.refundAmountLabel,
+                actionReasonLabel: copy.actionReasonLabel,
+                refundFeeDisclosure: copy.refundFeeDisclosure,
+                refundTransferCta: copy.refundTransferCta,
+                saveFailed: copy.saveFailed,
+              }}
+            />
+          ) : null}
         </section>
       )}
     </main>

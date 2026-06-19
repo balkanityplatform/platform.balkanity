@@ -177,10 +177,10 @@ Plans:
 **Requirements**: CLAIM-02, CLAIM-03
 **Success Criteria** (what must be TRUE):
 
-  1. A masked `wp_pool` view (security_invoker) physically omits all PII columns and exposes only pre-claim fields (date, arrival time, airport, destination zone, fare, pax, luggage) for `status='paid' AND driver_id IS NULL`
+  1. A masked `wp_pool` view (security_invoker) physically omits all PII columns and exposes only pre-claim fields (date, arrival time, airport, destination zone, flight no., fare, pax, luggage) for `status='paid' AND driver_id IS NULL`. (Flight no. is reclassified as operational/non-PII for v1 — it is route context drivers use to size up a job, exposed pre-claim.)
   2. ADVERSARIAL GATE: N simultaneous `claim_transfer()` calls on one transfer yield exactly one winner and N−1 graceful "already claimed" outcomes (automated concurrency test; atomic `UPDATE ... WHERE status='paid'`, not RLS, is the concurrency control)
-  3. ADVERSARIAL GATE: calling the pool endpoint with a non-claiming driver's JWT returns a payload containing zero PII keys
-  4. Full guest PII (name, contact, exact address, flight no., notes) is readable only by the claiming driver (`driver_id = auth.uid()`) and admins, enforced by RLS on `wp_transfers`; the winning driver receives the full row atomically via the claim RPC's `RETURNING *`
+  3. ADVERSARIAL GATE: calling the pool endpoint with a non-claiming driver's JWT returns a payload containing zero PII keys (PII = name, contact, exact address, notes — flight no. is operational, not PII)
+  4. Full guest PII (name, contact, exact address, notes) is readable only by the claiming driver (`driver_id = auth.uid()`) and admins, enforced by RLS on `wp_transfers`; the winning driver receives the full row atomically via the claim RPC's `RETURNING *`
 
 **Plans**: TBD
 **Notes**: REVIEW/SIGN-OFF REQUIRED — `wp_pool` view + RLS policies + `claim_transfer()` SECURITY DEFINER RPC schema migration. Crown-jewel phase: both adversarial gates MUST pass before the phase closes. The claim RPC is called with the user's auth context (never the service-role key). Avoids Pitfalls 4, 5, 6.

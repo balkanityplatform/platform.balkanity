@@ -263,6 +263,71 @@ export const en = {
   // generic confirm CTA closes each destructive dialog (the dismiss CTA reuses cancelCta).
   transferDriverIdLabel: "Driver id",
   confirmActionCta: "Confirm",
+
+  // --- Phase 7: notifications (UI-SPEC Copywriting Contract) ---
+
+  // In-app bell / feed (Driver + Admin). {count} interpolated in the trigger a11y label.
+  alertsTrigger: "Alerts",
+  alertsTriggerAria: "Alerts, {count} unread",
+  alertsPanelTitle: "Alerts",
+  markAllReadCta: "Mark all read",
+  alertsEmptyHeading: "You're all caught up",
+  alertsEmptyBody:
+    "New alerts about transfers and bookings will appear here.",
+  alertsLoadFailed:
+    "Couldn't load alerts. Check your connection and try again.",
+
+  // In-app notification item titles (pre-rendered into notifications.title)
+  notifNewPoolTitle: "New transfer available to claim",
+  notifRunAssignedTitle: "You were assigned a transfer",
+  notifRunReassignedTitle: "Your transfer was reassigned",
+  notifRunReleasedTitle: "Your transfer was released to the pool",
+  notifRunCancelledTitle: "Your transfer was cancelled",
+  notifNewBookingTitle: "New paid booking",
+  notifEmailCapTitle: "Email cap nearing — best-effort emails paused",
+
+  // Driver daily-digest preference UI (D-07/D-08)
+  digestPrefTitle: "Daily digest",
+  digestPrefBody:
+    "Get one morning email with the day's claimable transfers and your runs. Off by default.",
+  digestEnableLabel: "Email me a daily digest",
+  digestTimeLabel: "Send at",
+  digestSaveCta: "Save digest settings",
+  digestSavedToast: "Digest preferences saved",
+  digestSaveFailed:
+    "Couldn't save. Check your connection and try again.",
+
+  // Transactional email subjects (templates built in Plan 02)
+  emailAssignedSubject: "Your driver is assigned",
+  emailArrivedSubject: "Your driver has arrived",
+  emailAdminBookingSubject: "New paid booking",
+  emailInviteSubject: "You're invited to drive with Balkanity",
+  emailDigestSubject: "Your Balkanity day: transfers to claim",
+
+  // Email body copy (plain-HTML templates, Plan 02). {token} interpolated via fill().
+  // Guest "driver assigned" — the ONLY email carrying driver name + phone, ONLY to the guest (D-16).
+  emailAssignedHeading: "Your driver is on the way",
+  emailAssignedBody:
+    "Your driver {driverName} ({driverPhone}) has been assigned to your airport transfer. They'll meet you on arrival.",
+  // Guest "driver arrived" — heads-up only, no PII beyond the assignment already sent.
+  emailArrivedHeading: "Your driver has arrived",
+  emailArrivedBody:
+    "Your driver has arrived at the pickup point for your transfer. Please head to the meeting point.",
+  // Admin booking alert (EN-only).
+  emailAdminBookingHeading: "New paid booking",
+  emailAdminBookingBody:
+    "A new transfer has been paid and is now in the claim pool.",
+  // Driver invite (EN-only, un-stubbed in Plan 02). One CTA button (D-13).
+  emailInviteHeading: "You're invited to drive with Balkanity",
+  emailInviteBody:
+    "You've been invited to join Balkanity as a driver. Set your password to activate your account and start claiming transfers.",
+  emailInviteCta: "Set your password",
+  // Driver daily digest (EN-only). emailDigestEmptyBody used when nothing is claimable.
+  emailDigestHeading: "Your Balkanity day",
+  emailDigestIntro:
+    "Here are the transfers available to claim and your runs for today.",
+  emailDigestEmptyBody:
+    "No transfers are available to claim right now. Check the app through the day for new ones.",
 } as const;
 
 // The dictionary contract — bg.ts is type-checked against this (parity gate).

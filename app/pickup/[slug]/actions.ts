@@ -19,7 +19,7 @@
 // propagate so the redirect actually happens (never catch-and-swallow it).
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { getDict } from "@/platform/i18n/dictionary";
+import { getDict, getLang } from "@/platform/i18n/dictionary";
 import { createCheckoutSession } from "@/platform/payments/checkout";
 import { createAdminClient } from "@/platform/supabase/admin";
 
@@ -49,6 +49,9 @@ export async function createBooking(
   fd: FormData,
 ): Promise<BookingState> {
   const t = await getDict();
+  // D-17: capture the booking language (same cookie source as getDict) so the
+  // webhook-fired confirmation (Plan 03) can resolve guest copy via getDictFor(locale ?? 'en').
+  const lang = await getLang();
 
   const parsed = bookingSchema.safeParse(Object.fromEntries(fd));
   if (!parsed.success) {
@@ -104,6 +107,7 @@ export async function createBooking(
       destination_id: dest.id,
       status: "requested",
       amount_cents: dest.price_cents,
+      locale: lang, // D-17 — persisted booking language (EN fallback when NULL)
       guest_email: email,
       guest_name: name,
       guest_phone: phone,

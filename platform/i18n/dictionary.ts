@@ -20,3 +20,11 @@ export async function getLang(): Promise<Lang> {
 export async function getDict(): Promise<Dict> {
   return (await getLang()) === "bg" ? bg : en;
 }
+
+// Cookie-free, locale-by-argument accessor for webhook/cron/email paths that have NO
+// request cookie (Pitfall 2): the verified-webhook confirmation, the daily-digest cron,
+// and any server path that already knows the language (e.g. wp_transfers.locale). getLang/
+// getDict above remain the cookie-bound path for request-context callers.
+export function getDictFor(lang: Lang): Dict {
+  return lang === "bg" ? bg : en;
+}

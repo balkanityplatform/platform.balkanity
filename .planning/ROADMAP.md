@@ -244,8 +244,30 @@ Plans:
   4. The `sendEmail()` wrapper checks `email_log` before sending (idempotent against webhook retries), records every send (success/failure), respects ≤5 req/s, and short-circuits with an alarm as it approaches the daily cap
   5. The verified Resend sending domain is configured so production emails do not land in spam
 
-**Plans**: TBD
-**Notes**: REVIEW/SIGN-OFF REQUIRED — touches the shared notifications schema (keep it module-agnostic). Confirm Resend verified-domain count in the dashboard before the first production send. This phase fully wires the stubs left in Phases 2 (driver invite) and 4 (guest confirmation). Avoids Pitfalls 3, 9, 13.
+**Plans**: 6 plans
+Plans:
+**Wave 1**
+
+- [ ] 07-01-PLAN.md — Foundation + Nyquist: install resend (checkpoint) + author migration 0007 (notifications + email_log + wp_transfers.locale + digest cols, FILE ONLY) + getDictFor accessor & all EN/BG keys + createBooking locale capture + 8 Wave-0 RED specs (Resend mocked)
+
+**Wave 2** *(blocked on Wave 1)*
+
+- [ ] 07-02-PLAN.md — Engine: sendEmail() single Resend call-site (cap/idempotency/≤5 req/s guard) + notify.ts (insertNotification + gated markRead/markAllRead) + plain-HTML templates.ts
+
+**Wave 3** *(blocked on Wave 2; 03 + 05 run in parallel)*
+
+- [ ] 07-03-PLAN.md — In-app bell slice: own-rows feed read + NotificationBell poll-on-focus island (NOT Realtime, D-04) + mounted in driver (warm-light) & admin (slate) chromes (NOTF-01)
+- [ ] 07-05-PLAN.md — Digest slice: buildDigest (masked pool + own runs, zero PII) + sendDueDigests invokable + opt-in preference UI (Toggle off-by-default + send-hour Select) + gated save action (NOTF-05; cron trigger = Phase 8)
+
+**Wave 4** *(blocked on Wave 3; shares DriversView with 07-03)*
+
+- [ ] 07-04-PLAN.md — Lifecycle fan-out + un-stub seams: confirmation (un-stub) + email-only invite (D-14) + paid/claimed/arrived/admin-ops emails & in-app notifications, all log-and-continue (NOTF-02/03/04)
+
+**Wave 5** *(blocked on Wave 4)*
+
+- [ ] 07-06-PLAN.md — [BLOCKING/SIGN-OFF] apply migration 0007 LIVE to Balkanity (Management API) + verified send.balkanity.com subdomain + RESEND_API_KEY + D-15 live-delivery & end-to-end fan-out UAT
+
+**Notes**: REVIEW/SIGN-OFF REQUIRED — touches the shared notifications schema (keep it module-agnostic). Confirm Resend verified-domain count in the dashboard before the first production send. This phase fully wires the stubs left in Phases 2 (driver invite) and 4 (guest confirmation). Avoids Pitfalls 3, 9, 13. NOTE: SC#1's "via Realtime" wording is superseded by CONTEXT D-04 (poll-on-focus + interval); the polymorphic entity_type/entity_id + no-transfer_id parts of SC#1 still hold.
 
 ### Phase 8: Platform Health
 
@@ -276,5 +298,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
 | 5. Claim Correctness | 3/3 | Complete    | 2026-06-19 |
 | 6. Driver & Admin Views | 5/5 | UAT pending | - |
-| 7. Notifications | 0/TBD | Not started | - |
+| 7. Notifications | 0/6 | Planned | - |
 | 8. Platform Health | 0/TBD | Not started | - |

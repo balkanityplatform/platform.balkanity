@@ -256,7 +256,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2; 03 + 05 run in parallel)*
 
-- [ ] 07-03-PLAN.md — In-app bell slice: own-rows feed read + NotificationBell poll-on-focus island (NOT Realtime, D-04) + mounted in driver (warm-light) & admin (slate) chromes (NOTF-01)
+- [x] 07-03-PLAN.md — In-app bell slice: own-rows feed read + NotificationBell poll-on-focus island (NOT Realtime, D-04) + mounted in driver (warm-light) & admin (slate) chromes (NOTF-01)
 - [ ] 07-05-PLAN.md — Digest slice: buildDigest (masked pool + own runs, zero PII) + sendDueDigests invokable + opt-in preference UI (Toggle off-by-default + send-hour Select) + gated save action (NOTF-05; cron trigger = Phase 8)
 
 **Wave 4** *(blocked on Wave 3; shares DriversView with 07-03)*
@@ -298,5 +298,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
 | 5. Claim Correctness | 3/3 | Complete    | 2026-06-19 |
 | 6. Driver & Admin Views | 5/5 | UAT pending | - |
-| 7. Notifications | 2/6 | In Progress|  |
+| 7. Notifications | 3/6 | In Progress|  |
 | 8. Platform Health | 0/TBD | Not started | - |

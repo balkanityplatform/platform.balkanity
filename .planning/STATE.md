@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-02-PLAN.md
-last_updated: "2026-06-19T16:20:00.376Z"
+stopped_at: Completed 07-05-PLAN.md
+last_updated: "2026-06-19T16:29:04.170Z"
 last_activity: 2026-06-19
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 34
-  completed_plans: 31
+  completed_plans: 32
   percent: 75
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 07 (notifications) — EXECUTING
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-06-19
 
-Progress: [█████████░] 91%
+Progress: [█████████░] 94%
 
 ## Handoff (for a new session)
 
@@ -86,6 +86,7 @@ Progress: [█████████░] 91%
 | Phase 07 P01 | 18min | 4 tasks | 15 files |
 | Phase 07 P02 | 3min | 2 tasks | 4 files |
 | Phase 07 P03 | 7min | 3 tasks | 11 files |
+| Phase 07 P05 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -154,6 +155,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [07-01]: 8 Wave-0 Nyquist RED specs (Resend mocked everywhere) via runtime-string imports + comment-stripped source-grep gates; turn GREEN as Plans 02-05 land impls
 - [Phase 07]: Notification engine: sendEmail single Resend call-site (cap/idempotency/rate guard), insertNotification + gated markRead/markAllRead, five plain-HTML locale-resolved email builders
 - [Phase ?]: Plan 07-03: refetchNotifications exported from notify.ts (delegating to feed.ts readOwnNotifications) to satisfy the notifications-rls Wave-0 spec; admin reuses the driver NotificationBell (D-08); guests get no bell (D-01).
+- [Phase 07]: buildDigest returns rendered {subject, html} via buildDigestEmail (binding digest.test.ts contract over the draft action prose)
+- [Phase 07]: Digest send-hour handled as UTC now; per-driver local-hour scheduling deferred to the Phase 8 cron trigger (D-08 seam)
 
 ### Pending Todos
 
@@ -185,6 +188,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T16:19:49.678Z
-Stopped at: Completed 07-02-PLAN.md
+Last session: 2026-06-19T16:29:04.164Z
+Stopped at: Completed 07-05-PLAN.md
 Resume file: None

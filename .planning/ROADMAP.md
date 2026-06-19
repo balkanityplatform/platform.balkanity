@@ -252,7 +252,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1)*
 
-- [ ] 07-02-PLAN.md — Engine: sendEmail() single Resend call-site (cap/idempotency/≤5 req/s guard) + notify.ts (insertNotification + gated markRead/markAllRead) + plain-HTML templates.ts
+- [x] 07-02-PLAN.md — Engine: sendEmail() single Resend call-site (cap/idempotency/≤5 req/s guard) + notify.ts (insertNotification + gated markRead/markAllRead) + plain-HTML templates.ts
 
 **Wave 3** *(blocked on Wave 2; 03 + 05 run in parallel)*
 
@@ -298,5 +298,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
 | 5. Claim Correctness | 3/3 | Complete    | 2026-06-19 |
 | 6. Driver & Admin Views | 5/5 | UAT pending | - |
-| 7. Notifications | 1/6 | In Progress|  |
+| 7. Notifications | 2/6 | In Progress|  |
 | 8. Platform Health | 0/TBD | Not started | - |

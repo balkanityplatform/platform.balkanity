@@ -225,7 +225,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2; 03 + 05 run in parallel)*
 
-- [ ] 06-03-PLAN.md — Driver "My run": sorted active claims + inline advance CTA (D-13 gated service-role advanceStatus) + Completed today + driver detail (CLAIM-04/05/06)
+- [x] 06-03-PLAN.md — Driver "My run": sorted active claims + inline advance CTA (D-13 gated service-role advanceStatus) + Completed today + driver detail (CLAIM-04/05/06)
 - [ ] 06-05-PLAN.md — [BLOCKING/SIGN-OFF] apply migration 0006 LIVE + admin assign/reassign/release/cancel + server-only refund hook + refund form (OPS-03/04)
 **Notes**: Brand rules apply — status is always coloured dot + text label, ≥44px hit targets, warm light surfaces (driver), slate console (admin). Claim/status data is NetworkFirst (never SW-cached). No read-then-write anywhere on the claim path. Refund uses the platform payments hook. Avoids Pitfalls 4, 11, 12.
 **UI hint**: yes
@@ -275,6 +275,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 3. Payments Trust Spine | 5/5 | Complete    | 2026-06-18 |
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
 | 5. Claim Correctness | 3/3 | Complete    | 2026-06-19 |
-| 6. Driver & Admin Views | 3/5 | In Progress|  |
+| 6. Driver & Admin Views | 4/5 | In Progress|  |
 | 7. Notifications | 0/TBD | Not started | - |
 | 8. Platform Health | 0/TBD | Not started | - |

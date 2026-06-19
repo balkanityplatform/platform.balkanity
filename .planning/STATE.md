@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Completed 06-01-PLAN.md
-last_updated: "2026-06-19T12:17:27.695Z"
+last_updated: "2026-06-19T12:25:26.260Z"
 last_activity: 2026-06-19
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 28
-  completed_plans: 26
+  completed_plans: 27
   percent: 63
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 06 (driver-admin-views) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-06-19
 
-Progress: [█████████░] 93%
+Progress: [██████████] 96%
 
 ## Handoff (for a new session)
 
@@ -81,6 +81,7 @@ Progress: [█████████░] 93%
 | Phase 06 P01 | 8min | 4 tasks | 13 files |
 | Phase 06 P02 | 4min | 2 tasks tasks | 5 files files |
 | Phase 06 P04 | 4min | 2 tasks | 5 files |
+| Phase 06 P03 | 4min | 2 tasks tasks | 4 files files |
 
 ## Accumulated Context
 
@@ -139,6 +140,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [06-02]: claimAction is a thin caller-auth claimTransfer wrapper (never service-role, D-04); win -> /driver/run/<id> renders from the RPC's returned row (no follow-up PII fetch), lose -> neutral toast + card removal (D-03); no un-claim control (CLAIM-04)
 - [Phase ?]: [06-02]: /driver pool DATA path forced NetworkFirst in app/sw.ts (non-document rule alongside the document rule) so live claim state is never SW-cached (Pitfall 4, T-06-STALE)
 - [Phase ?]: Admin transfers list/detail read unmasked rows via wp_transfers_admin_read on the anon cookie-bound client (never service-role); needsAttention uses simple D-09 pilot constants; URL-searchParams drive server-side re-query (OPS-01/OPS-02).
+- [Phase ?]: [06-03]: advanceStatus is a D-13 gated service-role driver write (role + driver_id===auth.uid() ownership + ALLOWED_TRANSITIONS next edge + .eq(status,current) optimistic guard) — NOT a new RLS write policy, NOT a client write (Pitfall 1)
+- [Phase ?]: [06-03]: driver My run + detail read on the caller-auth client (claiming-driver RLS scopes rows to the owner); full PII legitimate only post-claim; completed drops to a Completed today partition; no un-claim control anywhere (CLAIM-04/05/06)
 
 ### Pending Todos
 
@@ -170,6 +173,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T12:17:21.934Z
+Last session: 2026-06-19T12:25:08.228Z
 Stopped at: Completed 06-01-PLAN.md
 Resume file: None

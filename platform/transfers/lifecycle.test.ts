@@ -29,7 +29,8 @@ const ALL_STATES: readonly TransferState[] = [
 const EXPECTED: Record<TransferState, ReadonlySet<TransferState>> = {
   requested: new Set(["paid", "cancelled"]),
   paid: new Set(["claimed", "cancelled"]),
-  claimed: new Set(["en_route", "cancelled"]),
+  // claimed → paid is the D-14 RELEASE backward edge (Phase 6); restricted to claimed only.
+  claimed: new Set(["en_route", "cancelled", "paid"]),
   en_route: new Set(["arrived", "cancelled"]),
   arrived: new Set(["picked_up", "cancelled"]),
   picked_up: new Set(["completed"]),
@@ -54,6 +55,14 @@ describe("transfer lifecycle transition map (XFER-01, mirror of the 0004 DB trig
 
   it("allows requested → paid (the webhook's first real transition — Pitfall 4)", () => {
     expect(canTransition("requested", "paid")).toBe(true);
+  });
+
+  it("allows claimed → paid (the D-14 release backward edge), restricted to claimed only", () => {
+    expect(canTransition("claimed", "paid")).toBe(true);
+    // Release is claimed-ONLY — no other state may rewind to paid.
+    expect(canTransition("en_route", "paid")).toBe(false);
+    expect(canTransition("arrived", "paid")).toBe(false);
+    expect(canTransition("picked_up", "paid")).toBe(false);
   });
 
   it("allows admin pre-pickup cancel from all five pre-pickup states (D-10)", () => {

@@ -15,14 +15,20 @@
 // truth (Don't-Hand-Roll lock, T-04-02). This file declares NO local state enum.
 import type { TransferState } from "@/platform/ui/StatusDot";
 
-// Allowed-transition map — EXACTLY mirrors the migration-0004 trigger (RESEARCH
+// Allowed-transition map — EXACTLY mirrors the migration-0004/0006 trigger (RESEARCH
 // Pattern 2; D-09 full 8-state machine; D-10 admin-cancel from the five pre-pickup
 // states only). `picked_up → completed` is the lone non-cancellable forward edge;
 // `completed` and `cancelled` are terminal (no outbound transitions).
+//
+// `claimed → paid` is the RELEASE backward edge (D-14, Phase 6): an admin releases a
+// claimed transfer back to the open pool (status='paid', driver_id cleared) so another
+// driver can claim it. Release is restricted to `claimed` ONLY — no `en_route → paid`
+// or any other backward edge. This edge is mirrored by the migration-0006 trigger; the
+// 8×8 pair test pins the two together.
 export const ALLOWED_TRANSITIONS: Record<TransferState, TransferState[]> = {
   requested: ["paid", "cancelled"],
   paid: ["claimed", "cancelled"],
-  claimed: ["en_route", "cancelled"],
+  claimed: ["en_route", "cancelled", "paid"],
   en_route: ["arrived", "cancelled"],
   arrived: ["picked_up", "cancelled"],
   picked_up: ["completed"],

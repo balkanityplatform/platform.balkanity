@@ -248,7 +248,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 07-01-PLAN.md — Foundation + Nyquist: install resend (checkpoint) + author migration 0007 (notifications + email_log + wp_transfers.locale + digest cols, FILE ONLY) + getDictFor accessor & all EN/BG keys + createBooking locale capture + 8 Wave-0 RED specs (Resend mocked)
+- [x] 07-01-PLAN.md — Foundation + Nyquist: install resend (checkpoint) + author migration 0007 (notifications + email_log + wp_transfers.locale + digest cols, FILE ONLY) + getDictFor accessor & all EN/BG keys + createBooking locale capture + 8 Wave-0 RED specs (Resend mocked)
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -298,5 +298,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
 | 5. Claim Correctness | 3/3 | Complete    | 2026-06-19 |
 | 6. Driver & Admin Views | 5/5 | UAT pending | - |
-| 7. Notifications | 0/6 | Planned | - |
+| 7. Notifications | 1/6 | In Progress|  |
 | 8. Platform Health | 0/TBD | Not started | - |

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 7 UI-SPEC approved
-last_updated: "2026-06-19T15:22:17.564Z"
-last_activity: 2026-06-19 -- Phase 07 planning complete
+status: executing
+stopped_at: Completed 07-01-PLAN.md
+last_updated: "2026-06-19T16:02:33.359Z"
+last_activity: 2026-06-19
 progress:
   total_phases: 8
   completed_phases: 6
-  total_plans: 28
-  completed_plans: 28
+  total_plans: 34
+  completed_plans: 29
   percent: 75
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
-**Current focus:** Phase 06 — driver-admin-views
+**Current focus:** Phase 07 — notifications
 
 ## Current Position
 
-Phase: 06 (driver-admin-views) — EXECUTING
-Plan: 5 of 5
-Status: Implementation + automated verification complete (8/8 must-haves); 2 code-review blockers fixed; 5 UAT items pending — run /gsd-verify-work 6
-Last activity: 2026-06-19 -- Phase 07 planning complete
+Phase: 07 (notifications) — EXECUTING
+Plan: 2 of 6
+Status: Ready to execute
+Last activity: 2026-06-19
 
-Progress: [██████████] 100%
+Progress: [█████████░] 85%
 
 ## Handoff (for a new session)
 
@@ -83,6 +83,7 @@ Progress: [██████████] 100%
 | Phase 06 P04 | 4min | 2 tasks | 5 files |
 | Phase 06 P03 | 4min | 2 tasks tasks | 4 files files |
 | Phase 06 P05 | 20min | 3 tasks | 9 files |
+| Phase 07 P01 | 18min | 4 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -145,6 +146,10 @@ Recent decisions affecting current work:
 - [Phase ?]: [06-03]: driver My run + detail read on the caller-auth client (claiming-driver RLS scopes rows to the owner); full PII legitimate only post-claim; completed drops to a Completed today partition; no un-claim control anywhere (CLAIM-04/05/06)
 - [Phase ?]: [06-05]: Migration 0006 applied LIVE to Balkanity via Management API after 'approved' sign-off — claimed->paid release edge (D-14, claimed-only) + last_action_* audit columns (D-15); ref guardrail confirmed Kalvia absent; history row inserted in the same BEGIN..COMMIT txn; no-write-policy lock intact (only SELECT policies on wp_transfers)
 - [Phase ?]: [06-05]: release is the ONE narrow gated status='paid' writer (D-15) guarded by .eq('status','claimed'); single-writer gate GREEN with exactly {webhook, admin transfers actions}; refund records last_action_* only and never sets paid (D-12); cancel never auto-refunds, only offers the refund shortcut (D-11); last_action_by is the acting admin's verified JWT uid
+- [Phase ?]: [07-01]: resend@6.14.0 installed (checkpoint-approved official SDK, no @react-email); RESEND_API_KEY server-only
+- [Phase ?]: [07-01]: Migration 0007 authored NOT applied — polymorphic notifications (entity_type/entity_id, NO transfer_id, own-rows SELECT, no write policy) + email_log (UNIQUE idempotency_key, admin-read) + wp_transfers.locale (D-17) + driver_profiles digest_enabled/digest_send_hour; live apply Plan 06 (Balkanity qyhdogajtmnvxphrslwm only)
+- [Phase ?]: [07-01]: getDictFor(lang) cookie-free dict accessor for webhook/cron/email paths; createBooking persists wp_transfers.locale (D-17); single-writer money lock unaffected
+- [Phase ?]: [07-01]: 8 Wave-0 Nyquist RED specs (Resend mocked everywhere) via runtime-string imports + comment-stripped source-grep gates; turn GREEN as Plans 02-05 land impls
 
 ### Pending Todos
 
@@ -176,6 +181,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T14:34:30.614Z
-Stopped at: Phase 7 UI-SPEC approved
-Resume file: .planning/phases/07-notifications/07-UI-SPEC.md
+Last session: 2026-06-19T16:02:33.352Z
+Stopped at: Completed 07-01-PLAN.md
+Resume file: None

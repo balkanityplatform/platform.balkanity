@@ -53,12 +53,12 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 
 ### Notifications
 
-- [ ] **NOTF-01**: Per-user in-app notification feed/bell (shared platform feature; primary channel for drivers)
-- [ ] **NOTF-02**: Guest receives a "driver assigned" email on `claimed` and a "driver has arrived" email on `arrived` (no email on `en_route`)
-- [ ] **NOTF-03**: Admin receives a booking alert email on new paid booking
+- [x] **NOTF-01**: Per-user in-app notification feed/bell (shared platform feature; primary channel for drivers)
+- [x] **NOTF-02**: Guest receives a "driver assigned" email on `claimed` and a "driver has arrived" email on `arrived` (no email on `en_route`)
+- [x] **NOTF-03**: Admin receives a booking alert email on new paid booking
 - [x] **NOTF-04**: Driver receives an invite email _(stubbed in 02-05 as a copy-paste set-password link revealed inline — D-03; complete-pending-UAT for the invite path, Resend email send wires in Phase 7)_
-- [ ] **NOTF-05**: Drivers get an opt-in daily digest at a self-chosen time instead of per-transfer email
-- [ ] **NOTF-06**: An email send-guardrail + `email_log` track volume and alarm before the Resend daily cap
+- [x] **NOTF-05**: Drivers get an opt-in daily digest at a self-chosen time instead of per-transfer email
+- [x] **NOTF-06**: An email send-guardrail + `email_log` track volume and alarm before the Resend daily cap
 
 ### Admin Operations
 
@@ -151,11 +151,11 @@ Which phases cover which requirements. Populated during roadmap creation.
 | OPS-02 | Phase 6 — Driver & Admin Views | Complete |
 | OPS-03 | Phase 6 — Driver & Admin Views | Complete |
 | OPS-04 | Phase 6 — Driver & Admin Views | Complete |
-| NOTF-01 | Phase 7 — Notifications | Pending |
-| NOTF-02 | Phase 7 — Notifications | Pending |
-| NOTF-03 | Phase 7 — Notifications | Pending |
-| NOTF-05 | Phase 7 — Notifications | Pending |
-| NOTF-06 | Phase 7 — Notifications | Pending |
+| NOTF-01 | Phase 7 — Notifications | Complete |
+| NOTF-02 | Phase 7 — Notifications | Complete |
+| NOTF-03 | Phase 7 — Notifications | Complete |
+| NOTF-05 | Phase 7 — Notifications | Complete |
+| NOTF-06 | Phase 7 — Notifications | Complete |
 | HLTH-02 | Phase 8 — Platform Health | Pending |
 | HLTH-03 | Phase 8 — Platform Health | Pending |
 | HLTH-04 | Phase 8 — Platform Health | Pending |

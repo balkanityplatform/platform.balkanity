@@ -260,7 +260,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
 | 3. Payments Trust Spine | 5/5 | Complete    | 2026-06-18 |
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
-| 5. Claim Correctness | 3/3 | Complete   | 2026-06-19 |
+| 5. Claim Correctness | 3/3 | Complete    | 2026-06-19 |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |
 | 7. Notifications | 0/TBD | Not started | - |
 | 8. Platform Health | 0/TBD | Not started | - |

@@ -186,7 +186,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 05-01-PLAN.md — Nyquist baseline: source-level 0005 contract test + N-parallel concurrency gate + non-claiming-driver PII gate + service-role seed/teardown fixtures (all RED)
+- [x] 05-01-PLAN.md — Nyquist baseline: source-level 0005 contract test + N-parallel concurrency gate + non-claiming-driver PII gate + service-role seed/teardown fixtures (all RED)
 
 **Wave 2** *(blocked on Wave 1)*
 
@@ -260,7 +260,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 2. Supply-Side Onboarding | 5/5 | Complete   | 2026-06-18 |
 | 3. Payments Trust Spine | 5/5 | Complete    | 2026-06-18 |
 | 4. Transfer Entity + Booking Form | 5/5 | Complete   | 2026-06-18 |
-| 5. Claim Correctness | 0/3 | Planned | - |
+| 5. Claim Correctness | 1/3 | In Progress|  |
 | 6. Driver & Admin Views | 0/TBD | Not started | - |
 | 7. Notifications | 0/TBD | Not started | - |
 | 8. Platform Health | 0/TBD | Not started | - |

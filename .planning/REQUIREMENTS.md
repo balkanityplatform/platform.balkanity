@@ -45,8 +45,8 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 
 - [x] **XFER-01**: Transfer follows the locked lifecycle: requested → paid → claimed → en_route → arrived → picked_up → completed (+ cancelled)
 - [ ] **CLAIM-01**: Invited driver signs in and sees a limited-detail pool of `paid`, unclaimed transfers (date, arrival time, airport, destination zone/area — NOT exact address — flight no., fare, pax, luggage)
-- [ ] **CLAIM-02**: Driver claims a transfer via an atomic conditional update (first-to-claim wins; loser gets "already claimed") — 0 double-claims under concurrency
-- [ ] **CLAIM-03**: Full guest PII (name, contact, exact address, notes) unlocks only for the claiming driver and admin, enforced at the data layer (RLS + masked view/RPC), not UI-only. *(Flight no. reclassified as operational/non-PII in Phase 5 — exposed pre-claim in the pool; see ROADMAP §Phase 5.)*
+- [x] **CLAIM-02**: Driver claims a transfer via an atomic conditional update (first-to-claim wins; loser gets "already claimed") — 0 double-claims under concurrency
+- [x] **CLAIM-03**: Full guest PII (name, contact, exact address, notes) unlocks only for the claiming driver and admin, enforced at the data layer (RLS + masked view/RPC), not UI-only. *(Flight no. reclassified as operational/non-PII in Phase 5 — exposed pre-claim in the pool; see ROADMAP §Phase 5.)*
 - [ ] **CLAIM-04**: A driver may hold multiple active claimed transfers and cannot un-claim (only admin can release/reassign)
 - [ ] **CLAIM-05**: Driver advances status: claimed → en_route → arrived → picked_up → completed from the "My run" view
 - [ ] **CLAIM-06**: "My run" lists the driver's active claimed transfers ordered by arrival time
@@ -141,8 +141,8 @@ Which phases cover which requirements. Populated during roadmap creation.
 | BOOK-07 | Phase 4 — Transfer Entity + Booking Form | Complete |
 | XFER-01 | Phase 4 — Transfer Entity + Booking Form | Complete |
 | AUTH-02 | Phase 4 — Transfer Entity + Booking Form | Complete |
-| CLAIM-02 | Phase 5 — Claim Correctness | Pending |
-| CLAIM-03 | Phase 5 — Claim Correctness | Pending |
+| CLAIM-02 | Phase 5 — Claim Correctness | Complete |
+| CLAIM-03 | Phase 5 — Claim Correctness | Complete |
 | CLAIM-01 | Phase 6 — Driver & Admin Views | Pending |
 | CLAIM-04 | Phase 6 — Driver & Admin Views | Pending |
 | CLAIM-05 | Phase 6 — Driver & Admin Views | Pending |

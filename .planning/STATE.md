@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 05 context gathered
-last_updated: "2026-06-19T06:41:53.209Z"
-last_activity: 2026-06-19 -- Phase 05 planning complete
+last_updated: "2026-06-19T06:52:43.222Z"
+last_activity: 2026-06-19
 progress:
   total_phases: 8
   completed_phases: 4
-  total_plans: 20
-  completed_plans: 20
+  total_plans: 23
+  completed_plans: 21
   percent: 50
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
-**Current focus:** Phase 04 — transfer-entity-booking-form
+**Current focus:** Phase 05 — claim-correctness
 
 ## Current Position
 
-Phase: 04 (transfer-entity-booking-form) — EXECUTING
-Plan: 4 of 5
+Phase: 05 (claim-correctness) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-19 -- Phase 05 planning complete
+Last activity: 2026-06-19
 
-Progress: [██████████] 95%
+Progress: [█████████░] 91%
 
 ## Handoff (for a new session)
 
@@ -74,6 +74,7 @@ Progress: [██████████] 95%
 | Phase 04 P02 | 2min | 3 tasks | 1 files |
 | Phase 04 P03 | 3min | 3 tasks | 4 files |
 | Phase 04 P04 | 10m | 3 tasks | 10 files |
+| Phase 05 P01 | 7min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Server-trusted amount: createBooking re-reads destinations.price_cents by slug for both the row and the Checkout Session; the booking form submits no amount input (04-03, Pitfall 5)
 - [Phase ?]: Status page reads the guest's own transfer via cookie/anon RLS + getUser; driver name+phone revealed post-claim via a narrow service-role {name,phone} read (driver_profiles join on user_id)
 - [Phase ?]: Confirmation + /track re-access emails stubbed (generateLink magic link revealed/logged); Resend send deferred to Phase 7 — function signature is the stable seam
+- [Phase ?]: [05-01]: Nyquist RED baseline for Phase 5 — source-level claim-schema contract + concurrency one-winner gate + non-claiming-driver zero-PII gate + shared service-role seed/caller-auth fixtures, all RED by design; migration 0005 is Plan 02, live apply Plan 03
+- [Phase ?]: [05-01]: Two-identity test split — service-role confined to seed/teardown, caller-auth (anon key + driver JWT) is the only claim/read identity (D-04, T-05-03); claim-schema contract accepts security_invoker view OR SECURITY DEFINER pool read (Open Q1 -> Plan 02)
 
 ### Pending Todos
 
@@ -149,6 +152,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-19T06:11:58.442Z
+Last session: 2026-06-19T06:52:24.712Z
 Stopped at: Phase 05 context gathered
-Resume file: .planning/phases/05-claim-correctness/05-CONTEXT.md
+Resume file: None

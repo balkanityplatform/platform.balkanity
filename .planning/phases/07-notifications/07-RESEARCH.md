@@ -506,21 +506,18 @@ await createAdminClient().from("notifications").insert({
 | A3 | `resend@^6` (`6.14.0`) is API-compatible with CLAUDE.md's pinned `^6.12`; the `emails.send` + `idempotencyKey` 2nd-arg shape is stable across `6.x`. | Standard Stack | Low — same major; verified the send signature against current docs. Pin `^6` and lockfile will resolve `6.14.0`. |
 | A4 | slopcheck verdict for `resend` (tool unavailable this session). | Package Legitimacy Audit | Low — official SDK in the locked stack, empty postinstall, official repo. Planner gates the install behind a checkpoint regardless. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Mark-read write mechanism: gated service-role action vs narrow self-UPDATE RLS policy**
+> All three questions are resolved by the Phase 7 plans (see 07-01…07-06). Markers inline below.
+
+1. **Mark-read write mechanism: gated service-role action vs narrow self-UPDATE RLS policy** — **RESOLVED:** gated service-role `markRead`/`markAllRead` action (07-02/07-03), preserving the no-write-policy lock.
    - What we know: the repo invariant is "no client write policy; writes via gated service-role action" (Phases 1–6). `advanceStatus` is the exact precedent.
    - What's unclear: whether the planner prefers a one-off narrow self-UPDATE RLS policy on `notifications.read_at` (would be the first write policy in the repo) — REVIEW-GATED if chosen.
    - Recommendation: **gated service-role `markRead`/`markAllRead` action** (preserves the no-write-policy lock; no schema review needed beyond the table itself).
 
-2. **Admin booking-alert recipient(s)**
-   - What we know: D-03 says admin gets a `new_paid_booking` email + in-app. The pilot has one admin (`balkanityplatform@gmail.com`).
-   - What's unclear: whether the alert goes to a fixed admin address (env constant) or queries `app_users` where `role='admin'`.
-   - Recommendation: query `app_users` for admin emails (forward-compatible with more admins) but a single env `ADMIN_ALERT_EMAIL` is acceptable for the pilot — planner's call, low risk.
+2. **Admin booking-alert recipient(s)** — **RESOLVED:** query `app_users` where `role='admin'` for alert recipients (07-04), forward-compatible with more admins.
 
-3. **Whether to add a grep-gate test for the single Resend call-site**
-   - What we know: single-writer.test.ts proves the "one paid writer" invariant by grep.
-   - Recommendation: add an analogous Wave-0 test asserting `resend.emails.send` appears ONLY in `platform/notifications/send-email.ts`. Cheap, prevents cap-bypass regressions. (Discretion.)
+3. **Whether to add a grep-gate test for the single Resend call-site** — **RESOLVED:** yes; `single-sender.test.ts` Wave-0 spec asserts `resend.emails.send` appears ONLY in `platform/notifications/send-email.ts` (07-01).
 
 ## Environment Availability
 

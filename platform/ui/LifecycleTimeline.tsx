@@ -27,7 +27,7 @@ export function LifecycleTimeline({ current }: { current: TransferState }) {
   const isCancelled = current === "cancelled";
 
   return (
-    <ol className="flex flex-col gap-[12px]">
+    <ol className="flex flex-col gap-[16px]">
       {LIFECYCLE_ORDER.map((state, idx) => {
         const isCurrent = !isCancelled && state === current;
         const isFuture = isCancelled || (currentIdx >= 0 && idx > currentIdx);

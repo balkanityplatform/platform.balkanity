@@ -34,6 +34,7 @@ export type BookingFormCopy = {
   notesLabel: string;
   notesPlaceholder: string;
   continueCta: string;
+  continuePending: string;
   backCta: string;
   yourDetails: string;
   disclosureHeading: string;
@@ -62,6 +63,9 @@ export function BookingForm({
 
   // BOOK-04 — the non-refundable acknowledgement gates the CTA.
   const [acked, setAcked] = useState(false);
+  // `touched` flips once the guest interacts with the acknowledgement; the blocked
+  // error is shown only after interaction (never pre-emptively on page load).
+  const [touched, setTouched] = useState(false);
 
   // Map the dictionary-keyed server error into an inline field/generic slot, exactly as
   // DestinationForm does. The email/phone/passengers/arrival errors point at their field;
@@ -85,7 +89,7 @@ export function BookingForm({
       {/* The slug carries the booking to the right destination; the amount does NOT. */}
       <input type="hidden" name="slug" value={slug} />
 
-      <h2 className="text-[18px] font-semibold leading-[1.3] text-slate">
+      <h2 className="text-[20px] font-semibold leading-[1.2] text-slate">
         {copy.yourDetails}
       </h2>
 
@@ -147,25 +151,28 @@ export function BookingForm({
       <TextField name="notes" label={copy.notesLabel} placeholder={copy.notesPlaceholder} />
 
       {/* BOOK-04 — prepaid & non-refundable disclosure, ABOVE the CTA. */}
-      <Card className="flex flex-col gap-[12px]">
-        <h3 className="text-[16px] font-semibold leading-[1.3] text-slate">
+      <Card className="flex flex-col gap-[16px]">
+        <h3 className="text-[20px] font-semibold leading-[1.2] text-slate">
           {copy.disclosureHeading}
         </h3>
-        <p className="text-[14px] leading-[1.5] text-grey">
+        <p className="text-[16px] leading-[1.5] text-grey">
           {copy.disclosureBody}
         </p>
-        <label className="flex min-h-[44px] items-center gap-[12px] text-[14px] leading-[1.4] text-slate">
+        <label className="flex min-h-[44px] items-center gap-[8px] text-[14px] leading-[1.4] text-slate">
           <input
             type="checkbox"
             name="ack"
             checked={acked}
-            onChange={(e) => setAcked(e.target.checked)}
+            onChange={(e) => {
+              setAcked(e.target.checked);
+              setTouched(true);
+            }}
             className="h-[20px] w-[20px] accent-teal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
           />
           {copy.disclosureCheckboxLabel}
         </label>
-        {!acked ? (
-          <p className="text-[14px] leading-[1.4] text-grey">
+        {touched && !acked ? (
+          <p role="alert" className="text-[14px] leading-[1.4] text-coral">
             {copy.disclosureBlockedError}
           </p>
         ) : null}
@@ -177,9 +184,21 @@ export function BookingForm({
         </p>
       ) : null}
 
-      {/* CTA disabled until acknowledged (BOOK-04) and while pending (no double-submit). */}
-      <Button type="submit" disabled={!acked || pending}>
-        {copy.continueCta}
+      {/* CTA disabled until acknowledged (BOOK-04) and while pending (no double-submit).
+          aria-busy + a label swap give a visible in-progress affordance during the
+          2–4 s Supabase-insert + Stripe-Checkout round-trip. */}
+      <Button
+        type="submit"
+        disabled={!acked || pending}
+        aria-busy={pending}
+      >
+        {pending ? copy.continuePending : copy.continueCta}
+      </Button>
+
+      {/* Secondary escape affordance (spec: ghost "Back") — a mobile-PWA guest may have
+          no reliable browser-back from a deep link / in-app browser. */}
+      <Button type="button" variant="ghost" onClick={() => history.back()}>
+        {copy.backCta}
       </Button>
     </form>
   );

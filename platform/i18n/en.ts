@@ -140,6 +140,7 @@ export const en = {
   bookingNotesPlaceholder:
     "Anything the driver should know — e.g. car seat needed, meeting point.",
   bookingContinueCta: "Continue to payment",
+  bookingContinuePending: "Starting payment…",
   bookingBackCta: "Back",
 
   // Prepaid & non-refundable disclosure (BOOK-04 — visible BEFORE payment).
@@ -200,6 +201,15 @@ export const en = {
   trackSuccessNeutral:
     "If that email has a booking, we've sent a secure link to it. Check your inbox.",
   trackError: "Couldn't send the link. Check your connection and try again.",
+
+  // Post-Checkout display-only page — /pay/success (BOOK-05, SC2/SC5). Display-only,
+  // never authoritative "paid" except the webhook-confirmed branch.
+  paySuccessTitle: "Transfer payment",
+  paySuccessNoRef: "No transfer reference provided.",
+  paySuccessNotFound: "We couldn't find that transfer.",
+  paySuccessConfirming: "Payment received — we're confirming it.",
+  paySuccessTrackCta: "View your booking status",
+  paySuccessTrackFallback: "Or request a fresh link by email.",
 } as const;
 
 // The dictionary contract — bg.ts is type-checked against this (parity gate).

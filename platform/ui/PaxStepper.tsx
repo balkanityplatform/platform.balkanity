@@ -36,8 +36,10 @@ export function PaxStepper({
   const inc = () => setValue((v) => (max === undefined || v < max ? v + 1 : v));
 
   // ≥44px square brand-styled tap target (mirrors TextField focus treatment).
+  // 16px Body weight-600 for the +/− glyphs (on-scale; the control reads clearly
+  // at the larger square size without an off-spec type step).
   const btn =
-    "flex h-[44px] w-[44px] items-center justify-center rounded-md border border-grey/40 text-[20px] font-semibold text-slate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal disabled:opacity-40";
+    "flex h-[44px] w-[44px] items-center justify-center rounded-md border border-grey/40 text-[16px] font-semibold text-slate focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal disabled:opacity-40";
 
   return (
     <div className="flex flex-col gap-[8px]">
@@ -47,7 +49,7 @@ export function PaxStepper({
       >
         {label}
       </label>
-      <div className="flex items-center gap-[12px]">
+      <div className="flex items-center gap-[16px]">
         <button
           type="button"
           className={btn}

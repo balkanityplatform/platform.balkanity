@@ -88,6 +88,7 @@ export default async function PickupPage({ params }: { params: Params }) {
           notesLabel: t.bookingNotesLabel,
           notesPlaceholder: t.bookingNotesPlaceholder,
           continueCta: t.bookingContinueCta,
+          continuePending: t.bookingContinuePending,
           backCta: t.bookingBackCta,
           yourDetails: t.bookingYourDetails,
           disclosureHeading: t.disclosureHeading,

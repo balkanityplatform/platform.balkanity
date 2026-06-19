@@ -141,6 +141,7 @@ export const bg: Dict = {
   bookingNotesPlaceholder:
     "Каквото шофьорът трябва да знае — напр. нужно столче за кола, място за среща.",
   bookingContinueCta: "Продължи към плащане",
+  bookingContinuePending: "Стартиране на плащането…",
   bookingBackCta: "Назад",
 
   // Предплатено и невъзстановимо оповестяване (BOOK-04 — видимо ПРЕДИ плащане).
@@ -201,4 +202,12 @@ export const bg: Dict = {
   trackSuccessNeutral:
     "Ако този имейл има резервация, изпратихме защитен линк към него. Проверете входящата си поща.",
   trackError: "Линкът не можа да бъде изпратен. Проверете връзката си и опитайте отново.",
+
+  // Страница след плащане — /pay/success (BOOK-05, SC2/SC5).
+  paySuccessTitle: "Плащане за трансфер",
+  paySuccessNoRef: "Не е посочена референция за трансфер.",
+  paySuccessNotFound: "Не успяхме да намерим този трансфер.",
+  paySuccessConfirming: "Плащането е получено — потвърждаваме го.",
+  paySuccessTrackCta: "Вижте статуса на резервацията си",
+  paySuccessTrackFallback: "Или поискайте нов линк по имейл.",
 };

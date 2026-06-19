@@ -25,6 +25,7 @@ import { getDict } from "@/platform/i18n/dictionary";
 import { fmtEur } from "@/platform/money/commission";
 import { createAdminClient } from "@/platform/supabase/admin";
 import { createClient } from "@/platform/supabase/server";
+import { Card } from "@/platform/ui/Card";
 import { LifecycleTimeline } from "@/platform/ui/LifecycleTimeline";
 import type { TransferState } from "@/platform/ui/StatusDot";
 
@@ -159,14 +160,14 @@ export default async function StatusPage({ params }: { params: Params }) {
   const isPaid = status === "paid" || row.paid_at != null;
 
   return (
-    <main className="mx-auto flex max-w-[480px] flex-col gap-[32px] px-[16px] py-[48px]">
+    <main className="mx-auto flex max-w-[480px] flex-col gap-[48px] px-[16px] py-[48px]">
       <h1 className="text-[28px] font-semibold leading-[1.2] text-slate">
         {t.statusTitle}
       </h1>
 
-      {/* Trip summary */}
-      <section className="flex flex-col gap-[8px]">
-        <h2 className="text-[16px] font-semibold leading-[1.4] text-slate">
+      {/* Trip summary — Card-grouped per UI-SPEC. */}
+      <Card className="flex flex-col gap-[8px]">
+        <h2 className="text-[20px] font-semibold leading-[1.2] text-slate">
           {t.statusYourTrip}
         </h2>
         <p className="text-[16px] leading-[1.5] text-slate">
@@ -188,19 +189,19 @@ export default async function StatusPage({ params }: { params: Params }) {
             {fill(t.statusPaxLine, { pax: String(row.pax) })}
           </p>
         ) : null}
-      </section>
+      </Card>
 
       {/* Lifecycle timeline (SC4) */}
-      <section className="flex flex-col gap-[12px]">
-        <h2 className="text-[16px] font-semibold leading-[1.4] text-slate">
+      <section className="flex flex-col gap-[16px]">
+        <h2 className="text-[20px] font-semibold leading-[1.2] text-slate">
           {t.statusTimelineHeading}
         </h2>
         <LifecycleTimeline current={status} />
       </section>
 
-      {/* Payment receipt — meaningful once paid (SC4). */}
-      <section className="flex flex-col gap-[4px]">
-        <h2 className="text-[16px] font-semibold leading-[1.4] text-slate">
+      {/* Payment receipt — meaningful once paid (SC4). Card-grouped per UI-SPEC. */}
+      <Card className="flex flex-col gap-[8px]">
+        <h2 className="text-[20px] font-semibold leading-[1.2] text-slate">
           {t.statusReceiptHeading}
         </h2>
         {isPaid ? (
@@ -221,11 +222,11 @@ export default async function StatusPage({ params }: { params: Params }) {
             {t.statusReceiptSubNote}
           </p>
         )}
-      </section>
+      </Card>
 
-      {/* Driver block — ONLY at/after claimed (D-06). */}
-      <section className="flex flex-col gap-[4px]">
-        <h2 className="text-[16px] font-semibold leading-[1.4] text-slate">
+      {/* Driver block — ONLY at/after claimed (D-06). Card-grouped per UI-SPEC. */}
+      <Card className="flex flex-col gap-[8px]">
+        <h2 className="text-[20px] font-semibold leading-[1.2] text-slate">
           {t.statusDriverHeading}
         </h2>
         {revealDriver ? (
@@ -240,7 +241,7 @@ export default async function StatusPage({ params }: { params: Params }) {
             {t.statusDriverPreClaimNote}
           </p>
         )}
-      </section>
+      </Card>
     </main>
   );
 }

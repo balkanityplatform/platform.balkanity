@@ -19,15 +19,11 @@
 // COLOUR-IS-NEVER-THE-SOLE-SIGNAL (WCAG 1.4.1, brand-locked): unread = teal dot + 600-weight
 // title (two cues); a read row is 400-weight grey. The admin `email_cap_near` alarm carries a
 // CORAL dot AND its explicit text title — never colour alone.
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/platform/ui/Button";
 import { Toast } from "@/platform/ui/Toast";
 import type { NotificationRow } from "@/platform/notifications/feed";
-import {
-  refetchNotifications,
-  markRead,
-  markAllRead,
-} from "@/app/notifications/actions";
+import { refetchNotifications, markAllRead } from "@/app/notifications/actions";
 
 export type NotificationBellCopy = {
   alertsTrigger: string; // "Alerts" — the TEXT label on the trigger (no glyph).
@@ -78,21 +74,20 @@ export function NotificationBell({
     }
   }, []);
 
-  const pollRef = useRef(poll);
-  pollRef.current = poll;
-
+  // `poll` is stable (useCallback with empty deps) so the listeners/interval bind once and the
+  // cleanup tears them down on unmount — same effect lifecycle as PoolView, without a render-time
+  // ref write (react-hooks/refs).
   useEffect(() => {
-    const onFocus = () => pollRef.current();
-    const onVisible = () => pollRef.current();
-    window.addEventListener("focus", onFocus);
-    document.addEventListener("visibilitychange", onVisible);
-    const id = setInterval(() => pollRef.current(), POLL_INTERVAL_MS);
+    const tick = () => poll();
+    window.addEventListener("focus", tick);
+    document.addEventListener("visibilitychange", tick);
+    const id = setInterval(tick, POLL_INTERVAL_MS);
     return () => {
-      window.removeEventListener("focus", onFocus);
-      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", tick);
+      document.removeEventListener("visibilitychange", tick);
       clearInterval(id);
     };
-  }, []);
+  }, [poll]);
 
   // Open the panel and mark every currently-visible unread row read (mark-on-open). Optimistic
   // local update, then the gated markAllRead server action; a genuine failure shows a coral Toast.

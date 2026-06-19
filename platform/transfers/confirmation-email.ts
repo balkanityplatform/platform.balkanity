@@ -19,8 +19,9 @@ import "server-only";
 // Origin header, WR-04). The magic link routes through the EXISTING /auth/confirm
 // route with an allowlisted `next=/status/<transferId>` so the guest lands on their
 // own status page after the session is established (AUTH-02).
-import { getDict } from "@/platform/i18n/dictionary";
+import { getDictFor } from "@/platform/i18n/dictionary";
 import { createAdminClient } from "@/platform/supabase/admin";
+import { sendEmail } from "@/platform/notifications/send-email";
 
 export type ConfirmationEmail = {
   to: string;
@@ -44,8 +45,20 @@ export async function sendBookingConfirmation(
   transferId: string,
   guestEmail: string,
 ): Promise<ConfirmationEmail> {
-  const t = await getDict();
   const admin = createAdminClient();
+
+  // D-17: resolve copy against the booking language persisted on the transfer row
+  // (wp_transfers.locale, Plan 01). There is NO request cookie on the webhook path
+  // (Pitfall 2) — getDictFor(locale ?? 'en') is the cookie-free accessor. A narrow
+  // service-role read of the single locale column (no PII fan-out beyond the email
+  // the caller already holds). A null/garbage locale falls back to EN.
+  const { data: localeRow } = await admin
+    .from("wp_transfers")
+    .select("locale")
+    .eq("id", transferId)
+    .maybeSingle();
+  const locale = (localeRow as { locale?: string | null } | null)?.locale;
+  const t = getDictFor(locale === "bg" ? "bg" : "en");
 
   // GoTrue magic-link generation bound to the guest email (mirrors 02-05's invite).
   // The redirectTo routes through the existing /auth/confirm route to the guest's
@@ -71,8 +84,10 @@ export async function sendBookingConfirmation(
   const actionLink = data?.properties?.action_link ?? "";
   const magicLink = actionLink.includes(verifiedDest) ? actionLink : verifiedDest;
 
-  // Minimal HTML body using the confirmation copy keys (plain string is fine for the
-  // stub; Phase 7 swaps in a react-email template). The CTA links to the magic link.
+  // Minimal HTML body using the confirmation copy keys (plain string is fine; the CTA
+  // links to the magic link). The subject is the confirmation subject key (amount token
+  // left empty — the row amount is not needed to land the guest on their status page).
+  const subject = fill(t.confirmEmailSubject, { amount: "" });
   const html = `<!doctype html><html><body>
 <h1>${t.confirmEmailHeading}</h1>
 <p>${fill(t.confirmEmailBody, { amount: "", arrivalDate: "" })}</p>
@@ -80,12 +95,18 @@ export async function sendBookingConfirmation(
 <p>${t.confirmEmailFooter}</p>
 </body></html>`;
 
-  // Phase-4 STUB: reveal/log only — DO NOT call Resend (that lands in Phase 7). A
-  // send failure must never roll back the verified `paid` write (the webhook wraps
-  // this call in log-and-continue).
-  console.info("[BOOK-06 stub] confirmation email", {
+  // Phase-7 un-stub: send through the single sendEmail call-site (NOTF-02). CRITICAL
+  // tier — the guest confirmation must land even past the soft cap. Stable idempotency
+  // key per transfer so a webhook retry never double-sends. This module writes ZERO
+  // `wp_transfers` rows (single-writer money lock) — sendEmail only touches email_log.
+  // The webhook wraps this call in log-and-continue, so a send failure never rolls back
+  // the verified `paid` write.
+  await sendEmail({
     to: guestEmail,
-    magicLink,
+    subject,
+    html,
+    tier: "critical",
+    idempotencyKey: `confirm:${transferId}`,
   });
 
   return { to: guestEmail, magicLink, html };

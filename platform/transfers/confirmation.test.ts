@@ -25,15 +25,30 @@ const FIXTURE_ACTION_LINK =
   TRANSFER_ID;
 
 // auth.admin.generateLink returns the fixture action_link (the magic-link properties).
+// The narrow wp_transfers.locale read (Plan 04 un-stub, D-17) resolves through a
+// maybeSingle() — stub it to return a null locale (→ EN fallback).
 const generateLink = vi.fn();
+const maybeSingle = vi.fn(async () => ({ data: { locale: null }, error: null }));
 vi.mock("@/platform/supabase/admin", () => ({
   createAdminClient: vi.fn(() => ({
     auth: { admin: { generateLink } },
+    from: vi.fn(() => ({
+      select: vi.fn(() => ({ eq: vi.fn(() => ({ maybeSingle })) })),
+    })),
   })),
 }));
 
+// Plan 04 un-stub routes through the single sendEmail call-site (critical tier). Mock
+// it so the suite exercises the build path without a live Resend/email_log dependency.
+const sendEmail = vi.fn(async () => ({ outcome: "sent" as const }));
+vi.mock("@/platform/notifications/send-email", () => ({
+  sendEmail,
+}));
+
+// D-17: confirmation now resolves copy via getDictFor(locale ?? 'en') — no request
+// cookie on the webhook path (getDict is no longer called here).
 vi.mock("@/platform/i18n/dictionary", () => ({
-  getDict: vi.fn(async () => ({
+  getDictFor: vi.fn(() => ({
     confirmEmailSubject: "SUBJECT",
     confirmEmailHeading: "HEADING",
     confirmEmailBody: "BODY",

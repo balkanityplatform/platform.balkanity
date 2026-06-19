@@ -51,8 +51,7 @@ export function DriversView({
     driverNameLabel: copy.driverNameLabel,
     driverPhoneLabel: copy.driverPhoneLabel,
     generateInviteLinkCta: copy.generateInviteLinkCta,
-    inviteLinkDeliveryNote: copy.inviteLinkDeliveryNote,
-    inviteLinkCopyCta: copy.inviteLinkCopyCta,
+    inviteEmailSentNote: copy.inviteEmailSentNote,
     fieldRequired: copy.fieldRequired,
     saveFailed: copy.saveFailed,
   };

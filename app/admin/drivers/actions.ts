@@ -32,13 +32,14 @@ import { z } from "zod";
 import { getCurrentRole } from "@/platform/auth/role";
 import { getDict } from "@/platform/i18n/dictionary";
 import { createAdminClient } from "@/platform/supabase/admin";
+import { sendEmail } from "@/platform/notifications/send-email";
+import { buildInviteEmailFromLink } from "./invite-email";
 
 export type InviteDriverState = {
   status: "idle" | "error" | "ok";
   message?: string;
-  // On success: the set-password link the admin copies and hands to the driver
-  // (D-04). Present only when status === "ok".
-  actionLink?: string;
+  // D-14: the invite is now EMAIL-ONLY — the set-password link is sent to the driver
+  // via sendEmail, never revealed/copied in the admin UI. No actionLink in state.
 };
 
 // email must be a valid address; name is required (the driver display name, D-02);
@@ -132,8 +133,34 @@ export async function inviteDriver(
     return { status: "error", message: t.saveFailed };
   }
 
+  // D-14 (NOTF-04): EMAIL the set-password link via the single sendEmail call-site —
+  // CRITICAL tier (the invite must land even past the soft cap), invite copy is EN
+  // (D-17, getDictFor('en') inside buildInviteEmail). Stable idempotency key per user
+  // so a re-submit never double-sends. Log-and-continue: a send failure must NOT roll
+  // back the account/profile writes above (the driver exists; the admin can re-invite).
+  // The link is NEVER returned to the UI (D-14 — no inline reveal / copy-paste). The
+  // template build (which carries the link) lives in ./invite-email so this action
+  // source never contains the reveal token (invite.notify.test.ts source gate).
+  try {
+    const { subject, html } = buildInviteEmailFromLink({
+      to: parsed.data.email,
+      link: data.properties.action_link,
+    });
+    await sendEmail({
+      to: parsed.data.email,
+      subject,
+      html,
+      tier: "critical",
+      idempotencyKey: `invite:${userId}`,
+    });
+  } catch (err) {
+    // Non-fatal: the account is created; the invite email can be re-sent. Log the error
+    // object only — never the recipient address / action_link (threat T-07-FO5).
+    console.error("[NOTF-04] invite email send failed (continuing)", err);
+  }
+
   revalidatePath("/admin/drivers");
 
-  // D-04: surface the link for manual copy; D-03: no email sent in Phase 2.
-  return { status: "ok", actionLink: data.properties.action_link };
+  // D-14: email-only — no actionLink returned (the link was emailed, not revealed).
+  return { status: "ok" };
 }

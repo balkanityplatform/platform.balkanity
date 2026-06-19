@@ -82,6 +82,9 @@ export const en = {
     "Copy this link and send it to the driver. They'll set their own password and sign in.",
   inviteLinkCopyCta: "Copy link",
   driverAlreadyInvited: "That driver has already been invited.",
+  // D-14: invite is email-only — the success state confirms the email was sent.
+  inviteEmailSentNote:
+    "Invite sent. The driver will receive an email with a link to set their password and sign in.",
 
   // Destructive — deactivate / delete confirmations
   deactivateDestinationConfirm: "Deactivate destination?",

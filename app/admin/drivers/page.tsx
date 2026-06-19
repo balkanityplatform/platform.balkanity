@@ -74,8 +74,7 @@ export default async function DriversPage() {
         driverNameLabel: t.driverNameLabel,
         driverPhoneLabel: t.driverPhoneLabel,
         generateInviteLinkCta: t.generateInviteLinkCta,
-        inviteLinkDeliveryNote: t.inviteLinkDeliveryNote,
-        inviteLinkCopyCta: t.inviteLinkCopyCta,
+        inviteEmailSentNote: t.inviteEmailSentNote,
         fieldRequired: t.fieldRequired,
         saveFailed: t.saveFailed,
       }}

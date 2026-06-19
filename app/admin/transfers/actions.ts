@@ -12,9 +12,17 @@
 //      anon/authenticated write policy (the no-write-policy lock; migration 0002-0006).
 //
 // The five actions (D-10 reason gate on the destructive four; assign is one-tap):
-//   • assign(id, driverId)          — one-tap; set driver_id; NO reason. The 0004 trigger
-//                                      moves paid->claimed when a paid row gains a driver.
-//   • reassign(id, driverId, reason)— swap the claiming driver; persist last_action_*; reason req.
+//   • assign(id, driverId)          — one-tap; set driver_id AND move paid->claimed in the SAME
+//                                      write (guarded .eq("status","paid")). There is NO trigger
+//                                      that moves status on a driver_id-only change, so the status
+//                                      MUST be set here or the row would orphan (stay paid, drop
+//                                      out of wp_pool because driver_id is set, and never enter the
+//                                      assigned driver's run). The 0004 trigger permits paid->claimed.
+//   • reassign(id, driverId, reason)— swap the claiming driver of an ACTIVE claimed transfer
+//                                      (claimed/en_route/arrived/picked_up); persist last_action_*;
+//                                      reason req. Guarded .in(status, active) so a paid/cancelled/
+//                                      completed row is never silently re-owned (status is unchanged,
+//                                      so the trigger never fires — the guard is the only protection).
 //   • release(id, reason)           — the D-14 backward edge: GUARDED to status='claimed', writes
 //                                      { driver_id: null, status: 'paid', last_action_* }. This is
 //                                      the ONE narrow gated status='paid' writer (D-15) — in the
@@ -90,8 +98,10 @@ async function actingAdminId(): Promise<string | null> {
 }
 
 // ---------------------------------------------------------------------------
-// assign — one-tap; set driver_id. No reason (D-10). The 0004 trigger handles
-// the paid->claimed status move when a paid row gains a driver.
+// assign — one-tap; set driver_id AND move paid->claimed in one write. No reason (D-10).
+// Guarded .eq("status","paid") so assign only acts on an unclaimed paid row, and a row-count
+// check rejects the no-op (already claimed/cancelled/etc.). No trigger reacts to a driver_id-only
+// change, so omitting status:'claimed' would orphan the row (CR-01).
 // ---------------------------------------------------------------------------
 export async function assign(
   _prev: TransferActionState,
@@ -112,12 +122,21 @@ export async function assign(
   }
 
   const admin = createAdminClient();
-  const { error } = await admin
+  // Set driver_id + status=claimed atomically, guarded to a currently-paid (unclaimed) row.
+  // The 0004 trigger permits the paid->claimed edge; .eq("status","paid") makes a stale/raced
+  // assign a 0-row no-op instead of orphaning the transfer.
+  const { data, error } = await admin
     .from("wp_transfers")
-    .update({ driver_id: parsed.data.driverId })
-    .eq("id", parsed.data.id);
+    .update({ driver_id: parsed.data.driverId, status: "claimed" })
+    .eq("id", parsed.data.id)
+    .eq("status", "paid")
+    .select("id");
 
   if (error) {
+    return { status: "error", message: t.saveFailed };
+  }
+  // Zero rows updated → the row was not in 'paid' (already claimed/cancelled/completed).
+  if (!data || data.length === 0) {
     return { status: "error", message: t.saveFailed };
   }
 
@@ -126,8 +145,15 @@ export async function assign(
 }
 
 // ---------------------------------------------------------------------------
-// reassign — swap the claiming driver; persist the D-10 audit reason. Reason required.
+// reassign — swap the claiming driver of an ACTIVE claimed transfer; persist the D-10 audit
+// reason. Reason required. Guarded .in("status", REASSIGNABLE_STATES) so a paid (unclaimed),
+// cancelled, or completed row is never silently re-owned. status is unchanged here, so the
+// transition trigger never fires — the .in guard + row-count check are the only protection (CR-03).
 // ---------------------------------------------------------------------------
+// States in which reassigning the driver is meaningful: a driver is assigned and the trip is
+// not yet completed/cancelled. (paid = unclaimed → use assign; completed/cancelled = terminal.)
+const REASSIGNABLE_STATES = ["claimed", "en_route", "arrived", "picked_up"];
+
 export async function reassign(
   _prev: TransferActionState,
   formData: FormData,
@@ -148,7 +174,7 @@ export async function reassign(
   }
 
   const admin = createAdminClient();
-  const { error } = await admin
+  const { data, error } = await admin
     .from("wp_transfers")
     .update({
       driver_id: parsed.data.driverId,
@@ -156,9 +182,15 @@ export async function reassign(
       last_action_by: await actingAdminId(),
       last_action_at: new Date().toISOString(),
     })
-    .eq("id", parsed.data.id);
+    .eq("id", parsed.data.id)
+    .in("status", REASSIGNABLE_STATES)
+    .select("id");
 
   if (error) {
+    return { status: "error", message: t.saveFailed };
+  }
+  // Zero rows updated → the row was not in an active claimed state (paid/cancelled/completed).
+  if (!data || data.length === 0) {
     return { status: "error", message: t.saveFailed };
   }
 

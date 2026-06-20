@@ -81,6 +81,7 @@ export default async function AdminPage() {
             { href: "/admin/destinations", label: t.destinationsTitle },
             { href: "/admin/drivers", label: t.driversTitle },
             { href: "/admin/transfers", label: t.transfersTitle },
+            { href: "/admin/health", label: t.healthTitle },
           ].map((section) => (
             <Link
               key={section.href}

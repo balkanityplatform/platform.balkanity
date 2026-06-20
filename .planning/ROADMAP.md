@@ -315,3 +315,104 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 6. Driver & Admin Views | 5/5 | UAT pending | - |
 | 7. Notifications | 5/6 | In Progress|  |
 | 8. Platform Health | 4/5 | In Progress|  |
+
+---
+
+## Milestone v1.1: UI Rebuild
+
+### Overview
+
+v1.1 rebuilds the **presentation layer of all three surfaces** (guest, driver, admin) to match the Stitch mockups + the `DESIGN.md` ("Balkanity Path") design system, while preserving the current minimalist feel — with **zero backend, schema, auth, RLS, or payment-path changes**. Every existing wiring stays exactly as shipped in Phases 1–8: the atomic `claim_transfer` RPC, the masked `wp_pool` SECURITY DEFINER read (no guest PII to drivers pre-claim), the single-writer `paid` invariant (verified Stripe webhook is still the sole `paid` author), and magic-link / email-password auth. Brand primary stays **`#029B87`** — `DESIGN.md`'s `#00685a` token is rejected and corrected on contact.
+
+The work is a strict, user-locked dependency chain: the shared **Design System foundation (Phase 9)** must land first — it maps the "Balkanity Path" tokens into the Tailwind v4 CSS-first `@theme`, and ships the reusable status badge, infinity/route motif, and lifecycle stepper that every surface consumes. Then surfaces rebuild in order **Guest (Phase 10) → Driver (Phase 11) → Admin (Phase 12)**. Each surface phase is **design-contract-first**: a `/gsd:ui-phase` UI-SPEC precedes planning so the visual contract is fixed before any screen is built. Mockup features with no backing data (live GPS map, driver ratings, earnings analytics, an Analytics nav page, "Download Manifest" export, invented KPI goal %) are **omitted** to keep the UI truthful to current capabilities.
+
+### Phases
+
+- [ ] **Phase 9: Design System Foundation** - "Balkanity Path" tokens in Tailwind v4 @theme + status badge, infinity/route motif, and lifecycle stepper components (prerequisite for all surfaces)
+- [ ] **Phase 10: Guest UI Rebuild** - Boarding-pass "Transfer Pass" booking screen + restyled form + magic-link status page with live stepper + Stripe trust CTA
+- [ ] **Phase 11: Driver PWA Rebuild** - Claim cards (no pre-claim PII), bottom nav, My Trips, and en-route trip detail with progress stepper + Confirm-Arrival, riding the existing atomic claim
+- [ ] **Phase 12: Admin Console Rebuild** - Left sidebar nav, Transfer Pool KPI cards, pending-transmissions transfers table + restyled detail, and top bar with search / notifications bell / admin identity
+
+### Phase Details
+
+#### Phase 9: Design System Foundation
+
+**Goal**: The shared "Balkanity Path" design system is live in the codebase — brand tokens are mapped into the Tailwind v4 CSS-first `@theme` and the three reusable building blocks every surface needs (status badge, infinity/route motif, lifecycle stepper) exist as components — so the Guest, Driver, and Admin rebuilds all consume one consistent, correct visual foundation.
+**Mode:** mvp
+**Depends on**: Phase 8 (v1.0 complete); first phase of the v1.1 milestone
+**Requirements**: DS-01, DS-02, DS-03, DS-04
+**Context / Non-goals (presentation-only)**: NO backend, schema, auth, RLS, or payment changes. This phase touches only `globals.css` / `@theme` tokens and shared presentational components. Brand primary is **`#029B87`** (correct `DESIGN.md`'s `#00685a` on sight). Tailwind v4 CSS-first `@theme` only — no JS `tailwind.config`. Status is always a coloured dot/badge **plus** a worded label (never colour alone). This is the hard prerequisite ordered before any Guest/Driver/Admin screen — no surface work begins until these tokens and components exist. Design-contract-first: a `/gsd:ui-phase` UI-SPEC precedes planning.
+**Success Criteria** (what must be TRUE):
+
+  1. The "Balkanity Path" tokens (colors with `#029B87` primary, the full Montserrat type scale, 8px spacing scale, radii) are defined in the Tailwind v4 `@theme` and resolve app-wide; no `#00685a` and no JS `tailwind.config` exist anywhere
+  2. A reusable status badge renders every transfer status as a coloured dot/badge plus its worded label — Unclaimed=coral, Claimed=teal, En route=amber, Completed=grey, Cancelled=hollow coral ring — and never communicates state by colour alone
+  3. A reusable lifecycle stepper renders the transfer states (Paid → Claimed → En route → Arrived → Picked up → Completed) with distinct completed / active / pending styling, driven by a passed-in current state
+  4. The infinity/route motif renders as the connective element between a departure and an arrival point on a route visualization, using the real brand pictogram assets (never re-drawn)
+
+**Plans**: TBD
+**UI hint**: yes
+
+#### Phase 10: Guest UI Rebuild
+
+**Goal**: The guest-facing surface is rebuilt to the boarding-pass "Transfer Pass" identity — the booking screen reads as a transfer pass, the form is restyled to the design system with no change to fields or validation, the magic-link status page shows the live lifecycle via the shared stepper, and the pay action carries a Stripe trust treatment — all driving the existing unchanged Checkout flow.
+**Mode:** mvp
+**Depends on**: Phase 9 (consumes the tokens, status badge, infinity motif, and lifecycle stepper)
+**Requirements**: GUI-01, GUI-02, GUI-03, GUI-04
+**Context / Non-goals (presentation-only)**: NO backend, schema, auth, RLS, or payment changes. The booking form collects exactly the same fields with exactly the same validation as today — only styling changes. The pay action drives the existing code-created Checkout-session flow unchanged; the client redirect never sets `paid` (single-writer invariant preserved). Magic-link auth for the status page is preserved as-is. Brand primary `#029B87`. Design-contract-first: a `/gsd:ui-phase` UI-SPEC precedes planning.
+**Success Criteria** (what must be TRUE):
+
+  1. The guest booking screen renders as the boarding-pass "Transfer Pass": airport→property route header (with the infinity motif), a details grid for date/flight/pickup/guests, a payment-status row, the total prepaid, and a primary pay CTA
+  2. The booking form inputs are restyled to the design system (48px fields, teal focus ring, Montserrat labels) with no change to the fields collected or the validation applied
+  3. The magic-link status page renders as the pass and reflects the live transfer lifecycle state via the shared lifecycle stepper
+  4. The pay action shows the Stripe-secured CTA and a "Secured payment · powered by Stripe" trust footer, and triggers the existing Checkout-session flow with no payment-path change
+
+**Plans**: TBD
+**UI hint**: yes
+
+#### Phase 11: Driver PWA Rebuild
+
+**Goal**: The driver PWA is rebuilt to the mockup identity — Available transfers as claim cards that show no guest PII pre-claim, a bottom navigation bar, a My Trips list, and an en-route trip detail with the shared progress stepper and a Confirm-Arrival CTA — with the Claim action still invoking the existing atomic claim RPC and honouring first-to-claim-wins.
+**Mode:** mvp
+**Depends on**: Phase 9 (tokens, status badge, infinity motif, lifecycle stepper); Phase 10 (Guest) precedes it per the locked surface order
+**Requirements**: DUI-01, DUI-02, DUI-03, DUI-04, DUI-05
+**Context / Non-goals (presentation-only)**: NO backend, schema, auth, RLS, or payment changes. Claim cards read the existing masked `wp_pool` and show **no guest PII pre-claim** (the data-layer boundary is preserved, not re-implemented in UI). The Claim action calls the existing atomic `claim_transfer` RPC — first-to-claim-wins / already-claimed semantics are unchanged. Confirm-Arrival is wired to the existing advance-status action. **Omit** the live GPS map, driver ratings, and the earnings dashboard (no backend). Warm light surfaces, ≥44px hit targets, 52px primary CTAs. Design-contract-first: a `/gsd:ui-phase` UI-SPEC precedes planning.
+**Success Criteria** (what must be TRUE):
+
+  1. Available transfers render as claim cards (pickup time, pax count, "Unclaimed" badge, route with the infinity motif, date, price, Claim CTA) showing zero guest-PII keys pre-claim
+  2. A bottom navigation bar provides Available / My Trips / Profile with the active tab highlighted
+  3. My Trips renders the driver's claimed/past transfers as trip cards (date, status badge, route, pax, duration, details link) with no earnings or ratings shown
+  4. The en-route trip detail renders the claimed passenger info, a route card, the shared trip-progress stepper, the passenger note, and a Confirm-Arrival CTA wired to the existing advance-status action — and shows no live map
+  5. Tapping Claim on a card invokes the existing atomic claim RPC and reflects the first-to-claim-wins / already-claimed outcome gracefully in the UI
+
+**Plans**: TBD
+**UI hint**: yes
+
+#### Phase 12: Admin Console Rebuild
+
+**Goal**: The admin desktop console is rebuilt to the "Transfer Pool" identity — a persistent left sidebar, KPI cards computed from real transfer data, the pending-transmissions transfers table with filter/sort and row actions, a restyled transfer detail keeping all existing operations intact, and a top bar with client-side search, the notifications bell, and the signed-in admin identity.
+**Mode:** mvp
+**Depends on**: Phase 9 (tokens, status badge, infinity motif, lifecycle stepper); Phases 10–11 precede it per the locked surface order (Guest → Driver → Admin)
+**Requirements**: AUI-01, AUI-02, AUI-03, AUI-04, AUI-05
+**Context / Non-goals (presentation-only)**: NO backend, schema, auth, RLS, or payment changes. KPI cards and the transfers table read the existing admin transfer queries; the search field is a client-side filter of already-loaded transfers (no new endpoint). The detail view keeps the existing assign / reassign / cancel / refund actions wired exactly as today (refund still records `last_action_*` only and never sets `paid`). The notifications bell reuses the existing feed. **Omit** the "Analytics" nav page, the "Download Manifest" export, and the invented KPI daily-goal %. Slate console surfaces. Design-contract-first: a `/gsd:ui-phase` UI-SPEC precedes planning.
+**Success Criteria** (what must be TRUE):
+
+  1. A persistent left sidebar provides the admin nav (Dashboard, Transfers, Drivers, Settings) with the active item highlighted, and no Analytics item is present
+  2. The Transfer Pool dashboard shows KPI cards (Unclaimed, Claimed, En route, Total today) computed from real transfer data, with no invented daily-goal metric
+  3. The transfers list renders as the pending-transmissions table (time/ID, passenger, route, lifecycle bar, status badge, assigned driver, row actions view / assign / cancel) with working filter and sort
+  4. The transfer detail view is restyled to the design system with the existing assign / reassign / cancel / refund actions intact and behaving identically (refund never sets `paid`)
+  5. A top bar shows the search field (client-side filter of loaded transfers), the notifications bell (existing feed), and the signed-in admin identity
+
+**Plans**: TBD
+**UI hint**: yes
+
+### Progress (v1.1)
+
+**Execution Order:**
+v1.1 phases execute in numeric order after v1.0: 9 → 10 → 11 → 12
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 9. Design System Foundation | 0/TBD | Not started | - |
+| 10. Guest UI Rebuild | 0/TBD | Not started | - |
+| 11. Driver PWA Rebuild | 0/TBD | Not started | - |
+| 12. Admin Console Rebuild | 0/TBD | Not started | - |

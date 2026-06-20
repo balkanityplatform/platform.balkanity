@@ -61,17 +61,34 @@ Mockup elements with no backing data — excluded to keep the UI truthful (revis
 
 ## Traceability
 
-Populated during roadmap creation.
+Every v1.1 requirement maps to exactly one phase (9–12). 18/18 mapped — no orphans.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (pending roadmap) | — | Pending |
+| DS-01 | Phase 9 | Pending |
+| DS-02 | Phase 9 | Pending |
+| DS-03 | Phase 9 | Pending |
+| DS-04 | Phase 9 | Pending |
+| GUI-01 | Phase 10 | Pending |
+| GUI-02 | Phase 10 | Pending |
+| GUI-03 | Phase 10 | Pending |
+| GUI-04 | Phase 10 | Pending |
+| DUI-01 | Phase 11 | Pending |
+| DUI-02 | Phase 11 | Pending |
+| DUI-03 | Phase 11 | Pending |
+| DUI-04 | Phase 11 | Pending |
+| DUI-05 | Phase 11 | Pending |
+| AUI-01 | Phase 12 | Pending |
+| AUI-02 | Phase 12 | Pending |
+| AUI-03 | Phase 12 | Pending |
+| AUI-04 | Phase 12 | Pending |
+| AUI-05 | Phase 12 | Pending |
 
 **Coverage:**
 - v1.1 requirements: 18 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 18 ⚠️
+- Mapped to phases: 18 (Phase 9: 4 · Phase 10: 4 · Phase 11: 5 · Phase 12: 5)
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-20*
-*Last updated: 2026-06-20 after starting milestone v1.1*
+*Last updated: 2026-06-20 after roadmap creation (v1.1 phases 9–12, 18/18 mapped)*

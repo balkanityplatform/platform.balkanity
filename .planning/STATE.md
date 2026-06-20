@@ -6,7 +6,7 @@ status: planning
 last_updated: "2026-06-20T12:27:02.827Z"
 last_activity: 2026-06-20
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,17 +17,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-17)
+See: .planning/PROJECT.md (updated 2026-06-20)
 
 **Core value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
-**Current focus:** Phase 08 — platform-health
+**Current focus:** Milestone v1.1 UI Rebuild — Phase 9 (Design System Foundation) next
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Not started (roadmap created)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-06-20 — Milestone v1.1 started
+Status: Roadmap created — awaiting Phase 9 planning
+Last activity: 2026-06-20 — v1.1 roadmap created (phases 9–12, 18/18 reqs mapped)
 
 ## Handoff (for a new session)
 
@@ -35,6 +35,7 @@ Last activity: 2026-06-20 — Milestone v1.1 started
 - Auth: email+password login; /sign-in, /forgot-password, /set-password, /auth/confirm. Test admin: balkanityplatform@gmail.com (Resend test sender only delivers here). Resend custom SMTP configured (test sender onboarding@resend.dev).
 - Access via local creds (NOT MCP): Vercel CLI authed+linked; .env.local holds Supabase keys, DB URL, and the Management access token. See memory files.
 - SECURITY TODO: rotate the sbp_ SUPABASE_ACCESS_TOKEN (pasted in chat) + remove from .env.local.
+- v1.1 is presentation-only: NO backend/schema/auth/RLS/payment changes across phases 9–12. Each surface phase (10/11/12) is design-contract-first (a /gsd:ui-phase UI-SPEC precedes planning). Phase 9 (Design System) is the hard prerequisite for all three surfaces.
 
 ## Performance Metrics
 
@@ -97,6 +98,11 @@ Last activity: 2026-06-20 — Milestone v1.1 started
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
+- [Roadmap v1.1]: 4-phase UI rebuild — Design System foundation (Phase 9) FIRST as a hard prerequisite, then surfaces in locked order Guest (10) → Driver (11) → Admin (12); 18/18 reqs mapped (DS×4, GUI×4, DUI×5, AUI×5)
+- [Roadmap v1.1]: Presentation-only — NO backend/schema/auth/RLS/payment changes; preserve atomic claim RPC, masked wp_pool (no pre-claim PII), single-writer `paid`, magic-link auth across all four phases
+- [Roadmap v1.1]: Brand primary stays `#029B87` (DESIGN.md's `#00685a` rejected/corrected); Tailwind v4 CSS-first @theme only (no JS tailwind.config)
+- [Roadmap v1.1]: Each surface phase is design-contract-first (a /gsd:ui-phase UI-SPEC precedes planning)
+- [Roadmap v1.1]: Omit backend-less mockup features — live GPS map, driver ratings, earnings dashboard, Admin Analytics page, Download Manifest export, invented KPI daily-goal % (Out of Scope table)
 - [Roadmap]: 8-phase strict dependency chain — seam/auth → onboarding → payments → transfer → claim → views → notifications → health
 - [Roadmap]: Platform/module seam (PLAT-01) is non-deferrable, established in Phase 1
 - [Roadmap]: `paid` written only by verified idempotent webhook (Phase 3); atomic claim + data-layer PII gating (Phase 5) — both with adversarial test gates
@@ -180,14 +186,15 @@ None yet.
 
 [Issues that affect future work]
 
-- OPEN MANUAL UAT (02-05): signed-in production walkthrough of the driver invite — admin logs in → /admin/drivers → submit invite → confirm the revealed action_link contains /auth/confirm?type=invite and resolves to /set-password → set password → resolves to driver role. Proves AUTH-03 + NOTF-04 end-to-end; creates a real auth user. Code + project config (Redirect-URLs allowlist + NEXT_PUBLIC_SITE_URL) shipped; only the live walkthrough is outstanding.
-- Open decision (before Phase 3): settlement currency EUR vs BGN (affects fee display; EUR 0.25 vs EUR 0.26 discrepancy).
-- Open decision (before Phase 8 / go-live): Supabase Pro vs free + external keep-alive for the real-money pilot.
+- v1.1 GUARDRAIL: phases 9–12 are presentation-only. Any plan that proposes a schema/RLS/auth/payment change is out of scope — fold it into a future backend milestone instead. Preserve atomic claim RPC, masked wp_pool (no pre-claim PII), single-writer `paid`, magic-link auth.
+- v1.1 ASSET note: real logo + plane/route pictograms live under Mockups/assets and Balkanity Branding/; never re-draw the logo or invent icons. Interactive HTML/CSS prototypes (Mockups/design/) are the visual source to rebuild as Next.js + Tailwind.
+- OPEN MANUAL UAT (02-05): signed-in production walkthrough of the driver invite — admin logs in → /admin/drivers → submit invite → confirm the revealed action_link contains /auth/confirm?type=invite and resolves to /set-password → set password → resolves to driver role. Proves AUTH-03 + NOTF-04 end-to-end; creates a real auth user.
+- OPEN (v1.0 carryover): Phase 6 has 5 UAT items pending; Phase 7 plan 07-06 (apply migration 0007 LIVE + verified send.balkanity.com + D-15 UAT) outstanding. These are v1.0 closeout items independent of the v1.1 UI rebuild.
 - Verify before relying: Resend verified-domain count (Phase 7), pg_cron ≥1.6.4 on Balkanity project (Phase 8).
 - Companion docs PRD.md / PRD-BG.md referenced in PROJECT.md are not yet in the repo — ingest if available.
 - Infra guardrail: all Supabase/Vercel work targets Balkanity only (ref `qyhdogajtmnvxphrslwm`), never Kalvia (`utyatpadtibqqswsfvtr`).
-- Review gate standing: schema / auth / RLS / payment changes require sign-off before applying (Phases 1, 2, 3, 4, 5, 7, 8 all touch flagged areas).
-- SECURITY: `.env.local.example` (tracked) verified CLEAN 2026-06-19 — all values are empty placeholders, no real secrets. (Prior concern resolved.) `.env.local` is gitignored. Remaining hygiene: `SUPABASE_ACCESS_TOKEN` rotated 2026-06-19 (old revoke is the user's action); DB password was exposed in chat via `SUPABASE_DB_URL` during Phase 06 UAT — reset before pilot.
+- Review gate standing: schema / auth / RLS / payment changes require sign-off before applying (v1.1 should touch NONE of these).
+- SECURITY: `.env.local.example` (tracked) verified CLEAN 2026-06-19. `.env.local` is gitignored. Remaining hygiene: `SUPABASE_ACCESS_TOKEN` rotated 2026-06-19 (old revoke is the user's action); DB password was exposed in chat via `SUPABASE_DB_URL` during Phase 06 UAT — reset before pilot.
 
 ## Deferred Items
 
@@ -197,9 +204,10 @@ Items acknowledged and carried forward from previous milestone close:
 |----------|------|--------|-------------|
 | Payouts | Stripe Connect commission payout (PAY-01/02) | v2 | Roadmap |
 | Growth | Self-service portal, auto-dispatch, flight tracking, SMS/WhatsApp, second module (GROW-01..06) | v2 | Roadmap |
+| UI backend | Driver live map, ratings, earnings; admin Analytics page, Download Manifest export, KPI goal % | backend-dependent | v1.1 Roadmap (Out of Scope) |
 
 ## Session Continuity
 
-Last session: 2026-06-20T10:37:25.156Z
-Stopped at: Phase 08 UI-SPEC approved
+Last session: 2026-06-20T12:27:02.827Z
+Stopped at: v1.1 roadmap created (phases 9–12)
 Resume file: None

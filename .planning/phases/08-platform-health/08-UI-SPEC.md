@@ -1,10 +1,11 @@
 ---
 phase: 8
 slug: platform-health
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-06-20
+reviewed_at: 2026-06-20
 ---
 
 # Phase 8 — UI Design Contract
@@ -143,6 +144,7 @@ These are not new tokens — they pin which established patterns the executor re
 
 - **Chrome:** slate console header (`bg-slate px-[24px] py-[16px]`) with the white-chip Balkanity logo + `LanguageToggle` (+ `NotificationBell` on the landing) — identical to `app/admin/page.tsx` / `TransfersView.tsx`.
 - **Content container:** `mx-auto max-w-2xl px-[24px] py-[48px]`, vertical `flex flex-col gap-[24px]`.
+- **Primary visual anchor:** the **email-cap gauge** is the focal point of the health surface — it sits first in the vertical stack and communicates overall system status at a glance (the only element whose fill colour changes state). The eye should land there first; the stuck-transfer and reconciliation panels follow below in reading order.
 - **Placement (Open Q2 from RESEARCH — planner's call, both acceptable):** either fold the gauge + panels into the existing `app/admin/page.tsx` landing, or a dedicated `/admin/health` page reachable from the console section nav. Either way, reuse the same chrome + container.
 - **Panels/cards:** group each widget in the `Card` primitive (`rounded-md border border-grey/30 bg-white p-[24px]`).
 - **Lists (stuck + health-events):** reuse the `TransfersView` list anatomy — `divide-y divide-grey/20 rounded-md border`, `min-h-[56px]` rows, primary line 16px/600 slate + meta line 14px/400 grey, coral `border-l-4` + text badge for flagged rows, each row a focusable link to `/admin/transfers/<id>` (or the webhook-event context).

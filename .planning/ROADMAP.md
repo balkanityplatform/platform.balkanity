@@ -292,7 +292,7 @@ Plans:
 
 - [x] 08-02-PLAN.md — Reconciliation (Stripe-API source of truth, D-03) + stuck + keep-alive detection + the x-cron-secret-gated 15-min health route (detect+alert only, never paid)
 - [x] 08-03-PLAN.md — Admin Platform-health console: email-cap gauge (D-07) + reconciliation list + stuck list (read-only RSC, admin-gated) + landing nav link
-- [ ] 08-04-PLAN.md — Hourly digest cron route (fires sendDueDigests, D-10) + Vercel daily backstop (HLTH-05)
+- [x] 08-04-PLAN.md — Hourly digest cron route (fires sendDueDigests, D-10) + Vercel daily backstop (HLTH-05)
 
 **Wave 3** *(blocked on Wave 2)*
 
@@ -314,4 +314,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Claim Correctness | 3/3 | Complete    | 2026-06-19 |
 | 6. Driver & Admin Views | 5/5 | UAT pending | - |
 | 7. Notifications | 5/6 | In Progress|  |
-| 8. Platform Health | 3/5 | In Progress|  |
+| 8. Platform Health | 4/5 | In Progress|  |

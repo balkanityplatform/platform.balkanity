@@ -331,6 +331,36 @@ export const en = {
     "Here are the transfers available to claim and your runs for today.",
   emailDigestEmptyBody:
     "No transfers are available to claim right now. Check the app through the day for new ones.",
+
+  // --- Phase 8: platform health (UI-SPEC Copywriting Contract) ---
+
+  // Page / panel heading
+  healthTitle: "Platform health",
+
+  // Email-cap gauge (HLTH-03). The figure renders as "{sent} / {cap}"; every coral/amber
+  // state carries a worded TEXT marker (WCAG 1.4.1 — colour is never the sole signal).
+  emailCapLabel: "Emails sent today",
+  emailCapWarning: "Approaching daily cap",
+  emailCapAtCap: "Daily cap reached — non-critical emails paused",
+  emailCapZero: "No emails sent yet today.",
+
+  // Stuck-transfer panel (HLTH-04). The row badge is the coral uppercase TEXT marker.
+  stuckHeading: "Stuck transfers",
+  stuckBadge: "UNCLAIMED",
+  stuckEmptyHeading: "No stuck transfers",
+  stuckEmptyBody:
+    "Every paid transfer has a driver or has time to spare. Nothing needs chasing right now.",
+
+  // Reconciliation panel (HLTH-02). The row badge is the coral uppercase TEXT marker.
+  reconHeading: "Payment reconciliation",
+  reconBadge: "NEEDS REVIEW",
+  reconEmptyHeading: "All payments reconciled",
+  reconEmptyBody:
+    "Every paid Stripe session has a matching paid transfer. No discrepancies to investigate.",
+
+  // Resolve CTA (clears a health event after human-driven webhook replay) + widget error state.
+  healthResolveCta: "Mark resolved",
+  healthLoadFailed: "Couldn't load health data. Refresh to try again.",
 } as const;
 
 // The dictionary contract — bg.ts is type-checked against this (parity gate).

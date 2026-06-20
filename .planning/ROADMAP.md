@@ -282,7 +282,22 @@ Plans:
   3. An admin health console shows the webhook_events log (signature result/outcome), the reconciliation flag list, an email-cap gauge (today's sends vs the Resend 100/day cap, warning at ~90/day to match the send-guardrail soft cap, D-07), and a stuck-transfer alert panel
   4. An external keep-alive (independent of user traffic) touches the DB on a schedule so the Supabase project does not pause and stop pg_cron during the pilot
 
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+**Wave 1**
+
+- [ ] 08-01-PLAN.md — Foundation + Nyquist: author migration 0008 (extensions + health_events + 2 cron schedules, FILE ONLY) + 5 Wave-0 RED specs + EN/BG health keys
+
+**Wave 2** *(blocked on Wave 1; 02 + 03 + 04 run in parallel — disjoint files)*
+
+- [ ] 08-02-PLAN.md — Reconciliation (Stripe-API source of truth, D-03) + stuck + keep-alive detection + the x-cron-secret-gated 15-min health route (detect+alert only, never paid)
+- [ ] 08-03-PLAN.md — Admin Platform-health console: email-cap gauge (D-07) + reconciliation list + stuck list (read-only RSC, admin-gated) + landing nav link
+- [ ] 08-04-PLAN.md — Hourly digest cron route (fires sendDueDigests, D-10) + Vercel daily backstop (HLTH-05)
+
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 08-05-PLAN.md — [BLOCKING/SIGN-OFF] apply 0008 LIVE to Balkanity (Management API) + Vault/Vercel cron secret + 3 live DoD gates (dropped-webhook caught/no paid write, cron fires, keep-alive)
+
 **Notes**: REVIEW/SIGN-OFF REQUIRED — scheduling/infra on the Balkanity Supabase project only (`qyhdogajtmnvxphrslwm`). Verify pg_cron ≥1.6.4 before scheduling. The dropped-webhook test is a DoD gate. Decide Supabase Pro vs free+keep-alive before going live. Avoids Pitfalls 8, 9, 10.
 
 ## Progress

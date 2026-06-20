@@ -271,15 +271,15 @@ Plans:
 
 ### Phase 8: Platform Health
 
-**Goal**: Close the operational loop: a reliable reconciliation sweep that catches a deliberately-dropped webhook and self-heals idempotently, an email-cap gauge, stuck-transfer alerts, and an external keep-alive that prevents the Supabase pause from silently stopping cron during the real-money pilot.
+**Goal**: Close the operational loop: a reliable reconciliation sweep that catches a deliberately-dropped webhook and flags it for human-driven idempotent replay (never auto-setting `paid` — the verified webhook stays the sole `paid` author), an email-cap gauge, stuck-transfer alerts, and an external keep-alive that prevents the Supabase pause from silently stopping cron during the real-money pilot.
 **Mode:** mvp
 **Depends on**: Phase 7
 **Requirements**: HLTH-02, HLTH-03, HLTH-04, HLTH-05
 **Success Criteria** (what must be TRUE):
 
-  1. ADVERSARIAL GATE: deliberately dropping one webhook in staging is flagged by the reconciliation sweep and healed idempotently within one sweep window (Stripe-paid session with no matching `paid` transfer is detected and re-applied via the same event.id dedup)
+  1. ADVERSARIAL GATE: deliberately dropping one webhook in staging is detected by the reconciliation sweep within one sweep window and surfaced as an admin alert (in-app + critical email) — a Stripe-paid session with no matching `paid` transfer is flagged for human-driven replay through the signature-verified webhook (idempotent via the existing `webhook_events.event_id` dedup). The sweep itself MUST NOT set `paid` (D-01 + money single-writer lock).
   2. The reconciliation sweep runs every ~15–30 min via Supabase pg_cron + pg_net → Edge Function (jobs <10 min, <8 concurrent); Vercel Hobby cron exists only as a once-daily backstop
-  3. An admin health console shows the webhook_events log (signature result/outcome), the reconciliation flag list, an email-cap gauge (today's sends vs 100, alarm at 80), and a stuck-transfer alert panel
+  3. An admin health console shows the webhook_events log (signature result/outcome), the reconciliation flag list, an email-cap gauge (today's sends vs the Resend 100/day cap, warning at ~90/day to match the send-guardrail soft cap, D-07), and a stuck-transfer alert panel
   4. An external keep-alive (independent of user traffic) touches the DB on a schedule so the Supabase project does not pause and stop pg_cron during the pilot
 
 **Plans**: TBD

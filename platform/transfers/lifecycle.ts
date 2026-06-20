@@ -56,3 +56,18 @@ export const LIFECYCLE_ORDER: readonly TransferState[] = [
   "picked_up",
   "completed",
 ];
+
+// The 6 happy-path steps from `paid` onward (drops `requested`) — the single
+// source of truth that drives the DS-04 horizontal `LifecycleStepper` (D-06).
+// The stepper consumes THIS const and must never hand-roll its own array
+// (Don't-Hand-Roll lock, T-04-02). `cancelled` is excluded exactly like
+// `LIFECYCLE_ORDER`: the consumer renders it as a distinct terminal treatment
+// (hollow coral ring + "Cancelled"), never inline in the horizontal track (D-08).
+export const STEPPER_ORDER: readonly TransferState[] = [
+  "paid",
+  "claimed",
+  "en_route",
+  "arrived",
+  "picked_up",
+  "completed",
+];

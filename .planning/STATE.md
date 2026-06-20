@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 08 UI-SPEC approved
-last_updated: "2026-06-20T10:19:40.957Z"
+last_updated: "2026-06-20T10:27:41.854Z"
 last_activity: 2026-06-20
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 39
-  completed_plans: 34
+  completed_plans: 35
   percent: 75
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 08 (platform-health) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-06-20
 
-Progress: [█████████░] 87%
+Progress: [█████████░] 90%
 
 ## Handoff (for a new session)
 
@@ -89,6 +89,7 @@ Progress: [█████████░] 87%
 | Phase 07 P05 | 3min | 2 tasks | 4 files |
 | Phase 07 P04 | 7min | 3 tasks | 12 files |
 | Phase 08 P01 | 9min | 3 tasks tasks | 8 files files |
+| Phase 08 P02 | 4min | 3 tasks tasks | 5 files files |
 
 ## Accumulated Context
 
@@ -163,6 +164,8 @@ Recent decisions affecting current work:
 - [Phase ?]: 07-04: lifecycle fan-out (paid/claimed/arrived/assign/reassign/release/cancel) is log-and-continue off the existing transition — never a second paid writer; guest emails always to=guest_email, driver name+phone revealed only to the guest (D-16)
 - [Phase ?]: [08-01]: Migration 0008 authored NOT applied — pg_cron/pg_net + polymorphic health_events (NO transfer_id, entity_id TEXT, free-form kind incl. keepalive, admin-read RLS, no write policy, partial open-index) + 2 idempotent Vault-authenticated cron schedules (health-sweep */15, digest-hourly 0 *); live apply Plan 05 (Balkanity qyhdogajtmnvxphrslwm only)
 - [Phase ?]: [08-01]: 5 Wave-0 RED specs via runtime-string dynamic import + comment-stripped source-grep (Stripe/admin/Resend mocked); EmailCapGauge thresholds at 80/90 default cap 90 (EMAIL_SOFT_CAP, D-07); 15 EN/BG health keys (Dict-parity green); single-writer ROOTS already covers app+platform
+- [Phase ?]: [08-02]: Detect-and-alert health layer — reconcile() (Stripe-API source of truth, ~10-min lookback, per-transfer dedup) fans out in-app + critical email; findStuck() paid+unclaimed<=12h in-app only (D-05); touchHeartbeat() benign auto-resolved health_events keepalive (no schema change); all ZERO status:'paid' writes (D-01)
+- [Phase ?]: [08-02]: RED specs are contract authority — reconcile returns Discrepancy[], stuck export is findStuck() returning StuckRow[], route delegates to runHealthSweep() in platform/health/sweep.ts; reconciliation health_events keyed by transfer id; route timing-safe x-cron-secret/Bearer gate (401 zero-work)
 
 ### Pending Todos
 
@@ -194,6 +197,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-20T10:19:19.321Z
+Last session: 2026-06-20T10:27:25.513Z
 Stopped at: Phase 08 UI-SPEC approved
 Resume file: None

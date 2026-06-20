@@ -82,7 +82,10 @@ export async function claimAction(transferId: string): Promise<ClaimResult> {
             subject,
             html,
             tier: "best_effort",
-            idempotencyKey: `assigned:${transferId}`,
+            // Key per (transfer, driver) — NOT per transfer (CR-02): a later reassignment to a
+            // DIFFERENT driver must re-send (new key) so the guest gets the new driver's name +
+            // phone, while a true retry of the SAME assignment still dedups (same key).
+            idempotencyKey: `assigned:${transferId}:${driverId}`,
           });
         }
       }

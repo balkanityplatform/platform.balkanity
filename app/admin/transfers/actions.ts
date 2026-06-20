@@ -120,7 +120,10 @@ async function sendAssignedEmail(
       subject,
       html,
       tier: "best_effort",
-      idempotencyKey: `assigned:${transferId}`,
+      // Key per (transfer, driver) — NOT per transfer (CR-02): a reassignment to a DIFFERENT
+      // driver must re-send (new key) so the guest learns their NEW driver's name + phone,
+      // while a true retry of the SAME assignment still dedups (same key).
+      idempotencyKey: `assigned:${transferId}:${driverId}`,
     });
   } catch (err) {
     console.error("[NOTF-02] admin assigned email failed (continuing)", err);
@@ -318,6 +321,14 @@ export async function reassign(
       parsed.data.id,
     );
   }
+
+  // NOTF-02 reassign GUEST email (CR-02): the driver changed, so the guest must be re-emailed
+  // the NEW driver's first name + phone (D-16) — previously reassign only fired the in-app
+  // driver notifications, so the guest kept the OLD driver's contact details. Best-effort,
+  // log-and-continue (sendAssignedEmail wraps its own try/catch) — a send failure NEVER rolls
+  // back the reassign write. The per-(transfer, driver) idempotency key means this re-sends for
+  // the new driver while still deduping a true retry. `to:` is ALWAYS the row's guest_email.
+  await sendAssignedEmail(admin, parsed.data.id, parsed.data.driverId);
 
   revalidatePath(`/admin/transfers/${parsed.data.id}`);
   return { status: "success" };

@@ -37,4 +37,12 @@ describe("advanceStatus arrived fan-out (NOTF-02, source gate)", () => {
     // No `en_route:` idempotency-key send wiring should ever appear — en_route is silent.
     expect(src).not.toMatch(/en_route:/);
   });
+
+  it("the self-claim assigned email keys per (transfer, driver), not per transfer (CR-02)", () => {
+    // The idempotency key MUST include the driverId so a later reassignment to a different
+    // driver re-sends (new key) while a true retry of the same claim still dedups.
+    expect(src).toMatch(/assigned:\$\{transferId\}:\$\{driverId\}/);
+    // Guard against a regression to the colliding per-transfer-only key.
+    expect(src).not.toMatch(/idempotencyKey:\s*`assigned:\$\{transferId\}`/);
+  });
 });

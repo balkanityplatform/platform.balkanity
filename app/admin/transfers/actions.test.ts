@@ -78,4 +78,34 @@ describe("admin transfers ops actions: re-gate + assign/reassign/release/cancel 
       true,
     );
   });
+
+  it("the guest assigned email keys per (transfer, driver), not per transfer (CR-02)", () => {
+    const c = code();
+    expect(c, "actions.ts must exist (Plan 05)").not.toBeNull();
+    if (!c) return;
+    // Per-(transfer, driver) key so a reassignment to a different driver re-sends, while a
+    // true retry of the same assignment still dedups.
+    expect(/assigned:\$\{transferId\}:\$\{driverId\}/.test(c)).toBe(true);
+    // Guard against a regression to the colliding per-transfer-only key.
+    expect(/idempotencyKey:\s*`assigned:\$\{transferId\}`/.test(c)).toBe(false);
+  });
+
+  it("reassign re-emails the guest the NEW driver via sendAssignedEmail (CR-02)", () => {
+    const c = code();
+    expect(c, "actions.ts must exist (Plan 05)").not.toBeNull();
+    if (!c) return;
+    // Isolate the reassign function body and assert it fires the guest assigned email for the
+    // newly-assigned driver — previously reassign only fired the in-app driver notifications,
+    // so the guest kept the OLD driver's name + phone.
+    const start = c.indexOf("export async function reassign");
+    expect(start, "reassign action must exist").toBeGreaterThan(-1);
+    const next = c.indexOf("export async function release", start);
+    const body = c.slice(start, next === -1 ? undefined : next);
+    expect(
+      /sendAssignedEmail\(\s*admin\s*,\s*parsed\.data\.id\s*,\s*parsed\.data\.driverId\s*\)/.test(
+        body,
+      ),
+      "reassign must call sendAssignedEmail(admin, id, newDriverId)",
+    ).toBe(true);
+  });
 });

@@ -359,4 +359,21 @@ export const bg: Dict = {
   // CTA за разрешаване (изчиства здравно събитие след ръчно повторение на webhook) + грешка на уиджета.
   healthResolveCta: "Отбележи като разрешено",
   healthLoadFailed: "Здравните данни не можаха да се заредят. Опреснете, за да опитате отново.",
+
+  // --- Фаза 9: dev-only showcase на дизайн системата (D-11) ---
+  // Заглавия на секции за временния /dev/design-system маршрут (404 в продукция).
+  // Само собственото chrome на showcase-а е ключирано; вътрешните статус етикети на
+  // StatusDot/stepper остават в STATE_META (само EN, съществуващ модел).
+  devShowcaseTitle: "Дизайн система",
+  devShowcaseIntro:
+    "Основа на дизайн системата (Фаза 9) — всеки токен и компонент, показан в състоянията и вариантите си. Само за разработка; не е част от потребителска повърхност.",
+  devShowcaseTokensHeading: "Токени",
+  devShowcaseColoursHeading: "Цветове",
+  devShowcaseRadiiHeading: "Радиуси",
+  devShowcaseSpacingHeading: "Отстояния",
+  devShowcaseTypeScaleHeading: "Типографска скала",
+  devShowcaseStatusDotHeading: "Статус бейдж",
+  devShowcaseStatusDotVariantHeading: "Вариант",
+  devShowcaseStepperHeading: "Степер на жизнения цикъл",
+  devShowcaseRouteMotifHeading: "Мотив на маршрута",
 };

@@ -361,6 +361,23 @@ export const en = {
   // Resolve CTA (clears a health event after human-driven webhook replay) + widget error state.
   healthResolveCta: "Mark resolved",
   healthLoadFailed: "Couldn't load health data. Refresh to try again.",
+
+  // --- Phase 9: dev-only design-system showcase chrome (D-11) ---
+  // Section headings for the throwaway, production-gated /dev/design-system route.
+  // Only the showcase's OWN chrome is keyed; component-internal StatusDot/stepper
+  // status labels stay in STATE_META (English-only, existing pattern).
+  devShowcaseTitle: "Design system",
+  devShowcaseIntro:
+    "Phase 9 design-system foundation — every token and component rendered across its states and variants. Dev-only; not part of any user-facing surface.",
+  devShowcaseTokensHeading: "Tokens",
+  devShowcaseColoursHeading: "Colours",
+  devShowcaseRadiiHeading: "Radii",
+  devShowcaseSpacingHeading: "Spacing",
+  devShowcaseTypeScaleHeading: "Type scale",
+  devShowcaseStatusDotHeading: "Status badge",
+  devShowcaseStatusDotVariantHeading: "Variant",
+  devShowcaseStepperHeading: "Lifecycle stepper",
+  devShowcaseRouteMotifHeading: "Route motif",
 } as const;
 
 // The dictionary contract — bg.ts is type-checked against this (parity gate).

@@ -349,7 +349,21 @@ The work is a strict, user-locked dependency chain: the shared **Design System f
   3. A reusable lifecycle stepper renders the transfer states (Paid → Claimed → En route → Arrived → Picked up → Completed) with distinct completed / active / pending styling, driven by a passed-in current state
   4. The infinity/route motif renders as the connective element between a departure and an arrival point on a route visualization, using the real brand pictogram assets (never re-drawn)
 
-**Plans**: TBD
+**Plans**: 5 plans (4 waves)
+Plans:
+**Wave 1**
+
+- [ ] 09-01-PLAN.md — DS-01 named @theme tokens (typography/radii/spacing) + DS-04 STEPPER_ORDER const
+**Wave 2** *(blocked on Wave 1; 02 + 03 run in parallel — disjoint files)*
+
+- [ ] 09-02-PLAN.md — DS-02 StatusDot variant prop (dot/pill) + cancelled hollow coral ring + tests
+- [ ] 09-03-PLAN.md — DS-03 RouteMotif (configurable endpoints + committed brand Transfer Badge midpoint)
+**Wave 3** *(blocked on Wave 2)*
+
+- [ ] 09-04-PLAN.md — DS-04 horizontal LifecycleStepper (STEPPER_ORDER-driven, shape-encoded states, cancelled terminal) + tests
+**Wave 4** *(blocked on Wave 3)*
+
+- [ ] 09-05-PLAN.md — D-11 dev-only design-system showcase route + EN/BG showcase keys
 **UI hint**: yes
 
 #### Phase 10: Guest UI Rebuild
@@ -412,7 +426,7 @@ v1.1 phases execute in numeric order after v1.0: 9 → 10 → 11 → 12
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 9. Design System Foundation | 0/TBD | Not started | - |
+| 9. Design System Foundation | 0/5 | Planned | - |
 | 10. Guest UI Rebuild | 0/TBD | Not started | - |
 | 11. Driver PWA Rebuild | 0/TBD | Not started | - |
 | 12. Admin Console Rebuild | 0/TBD | Not started | - |

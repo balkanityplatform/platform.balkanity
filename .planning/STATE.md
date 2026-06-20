@@ -4,13 +4,13 @@ milestone: v1.1
 milestone_name: UI Rebuild
 status: executing
 stopped_at: Completed 09-02-PLAN.md
-last_updated: "2026-06-20T13:42:56.774Z"
+last_updated: "2026-06-20T13:47:27.696Z"
 last_activity: 2026-06-20
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 ## Current Position
 
 Phase: 09 (design-system-foundation) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-06-20
 
@@ -94,6 +94,7 @@ Last activity: 2026-06-20
 | Phase 09 P01 | 5min | 2 tasks tasks | 2 files files |
 | Phase 09 P02 | 4min | 1 tasks | 2 files |
 | Phase 09 P03 | 2min | 2 tasks | 2 files |
+| Phase 09 P04 | 4min | 1 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -183,6 +184,8 @@ Recent decisions affecting current work:
 - [Phase 09]: [09-01]: STEPPER_ORDER (6 steps paid->completed) added to lifecycle.ts as the single source for the DS-04 stepper; excludes requested+cancelled; TransferState stays imported (Don't-Hand-Roll, D-06/D-08)
 - [Phase ?]: [09-02]: StatusDot gains a variant prop (dot default / pill solid badge) over one STATE_META map (T-04-02); cancelled becomes a hollow coral ring (border-2 border-coral bg-transparent) in BOTH variants — the one status-rendering change this phase ships (DS-02, D-03/D-04), worded WCAG-1.4.1 label always present
 - [Phase ?]: [09-03]: RouteMotif serves the real committed Transfer Badge from public/brand/transfer-badge.svg (copied verbatim from platform/ui/pictograms/transfers.svg) via next/image — NOT SVG-as-component, NEVER re-drawn (D-10/ASSET guardrail); Plane/Building defaults are inline 1.5px-stroke line pictograms (line icons, not brand marks); endpoint labels are props (i18n stays in the surface), no dangerouslySetInnerHTML
+- [Phase ?]: [09-04]: LifecycleStepper is a NEW separate horizontal component (D-05) — vertical LifecycleTimeline untouched; consumes STEPPER_ORDER + StatusDot.stateLabel (added accessor over STATE_META), no hand-rolled order/label arrays (D-06)
+- [Phase ?]: [09-04]: stepper shape encodes state beyond colour (D-07) — completed=teal+white check, active=amber circle, pending=grey #66676F outline ring; cancelled short-circuits to StatusDot hollow-coral-ring terminal, never in the track (D-08, WCAG 1.4.1)
 
 ### Pending Todos
 
@@ -216,6 +219,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-20T13:42:34.316Z
+Last session: 2026-06-20T13:47:00.072Z
 Stopped at: Completed 09-02-PLAN.md
 Resume file: None

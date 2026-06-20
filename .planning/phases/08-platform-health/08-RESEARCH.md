@@ -41,10 +41,10 @@
 
 | ID | Description | Research Support |
 |----|-------------|------------------|
-| HLTH-02 | Reconciliation sweep (Supabase pg_cron ~15 min) flags Stripe-paid payments with no matching paid transfer; Vercel cron is a daily backstop only | pg_cron 1.6.4 + pg_net 0.20.3 verified available LIVE on Balkanity; detection SQL over `webhook_events.payload` ⨝ `wp_transfers` (§Reconciliation Detection); invocation shape (pg_net → route handler) §Pattern 1; lookback window to avoid false positives §Pitfall 1 |
+| HLTH-02 | Reconciliation sweep (Supabase pg_cron ~15 min) flags Stripe-paid payments with no matching paid transfer; Vercel cron is a daily backstop only | pg_cron 1.6.4 + pg_net 0.20.3 verified available LIVE on Balkanity; detection lists paid Checkout Sessions from the Stripe API ⨝ `wp_transfers` (§Reconciliation Detection, D-03 RESOLVED); invocation shape (pg_net → route handler) §Pattern 1; lookback window to avoid false positives §Pitfall 1 |
 | HLTH-03 | Email-cap gauge shows usage against the Resend daily cap | Reuses `email_log` daily-count query already implemented verbatim in `send-email.ts` lines 63–71; surfaces on `app/admin` (§Email-Cap Gauge); threshold = `EMAIL_SOFT_CAP` (90) |
 | HLTH-04 | Stuck-transfer alerts (paid-but-unclaimed within 12h of arrival) | SQL over `wp_transfers` (status='paid' AND driver_id IS NULL AND arrival_at <= now()+12h); dedup via `notifications`/health row; can fold into the same sweep cron (§Stuck-Transfer Detection) |
-| HLTH-05 | Keep-alive prevents Supabase free-tier pause (which would stop pg_cron) | The 15-min reconciliation cron is itself a write/activity heartbeat; a dedicated tiny self-ping `UPDATE` on a 1-row health table is the belt-and-braces guarantee (§Keep-Alive) |
+| HLTH-05 | Keep-alive prevents Supabase free-tier pause (which would stop pg_cron) | The 15-min reconciliation cron is itself a write/activity heartbeat; a dedicated tiny self-ping write into `health_events` (`kind='keepalive'`) is the belt-and-braces guarantee (§Keep-Alive) |
 | D-10 (carried) | Digest cron trigger fires `sendDueDigests()` hourly honoring `digest_send_hour` | `sendDueDigests()` already filters on `digest_send_hour == current UTC hour` internally (digest.ts:117–126); Phase 8 adds one hourly `cron.schedule` → pg_net → the same route-handler entrypoint (§Digest Cron) |
 </phase_requirements>
 
@@ -54,19 +54,19 @@ Phase 8 adds an observability/health layer on top of the already-built money and
 
 The recommended invocation shape is **pg_cron → pg_net `net.http_post` → an existing-style Next.js route handler** (`app/api/cron/*`), NOT a Supabase Edge Function. The codebase already runs all server logic in Next route handlers/server modules (the webhook is `app/api/stripe/webhook/route.ts`, runtime `nodejs`), has zero Edge Functions, and the digest/sweep logic (`sendDueDigests`, `buildDigest`) already lives in `platform/notifications/*` and would only need a thin route wrapper. The route handler authenticates the caller by comparing a shared-secret header (pulled from Vault by the cron, set as a Vercel env var on the receiver) — the route then uses the service-role client server-side; the secret never reaches a client.
 
-Reconciliation detection is a **left-anti-join in SQL**: every `webhook_events` row whose `type='checkout.session.completed'` and `payload.data.object.metadata.transfer_id` points at a `wp_transfers` row that is NOT `paid` (or is missing), **filtered to events older than a lookback window** (recommend 10 min) so a just-paid transfer mid-processing is never flagged. The webhook already records exactly the discrepancy outcomes the sweep keys on (`no_matching_transfer`, `write_failed`) plus `payload` (the full verified event), so the source data is rich and already live.
+Reconciliation detection is, per **D-03 RESOLVED (Stripe API is the source of truth)**, a **left-anti-join of recent paid Stripe Checkout Sessions (listed via the server-only Stripe key) against `wp_transfers`**: every Stripe session that is `paid`/`complete` whose `metadata.transfer_id` points at a `wp_transfers` row that is NOT `paid` (or is missing), **filtered to sessions older than a lookback window** (recommend 10 min) so a just-paid transfer mid-processing is never flagged. This is the only design that catches a *never-delivered* webhook (which leaves NO `webhook_events` row at all). `webhook_events` (already records `no_matching_transfer`/`write_failed` outcomes plus the full verified `payload`) remains available as a secondary effect-failure cross-check, but the Stripe API list is primary.
 
-**Primary recommendation:** One new migration `0008_platform_health.sql` (FLAGGED — sign-off before live apply via Management API, Balkanity ref only) that (1) `create extension pg_cron, pg_net`; (2) adds a `health_events` table (service-role writes, admin-read SELECT, NO write policy — mirrors `notifications`/`email_log`); (3) schedules **three** cron jobs: the 15-min sweep+stuck+keep-alive combined job, and the hourly digest job — both calling `net.http_post` to `app/api/cron/*` route handlers guarded by a Vault-stored shared secret. The email-cap gauge is a pure read-only admin widget reusing the existing `email_log` daily-count query.
+**Primary recommendation:** One new migration `0008_platform_health.sql` (FLAGGED — sign-off before live apply via Management API, Balkanity ref only) that (1) `create extension pg_cron, pg_net`; (2) adds a `health_events` table (service-role writes, admin-read SELECT, NO write policy — mirrors `notifications`/`email_log`); (3) schedules **two** cron jobs: the 15-min sweep+stuck+keep-alive combined job, and the hourly digest job — both calling `net.http_post` to `app/api/cron/*` route handlers guarded by a Vault-stored shared secret. The email-cap gauge is a pure read-only admin widget reusing the existing `email_log` daily-count query.
 
 ## Architectural Responsibility Map
 
 | Capability | Primary Tier | Secondary Tier | Rationale |
 |------------|-------------|----------------|-----------|
-| Reconciliation detection (HLTH-02) | Database (pg_cron schedule + detection SQL) | API/Backend (route handler runs the alert fan-out) | The discrepancy is a SQL set-difference over two DB tables; pg_cron is the only free-tier scheduler that can fire every 15 min. The *alerting* (in-app + critical email) belongs in the backend because it routes through `insertNotification` + `sendEmail`. |
+| Reconciliation detection (HLTH-02) | API/Backend (route handler lists Stripe paid sessions + runs the anti-join) | Database (pg_cron schedule fires the route every 15 min) | D-03 RESOLVED: the Stripe API is the source of truth, so the discrepancy is computed in TS (server-only Stripe key) against `wp_transfers`; pg_cron is the only free-tier scheduler that can fire every 15 min. The *alerting* (in-app + critical email) also belongs in the backend because it routes through `insertNotification` + `sendEmail`. |
 | Reconciliation alert delivery (D-09) | API/Backend (`insertNotification` + `sendEmail` critical) | — | Reuses the single notification + single email call-sites; never a new paid writer. |
 | Email-cap gauge (HLTH-03) | Frontend Server (RSC on `app/admin`) | Database (read `email_log` count) | Pure read; the daily-count query already exists in `send-email.ts`. No write, no cron — renders server-side in the admin console. |
 | Stuck-transfer detection (HLTH-04) | Database (SQL predicate) | API/Backend (alert fan-out) | A predicate over `wp_transfers`; cheapest folded into the reconciliation cron's route handler. In-app only (D-05). |
-| Keep-alive (HLTH-05) | Database (pg_cron self-ping write) | CDN/Vercel (daily backstop ping) | "Activity" that defeats the 7-day pause is a DB query/write; the 15-min cron already provides it, with a tiny dedicated self-ping `UPDATE` as the explicit guarantee. |
+| Keep-alive (HLTH-05) | Database (pg_cron self-ping write) | CDN/Vercel (daily backstop ping) | "Activity" that defeats the 7-day pause is a DB query/write; the 15-min cron already provides it, with a tiny dedicated self-ping write into `health_events` (`kind='keepalive'`) as the explicit guarantee. |
 | Digest cron trigger (D-10) | Database (pg_cron hourly schedule) | API/Backend (`sendDueDigests` fan-out) | Time trigger is a DB schedule; the send logic + PII gate already exist in `digest.ts`. |
 | Cron→server authentication | API/Backend (shared-secret header check) | Database (Vault stores the secret) | Vault holds the secret server-side in the DB; pg_net sends it as a header; the route handler compares it. Service-role never leaves the server. |
 
@@ -86,6 +86,7 @@ Reconciliation detection is a **left-anti-join in SQL**: every `webhook_events` 
 | `platform/notifications/notify.ts` → `insertNotification` | Admin in-app health-alert sink (stuck, cap-near, reconciliation) | All three alert types write here (service-role). [VERIFIED: file read] |
 | `platform/notifications/send-email.ts` → `sendEmail` | Critical-tier reconciliation admin email (D-09) | Only the reconciliation discrepancy emails; tier `"critical"` bypasses the soft cap. [VERIFIED: file read] |
 | `platform/notifications/digest.ts` → `sendDueDigests` | The invokable the hourly digest cron fires (D-10) | Already filters by `digest_send_hour == current UTC hour` (lines 117–126); no logic change needed. [VERIFIED: file read] |
+| `platform/payments/stripe.ts` → `getStripe` | Server-only Stripe client; lists paid Checkout Sessions for the reconciliation anti-join (D-03 source of truth) | The reconcile detection only; key never reaches a client. [VERIFIED: file read] |
 | `platform/supabase/admin` → `createAdminClient` | Service-role client for all health writes + route-handler reads | Mirrors webhook/digest usage. [VERIFIED: referenced across files] |
 | `email_log` (0007) daily-count query | The gauge data source — verbatim the query in `send-email.ts:63–71` | Gauge reuses it read-only. [VERIFIED: file read] |
 
@@ -93,7 +94,7 @@ Reconciliation detection is a **left-anti-join in SQL**: every `webhook_events` 
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
 | pg_net → Next route handler | pg_net → Supabase **Edge Function** | Edge Function is the doc's canonical example, BUT the repo has **zero Edge Functions**, all server logic is Next route handlers/server modules, and the sweep/digest logic already lives in `platform/notifications/*`. A route handler reuses that code with a thin wrapper; an Edge Function would duplicate it (Deno runtime, separate deploy, separate secret plumbing). **Route handler recommended.** |
-| pg_cron does the detection SQL inline (anti-join in the cron body) + pg_net only for alert | pg_net → route handler does both query + alert | Doing the *detection* in SQL and only the *alerting* over HTTP is viable and keeps the DB self-contained, BUT the alert fan-out must route through `insertNotification`/`sendEmail` (TypeScript). Recommend the route handler runs the detection query too (one place, testable in Vitest, reuses `createAdminClient`). |
+| Stripe-API list as the reconciliation source of truth (D-03 RESOLVED) | DB-only anti-join over `webhook_events` ⨝ `wp_transfers` | The DB-only anti-join cannot see a webhook Stripe **never delivered** (no `webhook_events` row exists). D-03 resolves this: list recent paid Checkout Sessions from the Stripe API (server-only key) and anti-join `wp_transfers` paid — the only design that satisfies the DoD "catch a deliberately-dropped webhook". `webhook_events` remains a cheap secondary effect-failure cross-check. |
 | Combined sweep+stuck+keep-alive in one 15-min cron | Three separate cron jobs | Free tier allows ≤8 concurrent jobs, so separate jobs are *allowed*. But folding sweep + stuck + keep-alive into one 15-min route handler call is fewer moving parts and the keep-alive comes free with any DB activity. Recommend **2 cron jobs total**: (1) 15-min health route, (2) hourly digest route. |
 | Vault-stored shared secret | Hardcode token in `cron.job.command` | `cron.job.command` is readable by any DB role that can select `cron.job`; a hardcoded service-role-equivalent token there is a leak. Vault `decrypted_secrets` is the documented pattern. **Vault recommended.** |
 
@@ -149,10 +150,10 @@ create extension if not exists pg_net;
    │   1. verify x-cron-secret === process.env.CRON_SECRET       1. verify x-cron-secret                                         │
    │      (timing-safe) → else 401, zero work                    2. await sendDueDigests()  ◄── existing digest.ts invokable     │
    │   2. createAdminClient() (service-role, server-only)           (filters drivers by digest_send_hour == current UTC hour)   │
-   │   3. RECONCILIATION: anti-join webhook_events ⨝ wp_transfers                                                               │
-   │      WHERE paid-event AND transfer not paid AND event > lookback                                                           │
+   │   3. RECONCILIATION: list Stripe paid Checkout Sessions ⨝ wp_transfers (D-03 Stripe-API source of truth)                   │
+   │      WHERE session paid AND transfer not paid AND session > lookback                                                       │
    │   4. STUCK: wp_transfers WHERE paid AND driver_id IS NULL AND arrival_at <= now()+12h                                       │
-   │   5. KEEP-ALIVE: UPDATE health_heartbeat SET last_ping = now()  (any write = activity)                                      │
+   │   5. KEEP-ALIVE: insert health_events (kind='keepalive', resolved_at=now()) — any write = activity (NO new table)          │
    │   6. for each NEW discrepancy/stuck not already alerted today:                                                              │
    │        insert health_events row (service-role)                                                                             │
    │        insertNotification(admin, ...)            ◄── in-app (all types)                                                     │
@@ -176,8 +177,9 @@ app/api/cron/
 └── digest/route.ts     # runtime nodejs; x-cron-secret gate → sendDueDigests() (the hourly job)
 
 platform/health/
-├── reconcile.ts        # detection query + discrepancy fan-out (testable in Vitest, mocks the admin client)
+├── reconcile.ts        # detection query + discrepancy fan-out (testable in Vitest, mocks the admin + Stripe clients)
 ├── stuck.ts            # paid-but-unclaimed-near-arrival predicate + dedup
+├── keepalive.ts        # service-role heartbeat write into health_events (kind='keepalive') — NO new table
 └── reconcile.test.ts   # Wave-0 contract: no-false-positive inside lookback; one alert per discrepancy
 
 app/admin/health/       # (or fold the gauge into app/admin/page.tsx)
@@ -253,15 +255,29 @@ export async function POST(req: NextRequest) {
 ```
 **Note:** `net.http_post` is **asynchronous and fire-and-forget** — pg_net queues the request and does NOT block or surface the HTTP response to the cron job. Delivery/response is inspectable via `net._http_response` (and `net.http_request_queue`). Do not expect the cron job to "know" the route succeeded; observability of the receiver is via `health_events` rows + `cron.job_run_details` (which only records that the SQL ran, not the HTTP outcome).
 
-### Pattern 2: Reconciliation detection as a left-anti-join with a lookback window
-**What:** Find paid Stripe events whose transfer is not `paid`, excluding events inside the in-flight window.
+### Pattern 2: Reconciliation detection as a left-anti-join (Stripe API source of truth) with a lookback window
+**What:** Per D-03 RESOLVED, list recent paid Stripe Checkout Sessions (server-only Stripe key) and find any whose transfer is not `paid`, excluding sessions inside the in-flight window. This catches a never-delivered webhook (no `webhook_events` row).
 **When to use:** The reconciliation core (HLTH-02).
-**Example:**
+**Example (TS — primary, D-03):**
+```typescript
+// Source: D-03 RESOLVED — Stripe API is the source of truth.
+// List recent paid Checkout Sessions, anti-join wp_transfers paid, skip the in-flight lookback window.
+const stripe = getStripe();
+const sessions = await stripe.checkout.sessions.list({ limit: 100 /*, created: { gte: now - 24h } */ });
+const lookbackCutoff = Math.floor(Date.now() / 1000) - 600; // ~10 min in-flight window (Pitfall 1)
+for (const s of sessions.data) {
+  if (s.payment_status !== "paid") continue;
+  if (s.created > lookbackCutoff) continue;                 // skip in-flight (no false positive)
+  const transferId = s.metadata?.transfer_id;               // the link key set by createCheckoutSession
+  const { data: t } = await admin.from("wp_transfers").select("id,status").eq("id", transferId).maybeSingle();
+  if (!t || t.status !== "paid") {
+    // DISCREPANCY → dedup against open health_events, then alert (in-app + critical email)
+  }
+}
+```
+**Secondary cross-check (cheap, optional):** `webhook_events` already records `outcome IN ('no_matching_transfer','write_failed')` for events it *received* but couldn't apply — those are a strong effect-failure signal and can be surfaced directly. **Important nuance:** the Stripe-API list (above) is the primary detector precisely because a webhook Stripe never delivered leaves NO `webhook_events` row — DB-only reconciliation cannot see it. See Open Question 1 (RESOLVED).
 ```sql
--- Source: derived from webhook route + 0003 schema (verified by reading both)
--- A "paid Stripe event with no matching paid transfer", older than the lookback window.
--- webhook_events.payload is the full verified Stripe event; the linking key is
--- payload -> 'data' -> 'object' -> 'metadata' ->> 'transfer_id' (set by createCheckoutSession).
+-- Optional SECONDARY effect-failure cross-check over webhook_events (NOT the primary detector).
 with paid_events as (
   select
     we.event_id,
@@ -276,10 +292,9 @@ with paid_events as (
 select pe.event_id, pe.transfer_id, pe.outcome
 from paid_events pe
 left join public.wp_transfers t on t.id = pe.transfer_id
-where t.id is null                       -- no such transfer row, OR
-   or t.status is distinct from 'paid';  -- transfer exists but never flipped to paid (dropped webhook)
+where t.id is null
+   or t.status is distinct from 'paid';
 ```
-The webhook already records `outcome IN ('no_matching_transfer','write_failed')` for events it *received* but couldn't apply — those are the strongest signal and can be surfaced directly. The anti-join additionally catches an event that Stripe sent but the webhook **never received** (a truly dropped webhook), because that event would not be in `webhook_events` at all — meaning the anti-join over `webhook_events` alone cannot see it. **Important nuance:** a webhook Stripe never delivered leaves NO `webhook_events` row, so DB-only reconciliation cannot detect it. See Open Question 1 — the DoD "deliberately-dropped webhook" test must drop the *effect* (e.g., a `no_matching_transfer`/`write_failed` outcome, or a `received`-but-not-`processed` event) so a `webhook_events` row exists for the sweep to find. If the requirement is to detect a webhook that never arrived at all, the sweep must instead query the Stripe API (`stripe.checkout.sessions.list` / PaymentIntents) for paid sessions and anti-join against `wp_transfers` — heavier, see Open Q1.
 
 ### Pattern 3: Stuck-transfer predicate with per-entity dedup
 ```sql
@@ -311,9 +326,10 @@ Dedup: before alerting, check whether a `health_events` row of `kind='stuck_uncl
 | Admin in-app alert | A new alerts table/UI | `insertNotification` + the existing `NotificationBell` | Phase 7 already ships the polymorphic feed + bell rendered on `app/admin`. |
 | Critical admin email | A second Resend call-site | `sendEmail({ tier: 'critical' })` | Single-call-site invariant (`single-sender.test.ts`); critical bypasses the soft cap. |
 | Daily email count | A new aggregation | The `email_log` count query in `send-email.ts:63–71` | Already battle-tested for the soft cap; gauge reuses it read-only. |
+| Catching a never-delivered webhook | A DB-only anti-join over `webhook_events` | The Stripe API list (`checkout.sessions.list`) anti-joined against `wp_transfers` (D-03) | A never-delivered webhook leaves no `webhook_events` row; only the Stripe API list sees it (the DoD's "deliberately-dropped webhook"). |
 | Digest scheduling-by-hour | New per-driver scheduling logic | `sendDueDigests()` as-is | It already filters `digest_send_hour == current UTC hour`; Phase 8 only fires it hourly. |
 
-**Key insight:** Phase 8 is almost entirely *wiring* existing seams to a scheduler. The only genuinely new code is (a) two thin authenticated route handlers, (b) the detection SQL/TS, (c) a `health_events` table, and (d) one read-only gauge widget. Resist building any new notification, email, or scheduling primitive.
+**Key insight:** Phase 8 is almost entirely *wiring* existing seams to a scheduler. The only genuinely new code is (a) two thin authenticated route handlers, (b) the detection TS (Stripe-API list + anti-join) + the stuck SQL, (c) a `health_events` table, and (d) one read-only gauge widget. Resist building any new notification, email, or scheduling primitive.
 
 ## Runtime State Inventory
 
@@ -321,10 +337,10 @@ Dedup: before alerting, check whether a `health_events` row of `kind='stuck_uncl
 
 | Category | Items Found | Action Required |
 |----------|-------------|------------------|
-| Stored data | New `health_events` table rows (service-role writes). No existing data renamed. | Data migration: none. Code edit: new table in 0008. |
+| Stored data | New `health_events` table rows (service-role writes), including `kind='keepalive'` heartbeat rows. No existing data renamed. | Data migration: none. Code edit: new table in 0008. |
 | Live service config | **`cron.job` entries** (the 2 schedules) live in the DB, NOT in git — only the migration that *creates* them is in git. Re-running the migration must be idempotent (unschedule-if-exists then schedule). **Vault secret `cron_secret`** lives in the DB, not git. **Vercel env `CRON_SECRET`** lives in Vercel, not git. | Migration uses `cron.unschedule('health-sweep')`-guard then `cron.schedule(...)`; Vault secret created once; Vercel env set once (manual). |
 | OS-registered state | None (no OS scheduler — pg_cron is in-DB; Vercel cron is config in `vercel.json`). | The Vercel daily backstop is declared in `vercel.json` `crons[]` (git-tracked). |
-| Secrets/env vars | `CRON_SECRET` (new, Vercel server env, never `NEXT_PUBLIC_`) ↔ Vault `cron_secret` (same value). Existing `SUPABASE_SERVICE_ROLE_KEY` reused by route handlers. | Set `CRON_SECRET` in Vercel + create the matching Vault secret. Both manual, one-time. |
+| Secrets/env vars | `CRON_SECRET` (new, Vercel server env, never `NEXT_PUBLIC_`) ↔ Vault `cron_secret` (same value). Existing `SUPABASE_SERVICE_ROLE_KEY` + `STRIPE_SECRET_KEY` reused by route handlers. | Set `CRON_SECRET` in Vercel + create the matching Vault secret. Both manual, one-time. |
 | Build artifacts | None — no compiled/installed package carries renamed state. | None. |
 
 **The canonical question:** After the migration runs, the cron schedules + Vault secret are LIVE DB state reproduced only by re-running 0008's idempotent cron block; the matching Vercel `CRON_SECRET` is the one piece of state that must be set out-of-band and kept in sync with the Vault value.
@@ -332,9 +348,9 @@ Dedup: before alerting, check whether a `health_events` row of `kind='stuck_uncl
 ## Common Pitfalls
 
 ### Pitfall 1: Reconciliation false positives during the normal in-flight window
-**What goes wrong:** A guest pays; Stripe fires `checkout.session.completed`; for a few seconds the `webhook_events` row exists but the `paid` UPDATE hasn't committed (or the webhook is mid-retry). A sweep with no lookback flags this perfectly-healthy in-flight transfer as a money discrepancy → false critical email.
+**What goes wrong:** A guest pays; Stripe fires `checkout.session.completed`; for a few seconds the session is paid but the `paid` UPDATE hasn't committed (or the webhook is mid-retry). A sweep with no lookback flags this perfectly-healthy in-flight transfer as a money discrepancy → false critical email.
 **Why it happens:** The webhook write and the sweep read are concurrent; "not yet paid" ≠ "dropped".
-**How to avoid:** Only consider events **older than a lookback window** (`created_at < now() - interval '10 minutes'`). 10 min is comfortably beyond Stripe's retry cadence and the webhook's sub-second processing, well inside the 15-min cadence so a real drop still alerts within ~15–25 min.
+**How to avoid:** Only consider sessions **older than a lookback window** (`session.created < now - 600s`). 10 min is comfortably beyond Stripe's retry cadence and the webhook's sub-second processing, well inside the 15-min cadence so a real drop still alerts within ~15–25 min.
 **Warning signs:** Reconciliation alerts that "resolve themselves" on the next sweep — the window is too short.
 
 ### Pitfall 2: Re-alerting the same discrepancy every 15 minutes
@@ -346,7 +362,7 @@ Dedup: before alerting, check whether a `health_events` row of `kind='stuck_uncl
 ### Pitfall 3: The 7-day pause silently stops EVERYTHING
 **What goes wrong:** During a quiet pilot stretch (no bookings for 7 days), the free project pauses; pg_cron stops; the sweep, stuck-check, AND digest all silently die — and reconciliation (the safety net) is exactly what's now off.
 **Why it happens:** Free-tier inactivity pause; "inactivity" = no DB activity.
-**How to avoid:** The 15-min health cron itself is recurring DB activity, so under normal operation it keeps the project warm. Add an explicit **keep-alive write** (`UPDATE health_heartbeat SET last_ping = now()`) inside the health route (or a tiny dedicated pg_cron job) as the belt-and-braces guarantee, plus the **Vercel daily backstop** (`vercel.json` `crons`) hitting `/api/cron/health` so even if pg_cron itself were the thing that lapsed, an external daily ping re-warms the DB. [CONFIRMED behaviour: CLAUDE.md Verified Provider Facts; community pattern travisvn/supabase-pause-prevention]
+**How to avoid:** The 15-min health cron itself is recurring DB activity, so under normal operation it keeps the project warm. Add an explicit **keep-alive write** — a benign `health_events` row `kind='keepalive'` (immediately `resolved_at=now()` so it never alerts; NO new table) inserted inside the health route (or a tiny dedicated pg_cron job) as the belt-and-braces guarantee, plus the **Vercel daily backstop** (`vercel.json` `crons`) hitting `/api/cron/health` so even if pg_cron itself were the thing that lapsed, an external daily ping re-warms the DB. [CONFIRMED behaviour: CLAUDE.md Verified Provider Facts; community pattern travisvn/supabase-pause-prevention]
 **Warning signs:** `cron.job_run_details` shows no runs for >24h; project dashboard shows "paused".
 
 ### Pitfall 4: `net.http_post` is async — no synchronous success signal
@@ -370,11 +386,11 @@ Dedup: before alerting, check whether a `health_events` row of `kind='stuck_uncl
 -- Source: pattern from 0007_notifications.sql (verified by reading) — FLAGGED, sign-off before live apply
 create table if not exists public.health_events (
   id           uuid primary key default gen_random_uuid(),
-  kind         text not null,          -- 'reconciliation_discrepancy' | 'stuck_unclaimed'
-  entity_type  text,                   -- polymorphic, e.g. 'transfer' | 'webhook_event' (NO transfer_id column, SC#1)
-  entity_id    text,                   -- the transfer id or stripe event_id (text: event ids are not uuid)
+  kind         text not null,          -- 'reconciliation_discrepancy' | 'stuck_unclaimed' | 'keepalive'
+  entity_type  text,                   -- polymorphic, e.g. 'transfer' | 'checkout_session' (NO transfer_id column, SC#1)
+  entity_id    text,                   -- the transfer id or stripe session/event id (text: event ids are not uuid)
   detail       jsonb,                  -- optional context (outcome, arrival_at, amount)
-  resolved_at  timestamptz,            -- NULL = open; set when a human replays/clears
+  resolved_at  timestamptz,            -- NULL = open; set when a human replays/clears (keepalive rows set it = now())
   created_at   timestamptz not null default now()
 );
 create index if not exists health_events_open_idx
@@ -385,6 +401,7 @@ drop policy if exists "health_events_admin_read" on public.health_events;
 create policy "health_events_admin_read" on public.health_events
   for select to authenticated using ( public.is_admin() );  -- reuses 0002 is_admin(); NO write policy
 ```
+**Keep-alive (HLTH-05) reuses this table — NO new table:** the heartbeat is a benign `health_events` insert with `kind='keepalive'` and `resolved_at = now()` so it never appears as an open alert. If a `CHECK` constraint is ever added to `kind`, it MUST include `'keepalive'`; the recommended schema uses NO `kind` CHECK constraint (free-form text), so `'keepalive'` is allowed by construction.
 
 ### Idempotent cron (re)scheduling block (re-runnable migration)
 ```sql
@@ -431,26 +448,19 @@ Vercel cron hits the same route; it carries Vercel's own `Authorization: Bearer 
 
 | # | Claim | Section | Risk if Wrong |
 |---|-------|---------|---------------|
-| A1 | The "deliberately-dropped webhook" DoD test drops the *effect* (leaving a `webhook_events` row with a non-`processed` outcome, or a transfer that never flipped to paid), so the DB-only anti-join can detect it. A webhook Stripe NEVER delivered leaves no `webhook_events` row and is invisible to DB-only reconciliation. | Pattern 2 / Open Q1 | If the intended test is a never-delivered webhook, the sweep must additionally query the Stripe API — larger scope. **Confirm with user before planning the detection source.** |
-| A2 | The link key is `payload #>> '{data,object,metadata,transfer_id}'` (Stripe event → Checkout Session → metadata). The webhook reads `session.metadata.transfer_id` (verified in route.ts:113–117); the stored `payload` is the full event, so the session is at `data.object`. | Pattern 2 | If `payload` stored only the session object (not the full event), the path is `{metadata,transfer_id}`. Verify against a real stored payload before finalizing the SQL (none exist yet — `webhook_events` is empty). |
+| A1 | The "deliberately-dropped webhook" DoD test is satisfied by the Stripe-API source of truth (D-03 RESOLVED): the sweep lists recent paid Checkout Sessions from Stripe and anti-joins `wp_transfers`, so it catches BOTH an effect-failed event AND a never-delivered webhook (which leaves no `webhook_events` row). | Pattern 2 / Open Q1 (RESOLVED) | Low — D-03 locks the Stripe API as primary. `webhook_events` remains a cheap secondary cross-check only. |
+| A2 | The link key is `session.metadata.transfer_id` (set by `createCheckoutSession`, read by the webhook at route.ts:113–117). The Stripe-API list reads it directly off each session; the optional `webhook_events` secondary path uses `payload #>> '{data,object,metadata,transfer_id}'`. | Pattern 2 | If `metadata.transfer_id` is ever unset on a session, that session cannot be linked — surface it as an unlinkable discrepancy rather than dropping it. |
 | A3 | A 10-minute lookback is comfortably longer than the webhook's processing + Stripe's retry window and short enough to still alert within the 15-min cadence. | Pitfall 1 | Too short → false positives; too long → slower detection. Tunable constant; low risk. |
 | A4 | The production receiver URL is `https://balkanityplatformproject.vercel.app` (from STATE handoff). A custom domain would change the cron URL. | Pattern 1 | Wrong URL → cron silently no-ops (Pitfall 5). Confirm the canonical production URL at plan time. |
 | A5 | `digest_send_hour` is interpreted as a UTC hour (digest.ts uses `getUTCHours()`), so the hourly cron + the invokable's internal filter align. "Self-chosen hour" is therefore effectively UTC, not the driver's local timezone. | Digest cron / D-10 | If drivers expect local-time delivery, a TZ mapping is needed — but Phase 7 already locked UTC (`digest_send_hour` UTC, STATE decision). Out of Phase 8 scope; flag only. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **What exactly does the DoD "deliberately-dropped webhook" test drop?**
-   - What we know: The webhook records every *received* event in `webhook_events` with an `outcome`; the anti-join detects events whose transfer never reached `paid`. The repo's idempotency/replay path is proven.
-   - What's unclear: Whether the DoD means (a) an event Stripe delivered but whose *effect* failed/was skipped (→ a `webhook_events` row exists; DB-only sweep detects it), or (b) an event Stripe never delivered at all (→ no row; DB-only sweep is blind; requires a Stripe API reconciliation).
-   - Recommendation: Default to (a) for the pilot — it matches CLAUDE.md's reconciliation framing and the existing `no_matching_transfer`/`write_failed` outcomes, and the remediation (human replay through the idempotent webhook) is already supported. **Surface (b) to the user**; if required, add a Stripe-API reconciliation pass (`stripe.checkout.sessions.list({ payment_status: 'paid' })` anti-joined against `wp_transfers`) — heavier, and the only way to catch a truly never-delivered webhook. This is the single most important thing to confirm before planning the detection source.
+1. **What exactly does the DoD "deliberately-dropped webhook" test drop?** — **RESOLVED by CONTEXT.md D-03 (2026-06-20): the Stripe API is the source of truth.** The sweep lists recent paid Checkout Sessions from Stripe (server-only key) and anti-joins them against `wp_transfers` paid, so it catches BOTH an effect-failed event AND a truly never-delivered webhook (which leaves NO `webhook_events` row). Implemented in **Plan 08-02** (`platform/health/reconcile.ts` via `getStripe().checkout.sessions.list`), proven live in **Plan 08-05** Gate A. `webhook_events` remains an available secondary effect-failure cross-check, but the Stripe-API anti-join is the primary detector and is sufficient for the pilot DoD. (Original analysis: a DB-only anti-join over `webhook_events` is blind to a never-delivered webhook — that is precisely why D-03 selected the Stripe API.)
 
-2. **Where does the email-cap gauge live — its own `/admin/health` page or folded into `app/admin/page.tsx`?**
-   - What we know: D-06 says "admin console"; the console already renders RSC widgets and the bell.
-   - Recommendation: A small gauge on the existing `app/admin` landing (alongside the section nav) is simplest for a pilot; a dedicated `/admin/health` page is cleaner if stuck-list + health-events log also surface. Planner's call — both are read-only RSC reads behind the existing `getCurrentRole` gate.
+2. **Where does the email-cap gauge live — its own `/admin/health` page or folded into `app/admin/page.tsx`?** — **RESOLVED: it lives on the new `/admin/health` console page**, built in **Plan 08-03** (`app/admin/health/page.tsx` + `EmailCapGauge.tsx`), reachable via an additive nav link from `app/admin/page.tsx`. A dedicated page is cleaner because the same console also surfaces the open reconciliation-discrepancy list and the stuck-transfer list (D-06). All read-only RSC behind the existing `getCurrentRole === 'admin'` gate.
 
-3. **One combined 15-min job vs separate sweep / stuck / keep-alive jobs?**
-   - What we know: Free tier ≤8 concurrent jobs; one route handler can do all three cheaply.
-   - Recommendation: **One** 15-min health job (sweep + stuck + keep-alive in one route) + **one** hourly digest job = 2 cron jobs total. Fewer moving parts; the keep-alive write rides on the same call.
+3. **One combined 15-min job vs separate sweep / stuck / keep-alive jobs?** — **RESOLVED: a 2-job design** — (1) a single 15-min `health-sweep` job that runs reconciliation + stuck + keep-alive in one route handler, and (2) an hourly `digest-hourly` job. Both schedules are authored in **Plan 08-01** (`0008_platform_health.sql`), the health route + workers are built in **Plan 08-02**, the digest route is built in **Plan 08-04**, and both are registered live in **Plan 08-05**. Fewer moving parts; the keep-alive write rides on the same 15-min call (well within the free-tier ≤8 concurrent-jobs limit).
 
 ## Environment Availability
 
@@ -461,6 +471,7 @@ Vercel cron hits the same route; it carries Vercel's own `Authorization: Bearer 
 | supabase_vault | cron→route auth secret | ✓ installed | 0.3.1 | env-only secret without Vault (less safe) — Vault strongly preferred |
 | PostgreSQL | host | ✓ | 17.6 | — |
 | Vercel Hobby cron | HLTH-05 daily backstop | ✓ (config) | n/a | the pg_cron self-ping alone |
+| Stripe API (paid session list) | HLTH-02 reconciliation source of truth (D-03) | ✓ (Phase 3 `getStripe()`) | n/a | `webhook_events` DB-only cross-check (cannot see a never-delivered webhook) |
 | Resend (critical send) | D-09 reconciliation email | ✓ (Phase 7 `sendEmail`) | n/a | in-app only if Resend down |
 | Production receiver URL | both cron jobs | ✓ | balkanityplatformproject.vercel.app | confirm canonical URL (A4) |
 
@@ -481,17 +492,17 @@ Vercel cron hits the same route; it carries Vercel's own `Authorization: Bearer 
 ### Phase Requirements → Test Map
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| HLTH-02 | Reconciliation detects a paid-event-with-unpaid-transfer | unit | `vitest run platform/health/reconcile.test.ts` | ❌ Wave 0 |
-| HLTH-02 | NO false positive inside the lookback window (just-paid transfer not flagged) | unit | `vitest run platform/health/reconcile.test.ts -t lookback` | ❌ Wave 0 |
+| HLTH-02 | Reconciliation detects a paid-Stripe-session-with-unpaid-transfer | unit | `vitest run platform/health/reconcile.test.ts` | ❌ Wave 0 |
+| HLTH-02 | NO false positive inside the lookback window (just-paid session not flagged) | unit | `vitest run platform/health/reconcile.test.ts -t lookback` | ❌ Wave 0 |
 | HLTH-02 | Discrepancy fires exactly ONE alert (dedup; no re-alert on re-run) | unit | `vitest run platform/health/reconcile.test.ts -t dedup` | ❌ Wave 0 |
 | HLTH-02 | Sweep NEVER writes `status:'paid'` (single-writer lock holds) | unit | extend `platform/payments/single-writer.test.ts` grep-gate to include `platform/health/*` + `app/api/cron/*` | ✅ extend existing |
 | HLTH-02 | Cron route rejects a request without the valid `x-cron-secret` (401, zero work) | unit | `vitest run app/api/cron/health/route.test.ts -t unauthorized` | ❌ Wave 0 |
 | HLTH-03 | Gauge computes the correct daily 'sent' count + state (ok/warning/at-cap) | unit | `vitest run app/admin/**/EmailCapGauge.test.tsx` | ❌ Wave 0 |
 | HLTH-04 | Stuck predicate matches paid+unclaimed within 12h; ignores claimed/early | unit | `vitest run platform/health/stuck.test.ts` | ❌ Wave 0 |
 | HLTH-04 | Stuck alert is in-app only (NO `sendEmail`) | unit (grep) | assert no `sendEmail` in `stuck.ts` | ❌ Wave 0 |
-| HLTH-05 | Keep-alive performs a DB write each cycle | unit | `vitest run platform/health/*keep*` (or assert the heartbeat UPDATE) | ❌ Wave 0 |
+| HLTH-05 | Keep-alive performs a DB write each cycle | unit | `vitest run platform/health/*keep*` (or assert the keepalive health_events insert) | ❌ Wave 0 |
 | D-10 | Digest route invokes `sendDueDigests` only when authorized | unit | `vitest run app/api/cron/digest/route.test.ts` | ❌ Wave 0 |
-| DoD | Dropped-webhook is caught by the sweep (LIVE) | manual/live | live: insert a `no_matching_transfer`/unpaid case, run sweep, assert a `health_events` row + critical email | manual gate |
+| DoD | Dropped-webhook is caught by the sweep (LIVE) | manual/live | live: paid Stripe session whose transfer stays unpaid, run sweep, assert a `health_events` row + critical email | manual gate |
 | DoD | Cron actually fires on the live project | manual/live | `select * from cron.job_run_details order by start_time desc limit 5;` via Management API | manual gate |
 | DoD | Keep-alive prevents the pause | manual/live | observe project stays active across a quiet window; `cron.job_run_details` continuous | manual gate |
 
@@ -506,7 +517,7 @@ Vercel cron hits the same route; it carries Vercel's own `Authorization: Bearer 
 - [ ] `app/api/cron/health/route.test.ts` + `app/api/cron/digest/route.test.ts` — covers the `x-cron-secret` auth gate (401 on missing/wrong)
 - [ ] `app/admin/**/EmailCapGauge.test.tsx` — covers HLTH-03 (count + threshold states)
 - [ ] Extend `platform/payments/single-writer.test.ts` grep-gate to include `platform/health/*` and `app/api/cron/*` so the sweep can never become a `paid` writer
-- [ ] Shared service-role admin-client mock fixture (reuse the Phase 7 pattern in `send-email.test.ts`)
+- [ ] Shared service-role admin-client mock fixture (reuse the Phase 7 pattern in `send-email.test.ts`); add a `getStripe()` mock for reconcile.test.ts
 - [ ] Framework install: none — Vitest + Playwright already present
 
 ## Security Domain
@@ -518,8 +529,8 @@ Vercel cron hits the same route; it carries Vercel's own `Authorization: Bearer 
 | V2 Authentication | yes | The cron→route call authenticates via a shared secret (`x-cron-secret`) compared **timing-safe** (`crypto.timingSafeEqual`); secret stored in Vault (DB) + Vercel env, never `NEXT_PUBLIC_`. The webhook's HMAC pattern is the analog. |
 | V3 Session Management | no | Cron routes are session-less machine-to-machine; admin widgets reuse the existing `getCurrentRole` session gate. |
 | V4 Access Control | yes | Cron routes are public-internet endpoints doing privileged work (sends, alerts) → MUST reject unauthenticated callers (401, zero side effects). Admin widgets behind `getCurrentRole === 'admin'`. `health_events` admin-read RLS, NO client write policy. |
-| V5 Input Validation | yes (light) | Cron bodies are `{}` (no untrusted input). The detection SQL casts `metadata.transfer_id` to `uuid` (rejects malformed). Stripe `payload` is already signature-verified at ingest. |
-| V6 Cryptography | yes | Use `crypto.timingSafeEqual` for the secret compare (never `===`, which is timing-leaky). Service-role + Resend keys stay server-only. NEVER hand-roll crypto. |
+| V5 Input Validation | yes (light) | Cron bodies are `{}` (no untrusted input). The detection reads `session.metadata.transfer_id` from the (server-side, key-authenticated) Stripe API; the optional secondary SQL casts to `uuid` (rejects malformed). Stripe `payload` is already signature-verified at ingest. |
+| V6 Cryptography | yes | Use `crypto.timingSafeEqual` for the secret compare (never `===`, which is timing-leaky). Service-role + Stripe + Resend keys stay server-only. NEVER hand-roll crypto. |
 | V7 Error Handling/Logging | yes | `health_events` IS the audit log for discrepancies; log errors without PII (mirror `digest.ts` `console.error` discipline — never recipient PII). |
 
 ### Known Threat Patterns for {pg_cron + public cron route on Vercel}
@@ -532,13 +543,13 @@ Vercel cron hits the same route; it carries Vercel's own `Authorization: Bearer 
 | Re-alert storm exhausts Resend cap (Pitfall 2) | DoS (self-inflicted) | Per-entity dedup against `health_events`; reconciliation email is `critical` (counts toward cap) so dedup is mandatory |
 | Timing attack on the secret compare | Spoofing | `crypto.timingSafeEqual` over equal-length buffers |
 | Cron fires against a stale/preview deployment | — (availability) | Pin the canonical production URL; observe `cron.job_run_details` + `health_events` |
-| Reconciliation email leaks guest PII | Information Disclosure | The critical email body carries the discrepancy fact (transfer id / event id / amount), NOT guest contact PII — mirror the digest's non-PII projection discipline |
+| Reconciliation email leaks guest PII | Information Disclosure | The critical email body carries the discrepancy fact (transfer id / session id / amount), NOT guest contact PII — mirror the digest's non-PII projection discipline |
 
 ## Sources
 
 ### Primary (HIGH confidence)
 - **Supabase Management API `/database/query`** on Balkanity ref `qyhdogajtmnvxphrslwm` (2026-06-20) — LIVE verification: pg_cron 1.6.4 + pg_net 0.20.3 available (not installed), supabase_vault 0.3.1 installed, Postgres 17.6. Resolves the STATE open item.
-- **In-repo file reads (verified):** `platform/notifications/digest.ts`, `send-email.ts`, `notify.ts`; `supabase/migrations/0003_payments_spine.sql`, `0004_transfer_entity.sql`, `0007_notifications.sql`; `app/api/stripe/webhook/route.ts`; `app/admin/page.tsx`; `package.json`; `vercel.json`.
+- **In-repo file reads (verified):** `platform/notifications/digest.ts`, `send-email.ts`, `notify.ts`; `platform/payments/stripe.ts`; `supabase/migrations/0003_payments_spine.sql`, `0004_transfer_entity.sql`, `0007_notifications.sql`; `app/api/stripe/webhook/route.ts`; `app/admin/page.tsx`; `package.json`; `vercel.json`.
 - **CLAUDE.md** — Verified Provider Facts (pg_cron/pg_net free-tier limits, Vercel Hobby cron, 7-day pause, Resend cap, money single-writer lock) — project-locked HIGH.
 - **supabase.com/docs/guides/functions/schedule-functions** — `cron.schedule` + `net.http_post` + Vault `decrypted_secrets` syntax.
 
@@ -547,14 +558,14 @@ Vercel cron hits the same route; it carries Vercel's own `Authorization: Bearer 
 - **github.com/travisvn/supabase-pause-prevention** — keep-alive pattern (community).
 
 ### Tertiary (LOW confidence)
-- The exact stored `payload` JSON path (A2) — inferred from the webhook code + Stripe event shape; no live `webhook_events` row exists yet to confirm (table empty).
+- The exact stored `payload` JSON path for the optional `webhook_events` secondary cross-check (A2) — inferred from the webhook code + Stripe event shape; no live `webhook_events` row exists yet to confirm (table empty). Not load-bearing — the Stripe-API list is the primary detector (D-03).
 
 ## Metadata
 
 **Confidence breakdown:**
 - Standard stack (pg_cron/pg_net/vault): **HIGH** — verified LIVE on Balkanity + against existing code.
 - Architecture (cron→route→existing seams): **HIGH** — every seam exists and was read; only thin wrappers are new.
-- Reconciliation detection SQL: **MEDIUM-HIGH** — join logic derived from verified schema; the JSONB path (A2) and dropped-webhook semantics (Open Q1) need one live confirmation.
+- Reconciliation detection (Stripe-API list + anti-join): **HIGH** — D-03 RESOLVED locks the source of truth; `getStripe()` + `wp_transfers` both verified.
 - Pitfalls: **HIGH** — grounded in the existing CR-01 trap, the cap-near dedup pattern, and pg_net's documented async behaviour.
 
 **Research date:** 2026-06-20
@@ -568,9 +579,8 @@ Vercel cron hits the same route; it carries Vercel's own `Authorization: Bearer 
 ### Key Findings
 - **STATE open item RESOLVED (live):** Balkanity ref `qyhdogajtmnvxphrslwm` has `pg_cron 1.6.4` (meets ≥1.6.4) + `pg_net 0.20.3` **available but not installed** → migration must `create extension`; Postgres 17.6; `supabase_vault 0.3.1` already installed (store the cron secret there).
 - **Recommended invocation shape:** pg_cron → `net.http_post` → existing-style **Next route handlers** (`app/api/cron/health`, `app/api/cron/digest`, `runtime nodejs`), authenticated by a Vault-stored `x-cron-secret` (timing-safe compare) — NOT a Supabase Edge Function (repo has none; the sweep/digest logic already lives in `platform/notifications/*`). **2 cron jobs total** (15-min health = sweep+stuck+keep-alive; hourly digest).
-- **Reconciliation = left-anti-join** of `webhook_events` (paid events, `payload #>> '{data,object,metadata,transfer_id}'`) against `wp_transfers`, filtered to events `> 10 min` old (lookback kills false positives); DETECT-only per D-01, alerts via existing `insertNotification` + critical `sendEmail`.
-- **Everything else is wiring existing seams:** `sendDueDigests()` already self-filters by `digest_send_hour`; the email-cap gauge reuses the `email_log` daily-count query verbatim; `health_events` table mirrors the `notifications`/`email_log` RLS conventions (service-role write, admin-read, NO write policy).
-- **Two confirmations needed before/at planning (Open Q1, A2):** (a) does the DoD "dropped webhook" mean an effect-failed event (DB-detectable) or a never-delivered event (needs a Stripe-API reconciliation pass)? and (b) confirm the stored `payload` JSONB path against the first real `webhook_events` row.
+- **Reconciliation = Stripe-API source of truth (D-03 RESOLVED):** list recent paid Checkout Sessions via `getStripe().checkout.sessions.list` and anti-join `wp_transfers` paid, filtered to sessions `> 10 min` old (lookback kills false positives); DETECT-only per D-01, alerts via existing `insertNotification` + critical `sendEmail`. `webhook_events` is a secondary cross-check only.
+- **Everything else is wiring existing seams:** `sendDueDigests()` already self-filters by `digest_send_hour`; the email-cap gauge reuses the `email_log` daily-count query verbatim; `health_events` table mirrors the `notifications`/`email_log` RLS conventions (service-role write, admin-read, NO write policy); the keep-alive reuses `health_events` (`kind='keepalive'`, NO new table).
 
 ### File Created
 `.planning/phases/08-platform-health/08-RESEARCH.md`
@@ -580,12 +590,13 @@ Vercel cron hits the same route; it carries Vercel's own `Authorization: Bearer 
 |------|-------|--------|
 | Standard Stack | HIGH | Extensions verified LIVE on Balkanity |
 | Architecture | HIGH | All seams read in-repo; only thin route wrappers new |
+| Reconciliation | HIGH | D-03 RESOLVED (Stripe API source of truth); `getStripe()` + `wp_transfers` verified |
 | Pitfalls | HIGH | Grounded in existing CR-01 trap + cap-near dedup + pg_net async docs |
 
-### Open Questions
-1. Dropped-webhook DoD semantics (effect-failed vs never-delivered) → drives whether a Stripe-API reconciliation pass is needed (Open Q1 / A1).
-2. Confirm the `webhook_events.payload` JSONB path for `transfer_id` against a real row (table currently empty) (A2).
-3. Gauge placement (landing vs `/admin/health`) and 1-vs-2 cron-job split (Open Q2/Q3) — low-risk planner calls.
+### Open Questions (RESOLVED)
+1. Dropped-webhook DoD semantics → RESOLVED by D-03: Stripe API is the source of truth (catches a never-delivered webhook); implemented in Plan 08-02.
+2. Gauge placement → RESOLVED: dedicated `/admin/health` console page (Plan 08-03).
+3. 1-vs-2 cron-job split → RESOLVED: 2-job design (15-min health + hourly digest); Plans 08-01/08-02/08-04.
 
 ### Ready for Planning
 Research complete. Schema changes (extensions + `health_events` + cron schedules in `0008_platform_health.sql`) are FLAGGED/irreversible — require sign-off before live apply via the Management API (Balkanity ref only, never Kalvia). Planner can now create PLAN.md files.

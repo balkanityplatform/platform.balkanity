@@ -328,7 +328,7 @@ The work is a strict, user-locked dependency chain: the shared **Design System f
 
 ### Phases
 
-- [ ] **Phase 9: Design System Foundation** - "Balkanity Path" tokens in Tailwind v4 @theme + status badge, infinity/route motif, and lifecycle stepper components (prerequisite for all surfaces)
+- [x] **Phase 9: Design System Foundation** - "Balkanity Path" tokens in Tailwind v4 @theme + status badge, infinity/route motif, and lifecycle stepper components (prerequisite for all surfaces) (completed 2026-06-20)
 - [ ] **Phase 10: Guest UI Rebuild** - Boarding-pass "Transfer Pass" booking screen + restyled form + magic-link status page with live stepper + Stripe trust CTA
 - [ ] **Phase 11: Driver PWA Rebuild** - Claim cards (no pre-claim PII), bottom nav, My Trips, and en-route trip detail with progress stepper + Confirm-Arrival, riding the existing atomic claim
 - [ ] **Phase 12: Admin Console Rebuild** - Left sidebar nav, Transfer Pool KPI cards, pending-transmissions transfers table + restyled detail, and top bar with search / notifications bell / admin identity
@@ -363,7 +363,7 @@ Plans:
 - [x] 09-04-PLAN.md — DS-04 horizontal LifecycleStepper (STEPPER_ORDER-driven, shape-encoded states, cancelled terminal) + tests
 **Wave 4** *(blocked on Wave 3)*
 
-- [ ] 09-05-PLAN.md — D-11 dev-only design-system showcase route + EN/BG showcase keys
+- [x] 09-05-PLAN.md — D-11 dev-only design-system showcase route + EN/BG showcase keys
 **UI hint**: yes
 
 #### Phase 10: Guest UI Rebuild
@@ -426,7 +426,7 @@ v1.1 phases execute in numeric order after v1.0: 9 → 10 → 11 → 12
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 9. Design System Foundation | 4/5 | In Progress|  |
+| 9. Design System Foundation | 5/5 | Complete   | 2026-06-20 |
 | 10. Guest UI Rebuild | 0/TBD | Not started | - |
 | 11. Driver PWA Rebuild | 0/TBD | Not started | - |
 | 12. Admin Console Rebuild | 0/TBD | Not started | - |

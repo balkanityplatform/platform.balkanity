@@ -43,6 +43,13 @@ const STATE_META: Record<
   cancelled: { colorClass: "bg-coral", label: "Cancelled" },
 };
 
+// Read-only label accessor over the single STATE_META source. Consumers that
+// render their own shape (e.g. the DS-04 LifecycleStepper) derive the worded
+// label from HERE rather than hand-rolling a parallel label array (T-04-02).
+export function stateLabel(state: TransferState): string {
+  return STATE_META[state].label;
+}
+
 // D-04: cancelled is off the happy path — a hollow coral ring in BOTH variants.
 // 2px stroke, transparent fill; the worded label still renders (WCAG 1.4.1).
 const CANCELLED_RING = "border-2 border-coral bg-transparent";

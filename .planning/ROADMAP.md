@@ -353,7 +353,7 @@ The work is a strict, user-locked dependency chain: the shared **Design System f
 Plans:
 **Wave 1**
 
-- [ ] 09-01-PLAN.md — DS-01 named @theme tokens (typography/radii/spacing) + DS-04 STEPPER_ORDER const
+- [x] 09-01-PLAN.md — DS-01 named @theme tokens (typography/radii/spacing) + DS-04 STEPPER_ORDER const
 **Wave 2** *(blocked on Wave 1; 02 + 03 run in parallel — disjoint files)*
 
 - [ ] 09-02-PLAN.md — DS-02 StatusDot variant prop (dot/pill) + cancelled hollow coral ring + tests
@@ -426,7 +426,7 @@ v1.1 phases execute in numeric order after v1.0: 9 → 10 → 11 → 12
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 9. Design System Foundation | 0/5 | Planned | - |
+| 9. Design System Foundation | 1/5 | In Progress|  |
 | 10. Guest UI Rebuild | 0/TBD | Not started | - |
 | 11. Driver PWA Rebuild | 0/TBD | Not started | - |
 | 12. Admin Console Rebuild | 0/TBD | Not started | - |

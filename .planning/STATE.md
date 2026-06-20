@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: UI Rebuild
-status: planning
-stopped_at: Phase 9 context gathered
-last_updated: "2026-06-20T13:25:32.108Z"
-last_activity: 2026-06-20 — v1.1 roadmap created (phases 9–12, 18/18 reqs mapped)
+status: executing
+stopped_at: Completed 09-01-PLAN.md
+last_updated: "2026-06-20T13:32:05.133Z"
+last_activity: 2026-06-20
 progress:
   total_phases: 4
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 5
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-20)
 
 **Core value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
-**Current focus:** Milestone v1.1 UI Rebuild — Phase 9 (Design System Foundation) next
+**Current focus:** Phase 09 — design-system-foundation
 
 ## Current Position
 
-Phase: Not started (roadmap created)
-Plan: —
-Status: Roadmap created — awaiting Phase 9 planning
-Last activity: 2026-06-20 — v1.1 roadmap created (phases 9–12, 18/18 reqs mapped)
+Phase: 09 (design-system-foundation) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-06-20
 
 ## Handoff (for a new session)
 
@@ -91,6 +91,7 @@ Last activity: 2026-06-20 — v1.1 roadmap created (phases 9–12, 18/18 reqs ma
 | Phase 08 P02 | 4min | 3 tasks tasks | 5 files files |
 | Phase 08 P03 | 5min | 2 tasks tasks | 3 files files |
 | Phase 08 P04 | 2min | 2 tasks | 2 files |
+| Phase 09 P01 | 5min | 2 tasks tasks | 2 files files |
 
 ## Accumulated Context
 
@@ -176,6 +177,8 @@ Recent decisions affecting current work:
 - [Phase ?]: [08-03]: EmailCapGauge turns the 08-01 RED spec GREEN — pure gaugeState(sent,cap) (ok<80/warning>=80/at-cap>=90, default cap 90=EMAIL_SOFT_CAP, D-07) + presentational meter; figure + worded label, theme-token fill teal/amber/coral (WCAG 1.4.1)
 - [Phase ?]: [08-03]: The console DISPLAYS Plan-02 detection — renders OPEN health_events rows by kind (resolved_at IS NULL), linked by entity_id (the transfer id); shows id + non-PII detail.amount_cents only (T-08-12), no detection logic of its own
 - [Phase ?]: 08-04: digest cron route fires sendDueDigests() unchanged behind a timing-safe x-cron-secret/Bearer gate (D-10); Vercel daily backstop hits /api/cron/health only (HLTH-05 belt-and-braces, pg_cron remains the 15-min primary)
+- [Phase 09]: [09-01]: Named @theme tokens via Tailwind v4 CSS-first --text-*/--radius-*/--spacing-* (no JS tailwind.config); surfaces author semantic classes (text-heading/rounded-lg/h-cta-height) not arbitrary values (DS-01/D-01/D-02)
+- [Phase 09]: [09-01]: STEPPER_ORDER (6 steps paid->completed) added to lifecycle.ts as the single source for the DS-04 stepper; excludes requested+cancelled; TransferState stays imported (Don't-Hand-Roll, D-06/D-08)
 
 ### Pending Todos
 
@@ -209,6 +212,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-20T13:02:59.719Z
-Stopped at: Phase 9 context gathered
-Resume file: .planning/phases/09-design-system-foundation/09-CONTEXT.md
+Last session: 2026-06-20T13:32:05.127Z
+Stopped at: Completed 09-01-PLAN.md
+Resume file: None

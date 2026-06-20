@@ -8,6 +8,21 @@ The first module ("Welcome Pickup") of the Balkanity Platform — an installable
 
 A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
 
+## Current Milestone: v1.1 UI Rebuild
+
+**Goal:** Rebuild the presentation layer of all three surfaces (guest, driver, admin) to match the Stitch mockups + the DESIGN.md ("Balkanity Path") design system, while preserving the current minimalist feel — with **zero backend, schema, auth, RLS, or payment changes**.
+
+**Target features (one phase per surface, design-contract-first):**
+- **Guest UI** — boarding-pass "Transfer Pass" booking screen + magic-link status page
+- **Driver PWA** — Available (claim cards), My Trips, En-route trip detail, bottom nav
+- **Admin console** — "Transfer Pool" dashboard, left sidebar nav, KPI cards, transfers table + detail
+
+**Locked decisions:**
+- Brand primary stays **`#029B87`** (DESIGN.md's `#00685a` token rejected; correct that token).
+- **Omit** mockup features with no backend (live GPS map, driver ratings, earnings analytics, "Download Manifest") — keep the UI truthful to current capabilities.
+- **Presentation-only:** preserve auth, RLS, the masked pool view (no guest PII to drivers pre-claim), the atomic claim RPC, and the single-writer `paid` invariant.
+- Tailwind v4 CSS-first `@theme` — map DESIGN.md tokens into the existing theme; no JS `tailwind.config`.
+
 ## Requirements
 
 ### Validated
@@ -97,4 +112,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-19 after Phase 5 (claim-correctness) completion*
+*Last updated: 2026-06-20 after starting milestone v1.1 (UI Rebuild)*

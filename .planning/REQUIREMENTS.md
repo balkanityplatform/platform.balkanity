@@ -18,7 +18,7 @@
 ### Design System (shared foundation)
 
 - [x] **DS-01**: The "Balkanity Path" design tokens (colors with `#029B87` primary, Montserrat type scale, 8px spacing, radii) are mapped into the app's Tailwind v4 CSS-first `@theme` and used app-wide (no JS `tailwind.config`).
-- [ ] **DS-02**: Every status is shown as a colored dot/badge **plus** a worded label (Unclaimed=coral, Claimed=teal, En route=amber, Completed=grey, Cancelled=hollow coral ring) — never color alone.
+- [x] **DS-02**: Every status is shown as a colored dot/badge **plus** a worded label (Unclaimed=coral, Claimed=teal, En route=amber, Completed=grey, Cancelled=hollow coral ring) — never color alone.
 - [ ] **DS-03**: The infinity/route motif renders as the connective element between departure and arrival points on route visualizations.
 - [x] **DS-04**: A reusable lifecycle stepper component renders the transfer states (Paid → Claimed → En route → Arrived → Picked up → Completed) with completed/active/pending styling.
 
@@ -66,7 +66,7 @@ Every v1.1 requirement maps to exactly one phase (9–12). 18/18 mapped — no o
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | DS-01 | Phase 9 | Complete |
-| DS-02 | Phase 9 | Pending |
+| DS-02 | Phase 9 | Complete |
 | DS-03 | Phase 9 | Pending |
 | DS-04 | Phase 9 | Complete |
 | GUI-01 | Phase 10 | Pending |

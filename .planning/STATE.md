@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: UI Rebuild
 status: executing
-stopped_at: Completed 09-01-PLAN.md
-last_updated: "2026-06-20T13:32:05.133Z"
+stopped_at: Completed 09-02-PLAN.md
+last_updated: "2026-06-20T13:37:43.520Z"
 last_activity: 2026-06-20
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 ## Current Position
 
 Phase: 09 (design-system-foundation) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-06-20
 
@@ -92,6 +92,7 @@ Last activity: 2026-06-20
 | Phase 08 P03 | 5min | 2 tasks tasks | 3 files files |
 | Phase 08 P04 | 2min | 2 tasks | 2 files |
 | Phase 09 P01 | 5min | 2 tasks tasks | 2 files files |
+| Phase 09 P02 | 4min | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -179,6 +180,7 @@ Recent decisions affecting current work:
 - [Phase ?]: 08-04: digest cron route fires sendDueDigests() unchanged behind a timing-safe x-cron-secret/Bearer gate (D-10); Vercel daily backstop hits /api/cron/health only (HLTH-05 belt-and-braces, pg_cron remains the 15-min primary)
 - [Phase 09]: [09-01]: Named @theme tokens via Tailwind v4 CSS-first --text-*/--radius-*/--spacing-* (no JS tailwind.config); surfaces author semantic classes (text-heading/rounded-lg/h-cta-height) not arbitrary values (DS-01/D-01/D-02)
 - [Phase 09]: [09-01]: STEPPER_ORDER (6 steps paid->completed) added to lifecycle.ts as the single source for the DS-04 stepper; excludes requested+cancelled; TransferState stays imported (Don't-Hand-Roll, D-06/D-08)
+- [Phase ?]: [09-02]: StatusDot gains a variant prop (dot default / pill solid badge) over one STATE_META map (T-04-02); cancelled becomes a hollow coral ring (border-2 border-coral bg-transparent) in BOTH variants — the one status-rendering change this phase ships (DS-02, D-03/D-04), worded WCAG-1.4.1 label always present
 
 ### Pending Todos
 
@@ -212,6 +214,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-20T13:32:05.127Z
-Stopped at: Completed 09-01-PLAN.md
+Last session: 2026-06-20T13:37:43.513Z
+Stopped at: Completed 09-02-PLAN.md
 Resume file: None

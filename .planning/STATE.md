@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 
 ## Current Position
 
-Phase: 08 (platform-health) — PARTIAL (live apply done; Gate A deferred)
-Plan: 5 of 5 (08-05 partial)
-Status: Migration 0008 applied LIVE to Balkanity; cron secret provisioned; DoD Gates B (cron fires) + C (keep-alive/backstop) GREEN; Gate A (dropped-webhook reconciliation + critical email) DEFERRED — prod Vercel lacks STRIPE_SECRET_KEY/STRIPE_WEBHOOK_SECRET/RESEND_API_KEY and send.balkanity.com is unverified. Close-out steps in 08-GATES-EVIDENCE.md.
+Phase: 08 (platform-health) — COMPLETE (all 3 DoD gates green live)
+Plan: 5 of 5 (08-05 passed)
+Status: Migration 0008 LIVE on Balkanity; cron secret provisioned; DoD Gates A (dropped-webhook caught + remediated, no paid write), B (cron fires), C (keep-alive/backstop) all GREEN live. Stripe(test)+Resend env set on Vercel prod. One open non-blocking item: critical-email DELIVERY pending send.balkanity.com verification in Resend (shared Phase-7 D-15). Evidence: 08-GATES-EVIDENCE.md.
 Last activity: 2026-06-20
 
-Progress: [█████████░] 95% (Gate A pending operator-provisioned Stripe + Resend secrets)
+Progress: [██████████] 100% (DoD met; email-delivery DNS item shared with Phase 7)
 
 ## Handoff (for a new session)
 

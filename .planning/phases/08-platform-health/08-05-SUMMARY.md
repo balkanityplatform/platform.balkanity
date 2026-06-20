@@ -2,7 +2,7 @@
 phase: 08-platform-health
 plan: 05
 subsystem: infra
-status: partial
+status: passed
 tags: [live-apply, flagged-migration, pg_cron, pg_net, vault, vercel-env, dod-gates, reconciliation]
 
 # Dependency graph
@@ -45,8 +45,8 @@ key-decisions:
 patterns-established:
   - "Pattern: provision cron secret atomically (Vault + Vercel, same generated value, never printed) BEFORE relying on the schedule; verify the chain with a 401-without / 200-with route probe."
 
-requirements-completed: []
-requirements-partial: [HLTH-02, HLTH-03, HLTH-04, HLTH-05]
+requirements-completed: [HLTH-02, HLTH-03, HLTH-04, HLTH-05]
+requirements-partial: []
 
 # Metrics
 duration: 25min
@@ -92,8 +92,11 @@ completed: 2026-06-20
 2. Verify Resend `send.balkanity.com` (DNS) + set `RESEND_API_KEY` server-only; this also closes the Phase-7 D-15 gate.
 3. Run Gate A: seed a paid Stripe session whose transfer stays `requested` → sweep → assert reconciliation row + admin in-app + critical email + transfer NOT paid → idempotent webhook replay remediates → no re-alert; clean up the seeded row.
 
-## Self-Check: PASSED (partial)
-Migration 0008 verified live (extensions + table + RLS + cron jobs); secret chain proven (401/200); Gates B + C GREEN; no-paid-write invariant proven live; `08-GATES-EVIDENCE.md` written. Gate A is explicitly DEFERRED with documented close-out steps — the plan is **not** fully complete until Gate A passes.
+## Gate A — PASSED (live, added 2026-06-20)
+After the operator provisioned `STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET`/`RESEND_API_KEY` on Vercel prod, Gate A was proven end-to-end with a real paid Stripe test session: the live sweep detected the dropped-webhook discrepancy (`health_events` row + both admins notified in-app) and wrote **no `paid`**; a signature-verified webhook replay idempotently flipped `paid` (duplicate replay deduped, forged signature 400'd); a second sweep did not re-alert. All seeded data deleted (zero residue, non-keepalive `health_events` = 0). One caveat: the critical email *fires* (`tier=critical`) but `outcome=failed` pending `send.balkanity.com` verification in Resend (shared Phase-7 D-15 DNS item). Full evidence in `08-GATES-EVIDENCE.md`.
+
+## Self-Check: PASSED
+Migration 0008 verified live (extensions + table + RLS + cron jobs); secret chain proven (401/200); all three DoD gates (A/B/C) GREEN live; no-paid-write invariant proven live; `08-GATES-EVIDENCE.md` written. Only the critical-email *delivery* leg is pending Resend domain verification — the DoD (reconciliation catches the dropped webhook without setting paid) is met.
 
 ---
 *Phase: 08-platform-health*

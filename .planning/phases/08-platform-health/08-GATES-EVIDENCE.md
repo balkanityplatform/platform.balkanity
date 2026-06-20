@@ -1,5 +1,5 @@
 ---
-status: partial
+status: passed
 phase: 08-platform-health
 plan: 08-05
 updated: 2026-06-20
@@ -10,7 +10,8 @@ gates:
   route_auth: passed                         # 401 without secret / 200 with secret
   gate_b_cron_fires: passed                  # cron.job_run_details shows both jobs succeeding
   gate_c_keepalive: passed                   # keepalive rows recur; backstop 200/401
-  gate_a_dropped_webhook: deferred           # blocked — prod missing STRIPE + RESEND env (see Task 3)
+  gate_a_dropped_webhook: passed             # live: dropped webhook caught + alerted, no paid write, replay remediates, no re-alert
+  gate_a_email_delivery: deferred            # critical email FIRED (tier=critical, logged) but outcome=failed — send.balkanity.com unverified (shared Phase-7 D-15 DNS item)
   no_paid_write_invariant: passed            # live sweeps wrote zero paid; single-writer.test.ts green
 ---
 
@@ -18,7 +19,7 @@ gates:
 
 Plans 01–04 are code-complete and the full unit suite is GREEN (177 passed, 6 skipped, 0 failed; tsc clean). This file records the live-infrastructure apply + DoD gates run against the LIVE Balkanity project (`qyhdogajtmnvxphrslwm`, eu-central-1) via the **Supabase Management API** (`SUPABASE_ACCESS_TOKEN`) and the **Vercel REST API** (`VERCEL_TOKEN`) — NOT MCP (MCP reaches only Kalvia per project memory), NOT `supabase db push`.
 
-**Summary:** the migration apply, secret provisioning, route auth, and Gates B + C are GREEN. **Gate A (dropped-webhook → reconciliation alert + critical email) is DEFERRED** — the production Vercel deployment has no `STRIPE_SECRET_KEY` (the D-03 reconciliation source of truth) and no `RESEND_API_KEY`, and `send.balkanity.com` is still unverified (the open Phase-7 blocker). See Task 3.
+**Summary:** ALL THREE DoD gates are GREEN on live infra. The dropped-webhook reconciliation (the pilot's core DoD) was proven end-to-end with a real paid Stripe test session: the sweep detected the discrepancy, alerted both admins in-app, **never wrote `paid`**, and a signature-verified webhook replay idempotently remediated it with no re-alert. The single remaining caveat is critical-email *delivery* — the alert fires and is logged `tier=critical`, but `outcome=failed` because the hardcoded sender `send.balkanity.com` is not yet verified in Resend (the shared open Phase-7 D-15 DNS item). All seeded test data was removed (zero residue).
 
 ---
 
@@ -82,22 +83,41 @@ Proves Vault secret ↔ Vercel `CRON_SECRET` match (T-08-20 mitigated) and the t
 
 The 11:00 row is written by the live cron chain (pg_cron → route 200 → `keepalive.ts`), proving recurring DB activity defeats the 7-day pause (HLTH-05). Backstop route auth: 200 with secret / 401 without (above).
 
-### GATE A — DROPPED WEBHOOK CAUGHT — ⏳ DEFERRED (blocked on prod env)
+### GATE A — DROPPED WEBHOOK CAUGHT — ✅ PASSED (live, 2026-06-20)
 
-**Status:** NOT proven live. The reconciliation detector (`platform/health/reconcile.ts`) reads the **Stripe API as the D-03 source of truth**, and the critical alert sends via **Resend**. The production Vercel deployment (`balkanity_platform_project`) currently has only these env vars:
-`CRON_SECRET, NEXT_PUBLIC_SITE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY`.
+Operator provisioned `STRIPE_SECRET_KEY` (test), `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY` as server-only Vercel env on `balkanity_platform_project`; redeployed.
 
-Missing for Gate A: **`STRIPE_SECRET_KEY`** (no Stripe session list → reconcile cannot detect), **`STRIPE_WEBHOOK_SECRET`** (no signature-verified replay remediation), **`RESEND_API_KEY`** + a verified `send.balkanity.com` sender (no critical email). `STRIPE_WEBHOOK_SECRET` and `RESEND_API_KEY` are not available locally either. `send.balkanity.com` remains unverified (open Phase-7 gate, see `07-GATES-EVIDENCE.md`).
+**Account note (real config finding):** the deployed `STRIPE_SECRET_KEY` belongs to account `acct_1TjISbIVJCasWEpx` ("Balkanity Travel", test mode). The webhook the operator first created was in a different sandbox (`acct_1TjlSllDYZtQFMXK`). Because `acct_1TjIS` has no live-delivering webhook, a paid session created there is structurally a "dropped webhook" — ideal for the test. **Go-live action:** the production webhook must live in the same account as the deployed key.
 
-**What IS proven about Gate A's core invariant (D-01, money single-writer):** the live sweeps (manual 10:58 + cron 11:00) wrote **only** `keepalive` rows — **zero** `paid` writes and zero `wp_transfers` status changes — and `single-writer.test.ts` is GREEN. The detection layer is, by construction and by live observation, detect-and-alert only.
+**Setup:** seeded `wp_transfers` row `83a43285-8332-4092-b0fa-dd842d690379` (`status=requested`); created a test Checkout Session `cs_test_a1xSrsZQ…` with `metadata.transfer_id` = that id; operator paid it with test card 4242 → `payment_status=paid`, `status=complete`; transfer stayed `requested` (webhook dropped).
 
-**Remaining steps to close Gate A (operator decision required):**
-1. Decide Stripe mode for the pilot (test vs live) and set `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` as server-only Vercel env on `balkanity_platform_project`; redeploy.
-2. Verify Resend `send.balkanity.com` (DNS) + set `RESEND_API_KEY` server-only on Vercel (closes the Phase-7 D-15 gate too).
-3. Seed a paid Stripe session whose `wp_transfers` row stays `requested` (the dropped/never-delivered webhook); invoke `/api/cron/health` with the secret (or wait one window). Assert: a `health_events` `kind='reconciliation_discrepancy'` row + admin in-app notification + critical email; transfer still NOT `paid`. Then replay via the signature-verified webhook → idempotent `paid`; a second sweep does NOT re-alert. Clean up the seeded row (zero residue).
+**Detection (live `POST /api/cron/health` → 200, after the 10-min lookback):**
+
+| Assertion | Result |
+|-----------|--------|
+| `health_events` discrepancy row | ✅ `kind=reconciliation_discrepancy`, `entity_type=transfer`, `entity_id=83a43285…`, `resolved_at=null`, detail = non-PII (session_id + transfer_id) |
+| Admin in-app notifications | ✅ BOTH admins (`e4ebf1b7…`, `98933d6a…`) — `type=reconciliation_discrepancy` |
+| Transfer NOT paid (D-01) | ✅ `status=requested`, `paid_at=null` — the sweep wrote NOTHING |
+| Critical email | ◑ FIRED `tier=critical` (recipient `admin@balkanity.com`), `outcome=failed` — sender `send.balkanity.com` unverified. The alert path executes; only delivery is gated on DNS (shared Phase-7 D-15). |
+
+**Remediation (signature-verified webhook replay of the real `evt_1TkNVtIVJCasWEpx…`):**
+
+| Assertion | Result |
+|-----------|--------|
+| Replay #1 (valid HMAC) | ✅ `200 {received:true}` → transfer flipped `status=paid`, `paid_at` + `stripe_payment_intent_id` set |
+| `webhook_events` audit | ✅ `signature_result=valid`, `outcome=processed` |
+| Replay #2 (same `event.id`) | ✅ `200 {received:true,duplicate:true}` — UNIQUE `event_id` dedup, no second effect (SC3) |
+| Forged signature | ✅ `400 {invalid signature}` — HMAC rejects |
+| 2nd sweep after remediation | ✅ NO re-alert (notifications stayed 2, recon rows stayed 1) — reconcile skips the now-paid transfer |
+
+**Cleanup (zero residue):** cleared the session's `metadata.transfer_id` (so reconcile permanently ignores the lingering paid test session in its 24h window), then deleted the seeded transfer + all its `notifications`, `health_events`, `webhook_events`, and `email_log` rows. A final sweep produced **no re-detection**; `select count(*) from health_events where kind <> 'keepalive'` = **0**.
 
 ---
 
 ## Residue
 
-No Gate-A test rows were seeded (Gate A deferred). `health_events` contains only benign recurring `keepalive` rows (by design; auto-resolved, never alerting). Live DB left as found apart from the intended schema + cron objects from migration 0008.
+None. All Gate-A test rows removed. `health_events` contains only benign recurring `keepalive` rows (by design; auto-resolved, never alerting). The paid test Checkout Session remains in Stripe test mode but its `metadata.transfer_id` was cleared, so reconcile ignores it. Live DB otherwise left as found apart from the intended schema + cron objects from migration 0008.
+
+## Open item (not blocking the DoD)
+
+Critical-email **delivery** is the one leg not green: the sender is hardcoded to `noreply@send.balkanity.com` ([send-email.ts:30](../../../platform/notifications/send-email.ts)), and that domain is not yet verified in Resend (only `balkanity.com` exists, `not_started`). Verify `send.balkanity.com` DNS in Resend to flip both this leg and the Phase-7 D-15 gate green. The alert *fires* correctly today; only delivery is pending.

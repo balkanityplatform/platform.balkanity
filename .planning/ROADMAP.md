@@ -20,7 +20,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 5: Claim Correctness** - Masked pool view, atomic claim RPC (0 double-claims), and data-layer PII gating via RLS (completed 2026-06-19)
 - [ ] **Phase 6: Driver & Admin Views** - Driver pool/my-run/detail and admin transfers list/detail with assign/reassign/cancel/refund (implementation + automated verification complete 2026-06-19; 5 UAT items pending — run /gsd-verify-work 6)
 - [ ] **Phase 7: Notifications** - In-app feed/bell, Resend wrapper with cap guardrails + email_log, guest/admin emails, opt-in driver digest
-- [ ] **Phase 8: Platform Health** - Reconciliation sweep (catches dropped webhook), email-cap gauge, stuck-transfer alerts, keep-alive
+- [x] **Phase 8: Platform Health** - Reconciliation sweep (catches dropped webhook), email-cap gauge, stuck-transfer alerts, keep-alive — all 3 DoD gates green live (email delivery pending Resend DNS)
 
 ## Phase Details
 
@@ -296,7 +296,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2)*
 
-- [ ] 08-05-PLAN.md — [BLOCKING/SIGN-OFF] apply 0008 LIVE to Balkanity (Management API) + Vault/Vercel cron secret + 3 live DoD gates (dropped-webhook caught/no paid write, cron fires, keep-alive)
+- [x] 08-05-PLAN.md — [BLOCKING/SIGN-OFF] apply 0008 LIVE to Balkanity (Management API) + Vault/Vercel cron secret + 3 live DoD gates ALL GREEN (dropped-webhook caught/no paid write + replay remediates, cron fires, keep-alive); critical-email delivery pending send.balkanity.com DNS
 
 **Notes**: REVIEW/SIGN-OFF REQUIRED — scheduling/infra on the Balkanity Supabase project only (`qyhdogajtmnvxphrslwm`). Verify pg_cron ≥1.6.4 before scheduling. The dropped-webhook test is a DoD gate. Decide Supabase Pro vs free+keep-alive before going live. Avoids Pitfalls 8, 9, 10.
 

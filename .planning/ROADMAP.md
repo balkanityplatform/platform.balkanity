@@ -357,7 +357,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1; 02 + 03 run in parallel — disjoint files)*
 
 - [x] 09-02-PLAN.md — DS-02 StatusDot variant prop (dot/pill) + cancelled hollow coral ring + tests
-- [ ] 09-03-PLAN.md — DS-03 RouteMotif (configurable endpoints + committed brand Transfer Badge midpoint)
+- [x] 09-03-PLAN.md — DS-03 RouteMotif (configurable endpoints + committed brand Transfer Badge midpoint)
 **Wave 3** *(blocked on Wave 2)*
 
 - [ ] 09-04-PLAN.md — DS-04 horizontal LifecycleStepper (STEPPER_ORDER-driven, shape-encoded states, cancelled terminal) + tests
@@ -426,7 +426,7 @@ v1.1 phases execute in numeric order after v1.0: 9 → 10 → 11 → 12
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 9. Design System Foundation | 2/5 | In Progress|  |
+| 9. Design System Foundation | 3/5 | In Progress|  |
 | 10. Guest UI Rebuild | 0/TBD | Not started | - |
 | 11. Driver PWA Rebuild | 0/TBD | Not started | - |
 | 12. Admin Console Rebuild | 0/TBD | Not started | - |

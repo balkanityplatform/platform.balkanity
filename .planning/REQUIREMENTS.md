@@ -1,173 +1,77 @@
-# Requirements: Balkanity Platform — Welcome Pickup (v1)
+# Requirements: Balkanity Platform — v1.1 UI Rebuild
 
-**Defined:** 2026-06-17
+**Defined:** 2026-06-20
 **Core Value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
 
-## v1 Requirements
+> v1.0 requirements (PLAT/AUTH/ONBD/BOOK/CLAIM/NOTF/HLTH) shipped across Phases 1–8 and are
+> recorded in PROJECT.md (Validated) and the phase artifacts. This file scopes the **v1.1
+> presentation-layer rebuild**.
 
-Requirements for the pilot release (1 company + 3 properties; ~10 real-money transfers). Each maps to a roadmap phase.
+> **Milestone scope:** presentation-layer ONLY. Every requirement below is a UI/visual change.
+> No backend, schema, auth, RLS, or payment-path changes. All existing wiring (atomic claim
+> RPC, masked pool view, single-writer `paid`, magic-link auth) is preserved as-is. Source of
+> truth for visuals: the Stitch mockups + `DESIGN.md` ("Balkanity Path"), brand primary
+> **`#029B87`** (DESIGN.md's `#00685a` token is rejected).
 
-### Platform Foundation
+## v1.1 Requirements
 
-- [x] **PLAT-01**: Codebase enforces a one-way platform↔module seam (modules import platform, never the reverse) across DB schema, server modules, and UI
-- [ ] **PLAT-02**: App is an installable, offline-aware PWA shell (Serwist) deployed to the Balkanity Vercel project
-- [x] **PLAT-03**: Brand design tokens (six colours + white, Montserrat) and real logo/pictogram assets are wired as a reusable design system
-- [x] **PLAT-04**: UI strings support an EN/BG toggle
-- [x] **PLAT-05**: Supabase clients are split — anon client on the browser, service-role only on the server (never shipped to client)
+### Design System (shared foundation)
 
-### Authentication & Roles
+- [ ] **DS-01**: The "Balkanity Path" design tokens (colors with `#029B87` primary, Montserrat type scale, 8px spacing, radii) are mapped into the app's Tailwind v4 CSS-first `@theme` and used app-wide (no JS `tailwind.config`).
+- [ ] **DS-02**: Every status is shown as a colored dot/badge **plus** a worded label (Unclaimed=coral, Claimed=teal, En route=amber, Completed=grey, Cancelled=hollow coral ring) — never color alone.
+- [ ] **DS-03**: The infinity/route motif renders as the connective element between departure and arrival points on route visualizations.
+- [ ] **DS-04**: A reusable lifecycle stepper component renders the transfer states (Paid → Claimed → En route → Arrived → Picked up → Completed) with completed/active/pending styling.
 
-- [x] **AUTH-01**: Users have an app role ∈ {admin, driver, guest} enforced across the app
-- [x] **AUTH-02**: Guest can view their transfer status via a passwordless Supabase magic link
-- [x] **AUTH-03**: Drivers are admin-invited contractors only (no open signup); invite flow creates a driver account _(code + project config shipped in 02-05; complete-pending-UAT — one signed-in production walkthrough open: admin → /admin/drivers → invite → action_link resolves to /set-password → driver role)_
-- [x] **AUTH-04**: Admin can sign in to the desktop console via **email + password** (classic credentials). _Decision change 2026-06-18: reverses D-01 (passwordless magic-link) for admin/driver LOGIN → email+password; accounts are admin-created with an invite-to-set-password email + self-service password reset. Magic-link/tokenized access is retained only for guest transfer status (AUTH-02). Role layer (AUTH-01) unchanged._
+### Guest UI
 
-### Supply-Side Onboarding (Admin, no-code)
+- [ ] **GUI-01**: The guest booking screen renders as the boarding-pass "Transfer Pass" (airport→property route header, details grid for date/flight/pickup/guests, payment-status row, total prepaid, pay CTA).
+- [ ] **GUI-02**: The booking form inputs are restyled to the design system (48px fields, teal focus, Montserrat labels) with no change to the fields collected or validation.
+- [ ] **GUI-03**: The magic-link status page renders as the pass with the live lifecycle state reflected via the DS-04 stepper.
+- [ ] **GUI-04**: The pay action shows the Stripe-secured CTA and a "Secured payment · powered by Stripe" trust footer; it drives the existing Checkout-session flow unchanged.
 
-- [x] **ONBD-01**: Admin can create, edit, and list companies
-- [x] **ONBD-02**: Admin can create, edit, and list properties under a company
-- [x] **ONBD-03**: Admin can create, edit, and list destinations (slug, label, address, zone, airport, active)
-- [x] **ONBD-04**: Admin sets price + commission per destination with a live "you keep" calculation
-- [x] **ONBD-05**: Admin can invite drivers from the console
-- [x] **ONBD-06**: A second company can be onboarded entirely through the UI (no code/DB edits)
+### Driver PWA
 
-### Booking & Payment (Guest)
+- [ ] **DUI-01**: Available transfers render as claim cards (pickup time, pax count, "Unclaimed" badge, route with infinity motif, date, price, Claim CTA) showing **no guest PII** pre-claim.
+- [ ] **DUI-02**: A bottom navigation bar provides Available / My Trips / Profile with the active tab highlighted.
+- [ ] **DUI-03**: My Trips renders the driver's claimed/past transfers as trip cards (date, status, route, pax, duration, details link) — no earnings or ratings shown.
+- [ ] **DUI-04**: The en-route trip detail renders the claimed passenger info, route card, the DS-04 trip-progress stepper, the passenger note, and a Confirm-Arrival CTA wired to the existing advance-status action — no live map.
+- [ ] **DUI-05**: The Claim action on a card invokes the existing atomic claim RPC and reflects first-to-claim-wins / already-claimed outcomes in the UI.
 
-- [x] **BOOK-01**: Guest opens a per-destination slug page (`/pickup/<slug>`) showing the destination and fare
-- [x] **BOOK-02**: Guest completes a short booking form (email required; phone, flight no., pax, luggage, notes as applicable) — guestless checkout
-- [x] **BOOK-03**: Booking creates a transfer in `requested` and a code-created Stripe Checkout Session (not a dashboard Payment Link)
-- [x] **BOOK-04**: Checkout clearly states the booking is prepaid & non-refundable before payment
-- [x] **BOOK-05**: `paid` is set ONLY by a signature-verified Stripe webhook (raw body), idempotent on Stripe event id; the client success redirect never sets `paid`
-- [x] **BOOK-06**: On `paid`, the guest receives a booking confirmation email (Resend)
-- [x] **BOOK-07**: Guest status page shows a live lifecycle timeline and a visible payment record/receipt (proof of prepay)
+### Admin Console
 
-### Transfer Lifecycle & Driver Claim
-
-- [x] **XFER-01**: Transfer follows the locked lifecycle: requested → paid → claimed → en_route → arrived → picked_up → completed (+ cancelled)
-- [x] **CLAIM-01**: Invited driver signs in and sees a limited-detail pool of `paid`, unclaimed transfers (date, arrival time, airport, destination zone/area — NOT exact address — flight no., fare, pax, luggage)
-- [x] **CLAIM-02**: Driver claims a transfer via an atomic conditional update (first-to-claim wins; loser gets "already claimed") — 0 double-claims under concurrency
-- [x] **CLAIM-03**: Full guest PII (name, contact, exact address, notes) unlocks only for the claiming driver and admin, enforced at the data layer (RLS + masked view/RPC), not UI-only. *(Flight no. reclassified as operational/non-PII in Phase 5 — exposed pre-claim in the pool; see ROADMAP §Phase 5.)*
-- [x] **CLAIM-04**: A driver may hold multiple active claimed transfers and cannot un-claim (only admin can release/reassign)
-- [x] **CLAIM-05**: Driver advances status: claimed → en_route → arrived → picked_up → completed from the "My run" view
-- [x] **CLAIM-06**: "My run" lists the driver's active claimed transfers ordered by arrival time
-
-### Notifications
-
-- [x] **NOTF-01**: Per-user in-app notification feed/bell (shared platform feature; primary channel for drivers)
-- [x] **NOTF-02**: Guest receives a "driver assigned" email on `claimed` and a "driver has arrived" email on `arrived` (no email on `en_route`)
-- [x] **NOTF-03**: Admin receives a booking alert email on new paid booking
-- [x] **NOTF-04**: Driver receives an invite email _(stubbed in 02-05 as a copy-paste set-password link revealed inline — D-03; complete-pending-UAT for the invite path, Resend email send wires in Phase 7)_
-- [x] **NOTF-05**: Drivers get an opt-in daily digest at a self-chosen time instead of per-transfer email
-- [x] **NOTF-06**: An email send-guardrail + `email_log` track volume and alarm before the Resend daily cap
-
-### Admin Operations
-
-- [x] **OPS-01**: Admin sees a transfers list with filter and search
-- [x] **OPS-02**: Admin opens a transfer detail page (lifecycle, trip/payment details)
-- [x] **OPS-03**: Admin can assign, reassign, release, and cancel a transfer
-- [x] **OPS-04**: Admin can issue a manual Stripe refund from the transfer detail page
-
-### Platform Health (Admin)
-
-- [x] **HLTH-01**: `webhook_events` log records idempotency, signature result, and processing outcome for every Stripe event
-- [x] **HLTH-02**: A reconciliation sweep (Supabase pg_cron, ~15–30 min) flags Stripe-paid payments with no matching transfer; Vercel cron is a daily backstop only
-- [x] **HLTH-03**: An email-cap gauge shows usage against the Resend daily cap
-- [x] **HLTH-04**: Stuck-transfer alerts surface transfers that have not advanced as expected
-- [x] **HLTH-05**: A keep-alive prevents the Supabase project from pausing (which would stop pg_cron) during the pilot
-
-## v2 Requirements
-
-Deferred to a future release. Tracked but not in the current roadmap.
-
-### Payouts
-
-- **PAY-01**: Stripe Connect (Express) onboarding for property companies
-- **PAY-02**: Commission payout via `application_fee_amount` + `transfer_data[destination]` on the Checkout Session
-
-### Growth
-
-- **GROW-01**: Property company self-service portal
-- **GROW-02**: Auto-dispatch of transfers to drivers
-- **GROW-03**: Flight tracking integration
-- **GROW-04**: SMS / WhatsApp notifications
-- **GROW-05**: 24h-before guest reminder email (pending real-data decision vs email cap)
-- **GROW-06**: Second platform module (tours, car rental, …)
+- [ ] **AUI-01**: A persistent left sidebar provides the admin nav (Dashboard, Transfers, Drivers, Settings) with the active item highlighted.
+- [ ] **AUI-02**: The Transfer Pool dashboard shows KPI cards (Unclaimed, Claimed, En route, Total today) computed from real transfer data.
+- [ ] **AUI-03**: The transfers list renders as the pending-transmissions table (time/ID, passenger, route, lifecycle bar, status, assigned driver, row actions: view / assign / cancel) with filter + sort.
+- [ ] **AUI-04**: The transfer detail view is restyled to the design system with the existing assign / reassign / cancel / refund actions intact.
+- [ ] **AUI-05**: A top bar shows the search field (client-side filter of loaded transfers), the notifications bell (existing feed), and the signed-in admin identity.
 
 ## Out of Scope
 
-Explicitly excluded for v1. Documented to prevent scope creep.
+Mockup elements with no backing data — excluded to keep the UI truthful (revisit when backend exists).
 
 | Feature | Reason |
 |---------|--------|
-| Stripe Connect / commission payout | De-risk pilot; v1 records commission but settles all funds to Balkanity via plain Checkout |
-| Auto-dispatch | v1 is self-claim only |
-| Flight tracking | Not core to the pilot |
-| Property self-service portal | Admin onboards on companies' behalf in v1 |
-| SMS / WhatsApp | Email only in v1 |
-| Full i18n framework | EN/BG toggle is sufficient for v1 |
-| Second platform module | Welcome Pickup only |
-| Automated / guest-facing refund flow | Bookings prepaid & non-refundable; admin issues manual refunds for exceptions |
-| Pricing engine | Manual fixed price per destination |
-| Guest accounts (mandatory) | Guestless checkout + magic-link status is lower friction |
+| Driver live GPS map / route tracking | No location backend; mockup map is illustrative only |
+| Driver ratings (e.g. 4.9★) | No rating system in the data model |
+| Driver earnings dashboard (totals, +12% trends) | No earnings/payout ledger yet (Connect deferred) |
+| Admin "Analytics" nav page | No analytics backend; nav item omitted until built |
+| Admin "Download Manifest" export | No export endpoint; deferred |
+| KPI "daily goal %" progress | Invented metric with no source of truth |
+| Any backend / schema / RLS / payment change | Milestone is presentation-only by definition |
 
 ## Traceability
 
-Which phases cover which requirements. Populated during roadmap creation.
+Populated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PLAT-01 | Phase 1 — Platform Foundation | Complete |
-| PLAT-02 | Phase 1 — Platform Foundation | Pending |
-| PLAT-03 | Phase 1 — Platform Foundation | Complete |
-| PLAT-04 | Phase 1 — Platform Foundation | Complete |
-| PLAT-05 | Phase 1 — Platform Foundation | Complete |
-| AUTH-01 | Phase 1 — Platform Foundation | Complete |
-| AUTH-04 | Phase 1 — Platform Foundation | Complete |
-| ONBD-01 | Phase 2 — Supply-Side Onboarding | Complete |
-| ONBD-02 | Phase 2 — Supply-Side Onboarding | Complete |
-| ONBD-03 | Phase 2 — Supply-Side Onboarding | Complete |
-| ONBD-04 | Phase 2 — Supply-Side Onboarding | Complete |
-| ONBD-05 | Phase 2 — Supply-Side Onboarding | Complete |
-| ONBD-06 | Phase 2 — Supply-Side Onboarding | Complete |
-| AUTH-03 | Phase 2 — Supply-Side Onboarding | Complete (pending UAT) |
-| NOTF-04 | Phase 2 — Supply-Side Onboarding | Complete (pending UAT; email send → Phase 7) |
-| BOOK-05 | Phase 3 — Payments Trust Spine | Complete |
-| HLTH-01 | Phase 3 — Payments Trust Spine | Complete |
-| BOOK-01 | Phase 4 — Transfer Entity + Booking Form | Complete |
-| BOOK-02 | Phase 4 — Transfer Entity + Booking Form | Complete |
-| BOOK-03 | Phase 4 — Transfer Entity + Booking Form | Complete |
-| BOOK-04 | Phase 4 — Transfer Entity + Booking Form | Complete |
-| BOOK-06 | Phase 4 — Transfer Entity + Booking Form | Complete |
-| BOOK-07 | Phase 4 — Transfer Entity + Booking Form | Complete |
-| XFER-01 | Phase 4 — Transfer Entity + Booking Form | Complete |
-| AUTH-02 | Phase 4 — Transfer Entity + Booking Form | Complete |
-| CLAIM-02 | Phase 5 — Claim Correctness | Complete |
-| CLAIM-03 | Phase 5 — Claim Correctness | Complete |
-| CLAIM-01 | Phase 6 — Driver & Admin Views | Complete |
-| CLAIM-04 | Phase 6 — Driver & Admin Views | Complete |
-| CLAIM-05 | Phase 6 — Driver & Admin Views | Complete |
-| CLAIM-06 | Phase 6 — Driver & Admin Views | Complete |
-| OPS-01 | Phase 6 — Driver & Admin Views | Complete |
-| OPS-02 | Phase 6 — Driver & Admin Views | Complete |
-| OPS-03 | Phase 6 — Driver & Admin Views | Complete |
-| OPS-04 | Phase 6 — Driver & Admin Views | Complete |
-| NOTF-01 | Phase 7 — Notifications | Complete |
-| NOTF-02 | Phase 7 — Notifications | Complete |
-| NOTF-03 | Phase 7 — Notifications | Complete |
-| NOTF-05 | Phase 7 — Notifications | Complete |
-| NOTF-06 | Phase 7 — Notifications | Complete |
-| HLTH-02 | Phase 8 — Platform Health | Complete |
-| HLTH-03 | Phase 8 — Platform Health | Complete |
-| HLTH-04 | Phase 8 — Platform Health | Complete |
-| HLTH-05 | Phase 8 — Platform Health | Complete |
+| (pending roadmap) | — | Pending |
 
 **Coverage:**
-- v1 requirements: 44 total (PLAT 5, AUTH 4, ONBD 6, BOOK 7, XFER 1, CLAIM 6, NOTF 6, OPS 4, HLTH 5)
-- Mapped to phases: 44 ✓
-- Unmapped: 0 ✓
-
-> Note: the prior summary line cited "37 total" before the categories were fully enumerated; the actual v1 requirement count is 44. All 44 are mapped to exactly one phase, with no orphans or duplicates.
+- v1.1 requirements: 18 total
+- Mapped to phases: 0 (pending roadmap)
+- Unmapped: 18 ⚠️
 
 ---
-*Requirements defined: 2026-06-17*
-*Last updated: 2026-06-17 after roadmap creation (traceability populated, count corrected to 44)*
+*Requirements defined: 2026-06-20*
+*Last updated: 2026-06-20 after starting milestone v1.1*

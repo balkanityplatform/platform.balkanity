@@ -18,3 +18,11 @@ on the prior baseline (verified at HEAD~2). They are NOT caused by the health de
 | `app/admin/drivers/invite.test.ts`, `app/pickup/[slug]/booking.test.ts`, `platform/payments/checkout.test.ts` | unused-var warnings in test files |
 
 All Plan 08-02 files (`platform/health/*.ts`, `app/api/cron/health/route.ts`) lint clean.
+
+## Pre-existing RED-by-absence spec (discovered during 08-03 `npm run test`)
+
+`app/api/cron/digest/route.test.ts` (2 failures) is a Plan 08-01 Wave-0 Nyquist RED spec
+(committed `06df9df`) that is RED-by-absence because its target `app/api/cron/digest/route.ts`
+does not yet exist — it is resolved by **Plan 08-04** (per the 08-01 Known Stubs table). NOT
+caused by Plan 08-03; all 08-03 files (`app/admin/health/*`) and the EmailCapGauge spec are
+GREEN. Out of scope per the executor SCOPE BOUNDARY rule.

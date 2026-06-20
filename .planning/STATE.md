@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 08 UI-SPEC approved
-last_updated: "2026-06-20T10:27:41.854Z"
+last_updated: "2026-06-20T10:33:25.107Z"
 last_activity: 2026-06-20
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 39
-  completed_plans: 35
+  completed_plans: 36
   percent: 75
 ---
 
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-06-17)
 ## Current Position
 
 Phase: 08 (platform-health) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-06-20
 
-Progress: [█████████░] 90%
+Progress: [█████████░] 92%
 
 ## Handoff (for a new session)
 
@@ -90,6 +90,7 @@ Progress: [█████████░] 90%
 | Phase 07 P04 | 7min | 3 tasks | 12 files |
 | Phase 08 P01 | 9min | 3 tasks tasks | 8 files files |
 | Phase 08 P02 | 4min | 3 tasks tasks | 5 files files |
+| Phase 08 P03 | 5min | 2 tasks tasks | 3 files files |
 
 ## Accumulated Context
 
@@ -166,6 +167,9 @@ Recent decisions affecting current work:
 - [Phase ?]: [08-01]: 5 Wave-0 RED specs via runtime-string dynamic import + comment-stripped source-grep (Stripe/admin/Resend mocked); EmailCapGauge thresholds at 80/90 default cap 90 (EMAIL_SOFT_CAP, D-07); 15 EN/BG health keys (Dict-parity green); single-writer ROOTS already covers app+platform
 - [Phase ?]: [08-02]: Detect-and-alert health layer — reconcile() (Stripe-API source of truth, ~10-min lookback, per-transfer dedup) fans out in-app + critical email; findStuck() paid+unclaimed<=12h in-app only (D-05); touchHeartbeat() benign auto-resolved health_events keepalive (no schema change); all ZERO status:'paid' writes (D-01)
 - [Phase ?]: [08-02]: RED specs are contract authority — reconcile returns Discrepancy[], stuck export is findStuck() returning StuckRow[], route delegates to runHealthSweep() in platform/health/sweep.ts; reconciliation health_events keyed by transfer id; route timing-safe x-cron-secret/Bearer gate (401 zero-work)
+- [Phase ?]: [08-03]: Admin Platform-health console is a read-only RSC — role gate runs BEFORE any read (T-08-10); all reads via cookie-bound caller-auth client + admin-read RLS (email_log_admin_read/health_events_admin_read), createAdminClient count=0 (T-08-11)
+- [Phase ?]: [08-03]: EmailCapGauge turns the 08-01 RED spec GREEN — pure gaugeState(sent,cap) (ok<80/warning>=80/at-cap>=90, default cap 90=EMAIL_SOFT_CAP, D-07) + presentational meter; figure + worded label, theme-token fill teal/amber/coral (WCAG 1.4.1)
+- [Phase ?]: [08-03]: The console DISPLAYS Plan-02 detection — renders OPEN health_events rows by kind (resolved_at IS NULL), linked by entity_id (the transfer id); shows id + non-PII detail.amount_cents only (T-08-12), no detection logic of its own
 
 ### Pending Todos
 
@@ -197,6 +201,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-20T10:27:25.513Z
+Last session: 2026-06-20T10:32:53.546Z
 Stopped at: Phase 08 UI-SPEC approved
 Resume file: None

@@ -15,4 +15,35 @@
 
   --font-sans: var(--font-montserrat), "Montserrat", ui-sans-serif, system-ui,
     sans-serif;
+
+  /* Typography roles (DS-01, D-01) — Tailwind v4 `--text-<name>` generates
+   * `text-<name>` utilities with a paired line-height. Weight is applied at the
+   * call-site (font-normal / font-semibold — the loaded 400/600 pair); no extra
+   * font weights are loaded. Display is the 28px mobile baseline (32px desktop is
+   * a surface-level override). */
+  --text-display: 1.75rem; /* 28px — display / headline-xl */
+  --text-display--line-height: 2.125rem; /* 34px */
+  --text-heading: 1.5rem; /* 24px — section headings */
+  --text-heading--line-height: 2rem; /* 32px */
+  --text-body: 1rem; /* 16px — body copy */
+  --text-body--line-height: 1.5rem; /* 24px */
+  --text-label: 0.875rem; /* 14px — labels / captions */
+  --text-label--line-height: 1.25rem; /* 20px */
+
+  /* Radii (DS-01, D-01) — generates rounded-sm/md/lg/xl/full; DEFAULT (8px) is
+   * `--radius` → rounded. */
+  --radius-sm: 0.25rem; /* 4px */
+  --radius: 0.5rem; /* 8px — DEFAULT */
+  --radius-md: 0.75rem; /* 12px */
+  --radius-lg: 1rem; /* 16px */
+  --radius-xl: 1.5rem; /* 24px */
+  --radius-full: 9999px;
+
+  /* Spacing aliases (DS-01, D-01) — 8px-grid + touch ergonomics. Tailwind v4
+   * auto-generates padding / gap / height utilities from these (e.g.
+   * h-cta-height, gap-gutter). */
+  --spacing-touch-target: 44px; /* min interactive hit area */
+  --spacing-cta-height: 52px; /* primary CTA button height */
+  --spacing-gutter: 16px; /* mobile gutter (8px-grid) */
+  --spacing-margin: 32px; /* tablet+desktop margin (8px-grid) */
 }

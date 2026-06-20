@@ -286,7 +286,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 08-01-PLAN.md — Foundation + Nyquist: author migration 0008 (extensions + health_events + 2 cron schedules, FILE ONLY) + 5 Wave-0 RED specs + EN/BG health keys
+- [x] 08-01-PLAN.md — Foundation + Nyquist: author migration 0008 (extensions + health_events + 2 cron schedules, FILE ONLY) + 5 Wave-0 RED specs + EN/BG health keys
 
 **Wave 2** *(blocked on Wave 1; 02 + 03 + 04 run in parallel — disjoint files)*
 
@@ -314,4 +314,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8
 | 5. Claim Correctness | 3/3 | Complete    | 2026-06-19 |
 | 6. Driver & Admin Views | 5/5 | UAT pending | - |
 | 7. Notifications | 5/6 | In Progress|  |
-| 8. Platform Health | 0/TBD | Not started | - |
+| 8. Platform Health | 1/5 | In Progress|  |

@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: milestone
 status: executing
 stopped_at: Phase 08 UI-SPEC approved
-last_updated: "2026-06-20T09:31:11.245Z"
-last_activity: 2026-06-19
+last_updated: "2026-06-20T10:19:40.957Z"
+last_activity: 2026-06-20
 progress:
   total_phases: 8
   completed_phases: 6
-  total_plans: 34
-  completed_plans: 33
+  total_plans: 39
+  completed_plans: 34
   percent: 75
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-17)
 
 **Core value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
-**Current focus:** Phase 07 — notifications
+**Current focus:** Phase 08 — platform-health
 
 ## Current Position
 
-Phase: 07 (notifications) — EXECUTING
-Plan: 6 of 6
+Phase: 08 (platform-health) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-06-19
+Last activity: 2026-06-20
 
-Progress: [██████████] 97%
+Progress: [█████████░] 87%
 
 ## Handoff (for a new session)
 
@@ -88,6 +88,7 @@ Progress: [██████████] 97%
 | Phase 07 P03 | 7min | 3 tasks | 11 files |
 | Phase 07 P05 | 3min | 2 tasks | 4 files |
 | Phase 07 P04 | 7min | 3 tasks | 12 files |
+| Phase 08 P01 | 9min | 3 tasks tasks | 8 files files |
 
 ## Accumulated Context
 
@@ -160,6 +161,8 @@ Recent decisions affecting current work:
 - [Phase 07]: Digest send-hour handled as UTC now; per-driver local-hour scheduling deferred to the Phase 8 cron trigger (D-08 seam)
 - [Phase ?]: 07-04: invite is email-only (D-14) — set-password link emailed via sendEmail (critical), no inline copy-paste reveal
 - [Phase ?]: 07-04: lifecycle fan-out (paid/claimed/arrived/assign/reassign/release/cancel) is log-and-continue off the existing transition — never a second paid writer; guest emails always to=guest_email, driver name+phone revealed only to the guest (D-16)
+- [Phase ?]: [08-01]: Migration 0008 authored NOT applied — pg_cron/pg_net + polymorphic health_events (NO transfer_id, entity_id TEXT, free-form kind incl. keepalive, admin-read RLS, no write policy, partial open-index) + 2 idempotent Vault-authenticated cron schedules (health-sweep */15, digest-hourly 0 *); live apply Plan 05 (Balkanity qyhdogajtmnvxphrslwm only)
+- [Phase ?]: [08-01]: 5 Wave-0 RED specs via runtime-string dynamic import + comment-stripped source-grep (Stripe/admin/Resend mocked); EmailCapGauge thresholds at 80/90 default cap 90 (EMAIL_SOFT_CAP, D-07); 15 EN/BG health keys (Dict-parity green); single-writer ROOTS already covers app+platform
 
 ### Pending Todos
 
@@ -191,6 +194,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-20T09:31:11.239Z
+Last session: 2026-06-20T10:19:19.321Z
 Stopped at: Phase 08 UI-SPEC approved
-Resume file: .planning/phases/08-platform-health/08-UI-SPEC.md
+Resume file: None

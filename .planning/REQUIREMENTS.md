@@ -70,10 +70,10 @@ Requirements for the pilot release (1 company + 3 properties; ~10 real-money tra
 ### Platform Health (Admin)
 
 - [x] **HLTH-01**: `webhook_events` log records idempotency, signature result, and processing outcome for every Stripe event
-- [ ] **HLTH-02**: A reconciliation sweep (Supabase pg_cron, ~15–30 min) flags Stripe-paid payments with no matching transfer; Vercel cron is a daily backstop only
-- [ ] **HLTH-03**: An email-cap gauge shows usage against the Resend daily cap
-- [ ] **HLTH-04**: Stuck-transfer alerts surface transfers that have not advanced as expected
-- [ ] **HLTH-05**: A keep-alive prevents the Supabase project from pausing (which would stop pg_cron) during the pilot
+- [x] **HLTH-02**: A reconciliation sweep (Supabase pg_cron, ~15–30 min) flags Stripe-paid payments with no matching transfer; Vercel cron is a daily backstop only
+- [x] **HLTH-03**: An email-cap gauge shows usage against the Resend daily cap
+- [x] **HLTH-04**: Stuck-transfer alerts surface transfers that have not advanced as expected
+- [x] **HLTH-05**: A keep-alive prevents the Supabase project from pausing (which would stop pg_cron) during the pilot
 
 ## v2 Requirements
 
@@ -156,10 +156,10 @@ Which phases cover which requirements. Populated during roadmap creation.
 | NOTF-03 | Phase 7 — Notifications | Complete |
 | NOTF-05 | Phase 7 — Notifications | Complete |
 | NOTF-06 | Phase 7 — Notifications | Complete |
-| HLTH-02 | Phase 8 — Platform Health | Pending |
-| HLTH-03 | Phase 8 — Platform Health | Pending |
-| HLTH-04 | Phase 8 — Platform Health | Pending |
-| HLTH-05 | Phase 8 — Platform Health | Pending |
+| HLTH-02 | Phase 8 — Platform Health | Complete |
+| HLTH-03 | Phase 8 — Platform Health | Complete |
+| HLTH-04 | Phase 8 — Platform Health | Complete |
+| HLTH-05 | Phase 8 — Platform Health | Complete |
 
 **Coverage:**
 - v1 requirements: 44 total (PLAT 5, AUTH 4, ONBD 6, BOOK 7, XFER 1, CLAIM 6, NOTF 6, OPS 4, HLTH 5)

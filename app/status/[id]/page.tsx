@@ -26,7 +26,7 @@ import { fmtEur } from "@/platform/money/commission";
 import { createAdminClient } from "@/platform/supabase/admin";
 import { createClient } from "@/platform/supabase/server";
 import { Card } from "@/platform/ui/Card";
-import { LifecycleTimeline } from "@/platform/ui/LifecycleTimeline";
+import { LifecycleStepper } from "@/platform/ui/LifecycleStepper";
 import type { TransferState } from "@/platform/ui/StatusDot";
 
 // Service-role + Supabase auth cookie handling → Node runtime (mirrors /pay/success).
@@ -191,12 +191,12 @@ export default async function StatusPage({ params }: { params: Params }) {
         ) : null}
       </Card>
 
-      {/* Lifecycle timeline (SC4) */}
+      {/* Lifecycle stepper (SC4) — horizontal LifecycleStepper (DS-04) */}
       <section className="flex flex-col gap-[16px]">
         <h2 className="text-[20px] font-semibold leading-[1.2] text-slate">
           {t.statusTimelineHeading}
         </h2>
-        <LifecycleTimeline current={status} />
+        <LifecycleStepper current={status} />
       </section>
 
       {/* Payment receipt — meaningful once paid (SC4). Card-grouped per UI-SPEC. */}

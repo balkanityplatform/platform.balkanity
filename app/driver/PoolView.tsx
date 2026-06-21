@@ -20,17 +20,12 @@
 // CLAIM-04: a driver can never give a claimed transfer back — no such control exists here.
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { Button } from "@/platform/ui/Button";
-import { StatusDot } from "@/platform/ui/StatusDot";
-import { LanguageToggle } from "@/platform/ui/LanguageToggle";
-import {
-  NotificationBell,
-  type NotificationBellCopy,
-} from "@/platform/ui/NotificationBell";
+import { RouteMotif } from "@/platform/ui/RouteMotif";
 import { Toast, type ToastTone } from "@/platform/ui/Toast";
-import type { NotificationRow } from "@/platform/notifications/feed";
 import { fmtEur } from "@/platform/money/commission";
+import { PlaneIcon, BuildingIcon } from "@/app/(guest)/_pass/icons";
+import { LuggageIcon } from "./_ui/icons";
 import { claimAction, refetchPool } from "./actions";
 
 // The 9 masked pool columns — mirrors wp_pool()'s return shape. NO PII keys by construction.
@@ -47,7 +42,6 @@ export type PoolRow = {
 };
 
 export type PoolViewCopy = {
-  langToggle: string;
   claimTransferCta: string;
   poolEmptyHeading: string;
   poolEmptyBody: string;
@@ -55,6 +49,11 @@ export type PoolViewCopy = {
   claimFailedToast: string;
   airportLabel: string;
   zoneLabel: string;
+  unclaimedBadge: string;
+  flightLabel: string;
+  fareLabel: string;
+  passengersLabel: string;
+  luggageLabel: string;
 };
 
 const POLL_INTERVAL_MS = 25_000; // ~20-30s live refresh (D-01 / UI-SPEC interaction contract).
@@ -77,14 +76,10 @@ export function PoolView({
   pool,
   lang,
   copy,
-  bellInitial,
-  bellCopy,
 }: {
   pool: PoolRow[];
   lang: "en" | "bg";
   copy: PoolViewCopy;
-  bellInitial: NotificationRow[];
-  bellCopy: NotificationBellCopy;
 }) {
   const router = useRouter();
   const [rows, setRows] = useState<PoolRow[]>(pool);
@@ -146,29 +141,7 @@ export function PoolView({
   }
 
   return (
-    <main className="min-h-dvh bg-white">
-      {/* Driver warm-light chrome: white header w/ logo chip + teal accents (UI-SPEC). */}
-      <header className="flex items-center justify-between border-b border-grey/20 bg-white px-[24px] py-[16px]">
-        <span className="inline-flex items-center">
-          <Image
-            src="/brand/balkanity-logo.png"
-            alt="Balkanity"
-            width={96}
-            height={96}
-            className="h-[28px] w-auto"
-          />
-        </span>
-        <span className="inline-flex items-center gap-[8px]">
-          {/* Alerts bell — driver warm-light chrome, header-right (D-01: drivers see it). */}
-          <NotificationBell
-            initial={bellInitial}
-            lang={lang}
-            copy={bellCopy}
-          />
-          <LanguageToggle current={lang} label={copy.langToggle} />
-        </span>
-      </header>
-
+    <>
       <section className="mx-auto flex max-w-2xl flex-col gap-[16px] px-[24px] py-[24px]">
         {rows.length === 0 ? (
           <div className="flex flex-col gap-[8px] py-[32px] text-center">
@@ -184,29 +157,59 @@ export function PoolView({
             {rows.map((r) => (
               <li
                 key={r.id}
-                className="flex flex-col gap-[12px] rounded-md border border-grey/30 bg-white p-[16px] shadow-sm"
+                className="flex flex-col gap-[16px] rounded-md border border-grey/30 bg-white p-[16px] shadow-sm"
               >
-                <div className="flex items-center justify-between">
+                {/* Top row: arrival date · pickup time + the coral Unclaimed pill (DS-02
+                    presentation copy over a status='paid' row — NOT a new TransferState). */}
+                <div className="flex items-center justify-between gap-[8px]">
                   <span className="text-[16px] font-semibold leading-[1.4] text-slate">
                     {fmtArrival(r.arrival_at, lang)}
                   </span>
-                  <StatusDot state="paid" />
+                  <span className="inline-flex items-center rounded-full bg-coral px-[12px] py-[4px] text-[14px] font-semibold leading-[1.4] text-white">
+                    {copy.unclaimedBadge}
+                  </span>
                 </div>
 
-                <div className="flex flex-col gap-[4px] text-[14px] leading-[1.4] text-grey">
-                  <span className="text-slate">
-                    {[r.airport, r.zone].filter(Boolean).join(" → ")}
-                  </span>
+                {/* Route motif: airport → zone (area only — never the exact address). */}
+                <RouteMotif
+                  start={{
+                    icon: <PlaneIcon />,
+                    label: r.airport ?? copy.airportLabel,
+                  }}
+                  end={{
+                    icon: <BuildingIcon />,
+                    label: r.zone ?? copy.zoneLabel,
+                  }}
+                />
+
+                {/* Meta row: flight · fare · pax · luggage — the masked non-PII columns. */}
+                <div className="flex flex-wrap items-center gap-x-[16px] gap-y-[4px] text-[14px] leading-[1.4] text-grey">
+                  {r.flight_no && (
+                    <span>
+                      <span className="text-grey">{copy.flightLabel}: </span>
+                      <span className="font-semibold text-slate">{r.flight_no}</span>
+                    </span>
+                  )}
                   <span>
-                    {[
-                      r.flight_no,
-                      `${fmtEur(r.amount_cents)} €`,
-                      r.pax != null ? `${r.pax} pax` : null,
-                      r.luggage_count != null ? `${r.luggage_count} bags` : null,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
+                    <span className="text-grey">{copy.fareLabel}: </span>
+                    <span className="font-semibold text-slate">
+                      {fmtEur(r.amount_cents)} €
+                    </span>
                   </span>
+                  {r.pax != null && (
+                    <span>
+                      <span className="text-grey">{copy.passengersLabel}: </span>
+                      <span className="font-semibold text-slate">{r.pax}</span>
+                    </span>
+                  )}
+                  {r.luggage_count != null && (
+                    <span className="inline-flex items-center gap-[4px]">
+                      <LuggageIcon className="text-grey" aria-label={copy.luggageLabel} />
+                      <span className="font-semibold text-slate">
+                        {r.luggage_count}
+                      </span>
+                    </span>
+                  )}
                 </div>
 
                 <Button
@@ -232,6 +235,6 @@ export function PoolView({
           />
         </div>
       )}
-    </main>
+    </>
   );
 }

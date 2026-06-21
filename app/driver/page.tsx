@@ -19,7 +19,6 @@ import { redirect } from "next/navigation";
 import { getCurrentRole } from "@/platform/auth/role";
 import { getDict, getLang } from "@/platform/i18n/dictionary";
 import { createClient } from "@/platform/supabase/server";
-import { readOwnNotifications } from "@/platform/notifications/feed";
 import { PoolView, type PoolRow } from "./PoolView";
 
 // Tell Next this is always dynamic — the pool is live, never statically cached.
@@ -39,9 +38,6 @@ export default async function DriverPoolPage() {
   // Masked pre-claim read — the RPC returns ONLY the 9 non-PII pool columns (CLAIM-01).
   const { data } = await supabase.rpc("wp_pool");
 
-  // Role-gated own-rows-only seed for the Alerts bell (caller-auth RLS — never service-role).
-  const bellInitial = await readOwnNotifications();
-
   const pool: PoolRow[] = (data ?? []).map((r: Record<string, unknown>) => ({
     id: r.id as string,
     status: r.status as string,
@@ -59,7 +55,6 @@ export default async function DriverPoolPage() {
       pool={pool}
       lang={lang}
       copy={{
-        langToggle: t.langToggle,
         claimTransferCta: t.claimTransferCta,
         poolEmptyHeading: t.poolEmptyHeading,
         poolEmptyBody: t.poolEmptyBody,
@@ -67,16 +62,11 @@ export default async function DriverPoolPage() {
         claimFailedToast: t.claimFailedToast,
         airportLabel: t.airportLabel,
         zoneLabel: t.zoneLabel,
-      }}
-      bellInitial={bellInitial}
-      bellCopy={{
-        alertsTrigger: t.alertsTrigger,
-        alertsTriggerAria: t.alertsTriggerAria,
-        alertsPanelTitle: t.alertsPanelTitle,
-        markAllReadCta: t.markAllReadCta,
-        alertsEmptyHeading: t.alertsEmptyHeading,
-        alertsEmptyBody: t.alertsEmptyBody,
-        alertsLoadFailed: t.alertsLoadFailed,
+        unclaimedBadge: t.driverUnclaimedBadge,
+        flightLabel: t.driverFlightLabel,
+        fareLabel: t.driverFareLabel,
+        passengersLabel: t.driverPassengersLabel,
+        luggageLabel: t.driverLuggageLabel,
       }}
     />
   );

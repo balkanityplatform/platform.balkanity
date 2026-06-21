@@ -380,7 +380,17 @@ Plans:
   3. The magic-link status page renders as the pass and reflects the live transfer lifecycle state via the shared lifecycle stepper
   4. The pay action shows the Stripe-secured CTA and a "Secured payment · powered by Stripe" trust footer, and triggers the existing Checkout-session flow with no payment-path change
 
-**Plans**: TBD
+**Plans**: 4 plans (2 waves)
+Plans:
+**Wave 1** *(foundation slice — unblocks the screen slices)*
+
+- [ ] 10-1-pass-foundation-PLAN.md — New EN/BG pass copy keys + surface-local TransferPass/PassHeader/DetailsGrid + line pictograms + restyle /pay/cancel (the demonstrable consumer)
+
+**Wave 2** *(blocked on Wave 1; 02 + 03 + 04 run in parallel — disjoint files)*
+
+- [ ] 10-2-booking-pass-PLAN.md — /pickup/[slug] composed as the Transfer Pass + restyled BookingForm + pay CTA + Stripe trust footer (GUI-01/02/04)
+- [ ] 10-3-status-pass-PLAN.md — /status/[id] composed as the pass + horizontal LifecycleStepper swap (GUI-03)
+- [ ] 10-4-supporting-screens-PLAN.md — /pay/success + /track lighter DS restyle, spoof gate + neutral-action preserved (GUI-04 journey)
 **UI hint**: yes
 
 #### Phase 11: Driver PWA Rebuild
@@ -427,6 +437,6 @@ v1.1 phases execute in numeric order after v1.0: 9 → 10 → 11 → 12
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 9. Design System Foundation | 5/5 | Complete   | 2026-06-20 |
-| 10. Guest UI Rebuild | 0/TBD | Not started | - |
+| 10. Guest UI Rebuild | 0/4 | Planned | - |
 | 11. Driver PWA Rebuild | 0/TBD | Not started | - |
 | 12. Admin Console Rebuild | 0/TBD | Not started | - |

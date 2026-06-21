@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: UI Rebuild
-status: verifying
-stopped_at: Completed 10-04-PLAN.md
-last_updated: "2026-06-21T10:23:50.016Z"
+status: awaiting_uat
+stopped_at: Phase 11 context gathered
+last_updated: "2026-06-21T21:13:23.228Z"
 last_activity: 2026-06-21
 progress:
   total_phases: 4
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 
 Phase: 10 (guest-ui-rebuild) — EXECUTING
 Plan: 4 of 4
-Status: Phase complete — ready for verification
+Status: awaiting_uat
 Last activity: 2026-06-21
 
 ## Handoff (for a new session)
@@ -230,6 +230,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-21T10:23:50.010Z
-Stopped at: Completed 10-04-PLAN.md
-Resume file: None
+Last session: 2026-06-21T21:13:23.222Z
+Stopped at: Phase 11 context gathered
+Resume file: .planning/phases/11-driver-pwa-rebuild/11-CONTEXT.md

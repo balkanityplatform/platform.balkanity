@@ -13,6 +13,7 @@
 // Server-trusted amount (Pitfall 5): this form submits NO amount/price input — only the
 // slug (hidden) + the guest fields. The server re-reads price_cents.
 import { useActionState, useState } from "react";
+import { LockIcon } from "@/app/(guest)/_pass/icons";
 import { Button } from "@/platform/ui/Button";
 import { Card } from "@/platform/ui/Card";
 import { PaxStepper } from "@/platform/ui/PaxStepper";
@@ -35,6 +36,7 @@ export type BookingFormCopy = {
   notesPlaceholder: string;
   continueCta: string;
   continuePending: string;
+  trustFooter: string;
   backCta: string;
   yourDetails: string;
   disclosureHeading: string;
@@ -194,6 +196,17 @@ export function BookingForm({
       >
         {pending ? copy.continuePending : copy.continueCta}
       </Button>
+
+      {/* Stripe trust footer (GUI-04) — a teal lock pictogram + the secured-payment
+          reassurance line directly below the pay CTA, at the Label typography role.
+          Presentation only; the actual Checkout session is created server-side by the
+          existing createBooking action — this footer writes nothing. */}
+      <p className="flex items-center justify-center gap-[6px] text-[14px] leading-[1.4] text-grey">
+        <span className="text-teal">
+          <LockIcon />
+        </span>
+        {copy.trustFooter}
+      </p>
 
       {/* Secondary escape affordance (spec: ghost "Back") — a mobile-PWA guest may have
           no reliable browser-back from a deep link / in-app browser. */}

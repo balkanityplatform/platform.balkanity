@@ -15,6 +15,7 @@
 // auth.uid() (read server-side from the revalidated JWT) — NEVER a client-supplied id. A
 // forged call therefore matches 0 rows; one driver can never set another's preference.
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { getCurrentRole } from "@/platform/auth/role";
 import { getDict } from "@/platform/i18n/dictionary";
@@ -90,4 +91,16 @@ export async function saveDigestPreference(
 
   revalidatePath("/driver/settings");
   return { status: "success" };
+}
+
+// signOutAction — the lone NEW write of Phase 11 (D-05), auth/session-only.
+//
+// Clears the @supabase/ssr session cookie via the standard caller-auth client
+// (NEVER @supabase/auth-helpers-nextjs — CLAUDE.md), then redirects to /sign-in.
+// No payload, no zod, no service-role, no schema/RLS/table touched: it does not
+// trip the schema/auth review gate beyond a normal sign-out (threat T-11-14).
+export async function signOutAction() {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/sign-in");
 }

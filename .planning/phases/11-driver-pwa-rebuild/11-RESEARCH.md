@@ -371,17 +371,19 @@ import { RouteMotif } from "@/platform/ui/RouteMotif";
 
 **All other claims are `[VERIFIED: codebase]`** (every in-scope file read this session) or `[CITED: CLAUDE.md / 11-UI-SPEC.md / 11-CONTEXT.md / REQUIREMENTS.md]`.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Bell placement after layout consolidation**
    - What we know: The bell currently lives in each page's header, seeded by `readOwnNotifications()`.
    - What's unclear: Whether to move the bell into the layout (cleaner) or leave it per-page and only mount the bottom nav from the layout.
    - Recommendation: Move both header + bell into the layout (D-01 says the top header with the bell + language toggle is mounted once). Confirm during planning that pages drop their headers.
+   - RESOLVED: Per D-01, the header + bell move into `app/driver/layout.tsx` (Plan 01 Task 3); pages drop their per-page headers and Plan 02 Task 2 removes the duplicate bell (Pitfall-1 double-bell cleanup).
 
 2. **Trip-card route rendering: full `RouteMotif` vs compact line**
    - What we know: UI-SPEC says "`RouteMotif` (or compact route line)".
    - What's unclear: Whether the full motif (with Transfer Badge) is too tall in a dense My Trips list.
    - Recommendation: Use the full `RouteMotif` on the claim card and trip-detail hero; a compact teal route line is acceptable on My Trips cards (executor's visual call per discretion).
+   - RESOLVED: Delegated to executor discretion per CONTEXT.md "Claude's Discretion" and Plan 03 Task 1 — full `RouteMotif` on claim card + trip-detail hero; compact teal route line acceptable on dense My Trips cards.
 
 ## Environment Availability
 

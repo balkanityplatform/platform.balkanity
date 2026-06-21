@@ -4,13 +4,13 @@ milestone: v1.1
 milestone_name: UI Rebuild
 status: executing
 stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-06-21T21:56:33.605Z"
+last_updated: "2026-06-21T22:01:04.121Z"
 last_activity: 2026-06-21
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 14
-  completed_plans: 11
+  completed_plans: 12
   percent: 50
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 ## Current Position
 
 Phase: 11 (driver-pwa-rebuild) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-06-21
 
@@ -102,6 +102,7 @@ Last activity: 2026-06-21
 | Phase 10 P04 | 2min | 2 tasks | 4 files |
 | Phase 11 P01 | 7min | 3 tasks | 5 files |
 | Phase 11 P02 | 6min | 2 tasks | 2 files |
+| Phase 11 P03 | 6min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -203,6 +204,7 @@ Recent decisions affecting current work:
 - [Phase ?]: [11-01]: DriverBottomNav active tab via usePathname — Available exact '/driver', My Trips prefix '/driver/run' (keeps tab lit on /driver/run/[id] per D-02), Profile prefix '/driver/settings'; no authz rides on it; 12px/600 nav label is the one sub-14px exception (DUI-02)
 - [Phase ?]: [11-01]: driverUnclaimedBadge + 13 other Phase-11 keys are presentation copy only — no 'unclaimed' TransferState, STATE_META untouched (Pitfall 5); BG translated, tsc parity green
 - [Phase ?]: Driver Available pool restyled into claim cards (coral Unclaimed pill + RouteMotif + 52px Claim CTA) over the unchanged wp_pool() read and atomic claim path; zero PII pre-claim (11-02)
+- [Phase ?]: [11-03]: My Trips trip cards reuse RouteMotif+meta grammar with per-row real-state StatusDot; LifecycleTimeline removed from card, inline advanceStatus CTA preserved; arrival_at ASC + Completed-today partition kept green (RunView.test.tsx)
 
 ### Pending Todos
 
@@ -236,6 +238,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-21T21:56:13.585Z
+Last session: 2026-06-21T22:00:52.087Z
 Stopped at: Completed 11-01-PLAN.md
 Resume file: None

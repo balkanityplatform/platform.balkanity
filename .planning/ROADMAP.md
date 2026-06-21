@@ -417,7 +417,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1; 02 + 03 + 04 + 05 run in parallel — disjoint files)*
 
 - [x] 11-02-PLAN.md — Available claim cards: masked `wp_pool` read + coral Unclaimed badge + RouteMotif + 52px Claim CTA, claim/poll/PII verbatim (DUI-01/DUI-05)
-- [ ] 11-03-PLAN.md — My Trips: trip cards with per-row StatusDot + route + details link; arrival ASC + Completed-today + advance preserved (DUI-03)
+- [x] 11-03-PLAN.md — My Trips: trip cards with per-row StatusDot + route + details link; arrival ASC + Completed-today + advance preserved (DUI-03)
 - [ ] 11-04-PLAN.md — En-route trip detail: LifecycleTimeline→LifecycleStepper swap + dictionary captions + new DetailView Confirm-Arrival CTA → advanceStatus (DUI-04)
 - [ ] 11-05-PLAN.md — Profile rebuild: identity header + restyled digest card + language row + sign-out (new `signOutAction`, D-03/D-04/D-05)
 **UI hint**: yes
@@ -449,5 +449,5 @@ v1.1 phases execute in numeric order after v1.0: 9 → 10 → 11 → 12
 |-------|----------------|--------|-----------|
 | 9. Design System Foundation | 5/5 | Complete   | 2026-06-20 |
 | 10. Guest UI Rebuild | 4/4 | Complete   | 2026-06-21 |
-| 11. Driver PWA Rebuild | 2/5 | In Progress|  |
+| 11. Driver PWA Rebuild | 3/5 | In Progress|  |
 | 12. Admin Console Rebuild | 0/TBD | Not started | - |

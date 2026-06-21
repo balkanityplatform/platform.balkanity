@@ -143,8 +143,8 @@ export const bg: Dict = {
   bookingNotesLabel: "Бележки за вашия шофьор (по избор)",
   bookingNotesPlaceholder:
     "Каквото шофьорът трябва да знае — напр. нужно столче за кола, място за среща.",
-  bookingContinueCta: "Продължи към плащане",
-  bookingContinuePending: "Стартиране на плащането…",
+  bookingContinueCta: "Платете €{amount} и потвърдете",
+  bookingContinuePending: "Потвърждаване…",
   bookingBackCta: "Назад",
 
   // Предплатено и невъзстановимо оповестяване (BOOK-04 — видимо ПРЕДИ плащане).
@@ -213,6 +213,19 @@ export const bg: Dict = {
   paySuccessConfirming: "Плащането е получено — потвърждаваме го.",
   paySuccessTrackCta: "Вижте статуса на резервацията си",
   paySuccessTrackFallback: "Или поискайте нов линк по имейл.",
+
+  // --- Фаза 10: гост-повърхност „Transfer Pass“ (UI-SPEC Copywriting Contract) ---
+  passEyebrow: "Трансферен пас",
+  passRefLabel: "Реф.: {shortId}",
+  passDate: "Дата",
+  passFlightNo: "Номер на полет",
+  passGuests: "Пътници",
+  passTime: "Час",
+  passPaymentPending: "Очаква предплащане",
+  payTrustFooter: "Защитено плащане · с Stripe",
+  payCancelTitle: "Плащането е отказано",
+  payCancelBody: "Плащането ви не беше завършено.",
+  payCancelTrackCta: "Проследете резервацията си",
 
   // --- Фаза 6: шофьорско PWA + админ конзола за трансфери (UI-SPEC Copywriting Contract) ---
 

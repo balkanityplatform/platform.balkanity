@@ -142,8 +142,8 @@ export const en = {
   bookingNotesLabel: "Notes for your driver (optional)",
   bookingNotesPlaceholder:
     "Anything the driver should know — e.g. car seat needed, meeting point.",
-  bookingContinueCta: "Continue to payment",
-  bookingContinuePending: "Starting payment…",
+  bookingContinueCta: "Pay €{amount} & confirm",
+  bookingContinuePending: "Confirming…",
   bookingBackCta: "Back",
 
   // Prepaid & non-refundable disclosure (BOOK-04 — visible BEFORE payment).
@@ -213,6 +213,23 @@ export const en = {
   paySuccessConfirming: "Payment received — we're confirming it.",
   paySuccessTrackCta: "View your booking status",
   paySuccessTrackFallback: "Or request a fresh link by email.",
+
+  // --- Phase 10: guest "Transfer Pass" surface (UI-SPEC Copywriting Contract) ---
+  // Shared boarding-pass shell + details-grid captions + Stripe trust footer +
+  // the restyled /pay/cancel page. Captions are styling-uppercased in the
+  // components (NOT baked into the string). passRefLabel uses the in-source
+  // fill() {token} interpolation, not an i18n library.
+  passEyebrow: "Transfer Pass",
+  passRefLabel: "Ref: {shortId}",
+  passDate: "Date",
+  passFlightNo: "Flight No.",
+  passGuests: "Guests",
+  passTime: "Time",
+  passPaymentPending: "Pending prepayment",
+  payTrustFooter: "Secured payment · powered by Stripe",
+  payCancelTitle: "Payment cancelled",
+  payCancelBody: "Your payment was not completed.",
+  payCancelTrackCta: "Track your booking",
 
   // --- Phase 6: driver PWA + admin transfers console (UI-SPEC Copywriting Contract) ---
 

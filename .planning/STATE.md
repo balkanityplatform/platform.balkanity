@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: UI Rebuild
-status: executing
+status: verifying
 stopped_at: Completed 11-01-PLAN.md
-last_updated: "2026-06-21T22:04:21.740Z"
+last_updated: "2026-06-21T22:07:46.481Z"
 last_activity: 2026-06-21
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 14
-  completed_plans: 13
-  percent: 50
+  completed_plans: 14
+  percent: 75
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 
 Phase: 11 (driver-pwa-rebuild) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-06-21
 
 ## Handoff (for a new session)
@@ -104,6 +104,7 @@ Last activity: 2026-06-21
 | Phase 11 P02 | 6min | 2 tasks | 2 files |
 | Phase 11 P03 | 6min | 2 tasks | 2 files |
 | Phase 11 P04 | 3min | 2 tasks | 2 files |
+| Phase 11 P05 | 4min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -207,6 +208,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Driver Available pool restyled into claim cards (coral Unclaimed pill + RouteMotif + 52px Claim CTA) over the unchanged wp_pool() read and atomic claim path; zero PII pre-claim (11-02)
 - [Phase ?]: [11-03]: My Trips trip cards reuse RouteMotif+meta grammar with per-row real-state StatusDot; LifecycleTimeline removed from card, inline advanceStatus CTA preserved; arrival_at ASC + Completed-today partition kept green (RunView.test.tsx)
 - [Phase ?]: Plan 11-04: Confirm-Arrival CTA labels en_route→arrived via labelByNext[arrived]=driverConfirmArrivalCta; advanceStatus reused verbatim
+- [Phase ?]: Plan 11-05: signOutAction is the lone new write of Phase 11 — auth/session-only @supabase/ssr signOut + redirect, no schema/RLS
+- [Phase ?]: Plan 11-05: DigestPreferenceCard left unedited — already on the DS Card chrome; behaviour verbatim (NOTF-05)
 
 ### Pending Todos
 
@@ -240,6 +243,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-21T22:04:17.194Z
+Last session: 2026-06-21T22:07:31.589Z
 Stopped at: Completed 11-01-PLAN.md
 Resume file: None

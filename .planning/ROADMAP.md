@@ -330,7 +330,7 @@ The work is a strict, user-locked dependency chain: the shared **Design System f
 
 - [x] **Phase 9: Design System Foundation** - "Balkanity Path" tokens in Tailwind v4 @theme + status badge, infinity/route motif, and lifecycle stepper components (prerequisite for all surfaces) (completed 2026-06-20)
 - [x] **Phase 10: Guest UI Rebuild** - Boarding-pass "Transfer Pass" booking screen + restyled form + magic-link status page with live stepper + Stripe trust CTA (completed 2026-06-21)
-- [ ] **Phase 11: Driver PWA Rebuild** - Claim cards (no pre-claim PII), bottom nav, My Trips, and en-route trip detail with progress stepper + Confirm-Arrival, riding the existing atomic claim
+- [x] **Phase 11: Driver PWA Rebuild** - Claim cards (no pre-claim PII), bottom nav, My Trips, and en-route trip detail with progress stepper + Confirm-Arrival, riding the existing atomic claim (completed 2026-06-21)
 - [ ] **Phase 12: Admin Console Rebuild** - Left sidebar nav, Transfer Pool KPI cards, pending-transmissions transfers table + restyled detail, and top bar with search / notifications bell / admin identity
 
 ### Phase Details
@@ -419,7 +419,7 @@ Plans:
 - [x] 11-02-PLAN.md — Available claim cards: masked `wp_pool` read + coral Unclaimed badge + RouteMotif + 52px Claim CTA, claim/poll/PII verbatim (DUI-01/DUI-05)
 - [x] 11-03-PLAN.md — My Trips: trip cards with per-row StatusDot + route + details link; arrival ASC + Completed-today + advance preserved (DUI-03)
 - [x] 11-04-PLAN.md — En-route trip detail: LifecycleTimeline→LifecycleStepper swap + dictionary captions + new DetailView Confirm-Arrival CTA → advanceStatus (DUI-04)
-- [ ] 11-05-PLAN.md — Profile rebuild: identity header + restyled digest card + language row + sign-out (new `signOutAction`, D-03/D-04/D-05)
+- [x] 11-05-PLAN.md — Profile rebuild: identity header + restyled digest card + language row + sign-out (new `signOutAction`, D-03/D-04/D-05)
 **UI hint**: yes
 
 #### Phase 12: Admin Console Rebuild
@@ -449,5 +449,5 @@ v1.1 phases execute in numeric order after v1.0: 9 → 10 → 11 → 12
 |-------|----------------|--------|-----------|
 | 9. Design System Foundation | 5/5 | Complete   | 2026-06-20 |
 | 10. Guest UI Rebuild | 4/4 | Complete   | 2026-06-21 |
-| 11. Driver PWA Rebuild | 4/5 | In Progress|  |
+| 11. Driver PWA Rebuild | 5/5 | Complete   | 2026-06-21 |
 | 12. Admin Console Rebuild | 0/TBD | Not started | - |

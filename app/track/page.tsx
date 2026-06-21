@@ -12,10 +12,8 @@ export default async function TrackPage() {
 
   return (
     <main className="mx-auto flex max-w-[480px] flex-col gap-[24px] px-[16px] py-[48px]">
-      <h1 className="text-[28px] font-semibold leading-[1.2] text-slate">
-        {t.trackTitle}
-      </h1>
-      <p className="text-[16px] leading-[1.5] text-slate">{t.trackBody}</p>
+      <h1 className="text-display font-semibold text-slate">{t.trackTitle}</h1>
+      <p className="text-body text-slate">{t.trackBody}</p>
       <TrackForm
         copy={{
           emailLabel: t.trackEmailLabel,

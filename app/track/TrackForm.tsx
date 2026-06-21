@@ -25,7 +25,7 @@ export function TrackForm({ copy }: { copy: TrackCopy }) {
   if (state.status === "ok") {
     // Neutral success — never reveals whether the email had a booking.
     return (
-      <p role="status" className="text-[16px] leading-[1.5] text-slate">
+      <p role="status" className="text-body text-slate">
         {state.message}
       </p>
     );

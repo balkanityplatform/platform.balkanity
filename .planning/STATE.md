@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: UI Rebuild
-status: awaiting_uat
-stopped_at: Phase 11 context gathered
-last_updated: "2026-06-21T21:40:46.738Z"
-last_activity: 2026-06-21 -- Phase 11 planning complete
+status: executing
+stopped_at: Completed 11-01-PLAN.md
+last_updated: "2026-06-21T21:51:38.379Z"
+last_activity: 2026-06-21
 progress:
   total_phases: 4
   completed_phases: 2
-  total_plans: 9
-  completed_plans: 9
+  total_plans: 14
+  completed_plans: 10
   percent: 50
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-20)
 
 **Core value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
-**Current focus:** Phase 10 — guest-ui-rebuild
+**Current focus:** Phase 11 — driver-pwa-rebuild
 
 ## Current Position
 
-Phase: 10 (guest-ui-rebuild) — EXECUTING
-Plan: 4 of 4
-Status: awaiting_uat
-Last activity: 2026-06-21 -- Phase 11 planning complete
+Phase: 11 (driver-pwa-rebuild) — EXECUTING
+Plan: 2 of 5
+Status: Ready to execute
+Last activity: 2026-06-21
 
 ## Handoff (for a new session)
 
@@ -100,6 +100,7 @@ Last activity: 2026-06-21 -- Phase 11 planning complete
 | Phase 10 P02 | 3min | 2 tasks | 3 files |
 | Phase 10 P03 | 6min | 2 tasks | 2 files |
 | Phase 10 P04 | 2min | 2 tasks | 4 files |
+| Phase 11 P01 | 7min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -197,6 +198,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 10-2: /pickup booking screen IS the Transfer Pass; pay-CTA amount server-interpolated via fill() (no form input, Pitfall 5); Stripe trust footer below the pay CTA
 - [Phase ?]: Status page rebuilt as Transfer Pass + horizontal LifecycleStepper (DS-04); real truncated id shown, RLS/auth/PII/receipt unchanged (10-03)
 - [Phase 10]: Plan 10-04 restyle keeps the success spoof gate and /track neutral action verbatim — presentation-only
+- [Phase ?]: [11-01]: app/driver/layout.tsx shared shell consolidates the four driver headers + relocates the readOwnNotifications bell seed (own-rows, not widened) and mounts DriverBottomNav once (D-01); per-page headers removed by each Plan 02-05 (disjoint ownership, transient double-header accepted)
+- [Phase ?]: [11-01]: DriverBottomNav active tab via usePathname — Available exact '/driver', My Trips prefix '/driver/run' (keeps tab lit on /driver/run/[id] per D-02), Profile prefix '/driver/settings'; no authz rides on it; 12px/600 nav label is the one sub-14px exception (DUI-02)
+- [Phase ?]: [11-01]: driverUnclaimedBadge + 13 other Phase-11 keys are presentation copy only — no 'unclaimed' TransferState, STATE_META untouched (Pitfall 5); BG translated, tsc parity green
 
 ### Pending Todos
 
@@ -230,6 +234,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-21T21:13:23.222Z
-Stopped at: Phase 11 context gathered
-Resume file: .planning/phases/11-driver-pwa-rebuild/11-CONTEXT.md
+Last session: 2026-06-21T21:51:38.373Z
+Stopped at: Completed 11-01-PLAN.md
+Resume file: None

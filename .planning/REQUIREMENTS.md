@@ -32,7 +32,7 @@
 ### Driver PWA
 
 - [ ] **DUI-01**: Available transfers render as claim cards (pickup time, pax count, "Unclaimed" badge, route with infinity motif, date, price, Claim CTA) showing **no guest PII** pre-claim.
-- [ ] **DUI-02**: A bottom navigation bar provides Available / My Trips / Profile with the active tab highlighted.
+- [x] **DUI-02**: A bottom navigation bar provides Available / My Trips / Profile with the active tab highlighted.
 - [ ] **DUI-03**: My Trips renders the driver's claimed/past transfers as trip cards (date, status, route, pax, duration, details link) — no earnings or ratings shown.
 - [ ] **DUI-04**: The en-route trip detail renders the claimed passenger info, route card, the DS-04 trip-progress stepper, the passenger note, and a Confirm-Arrival CTA wired to the existing advance-status action — no live map.
 - [ ] **DUI-05**: The Claim action on a card invokes the existing atomic claim RPC and reflects first-to-claim-wins / already-claimed outcomes in the UI.
@@ -74,7 +74,7 @@ Every v1.1 requirement maps to exactly one phase (9–12). 18/18 mapped — no o
 | GUI-03 | Phase 10 | Complete |
 | GUI-04 | Phase 10 | Complete |
 | DUI-01 | Phase 11 | Pending |
-| DUI-02 | Phase 11 | Pending |
+| DUI-02 | Phase 11 | Complete |
 | DUI-03 | Phase 11 | Pending |
 | DUI-04 | Phase 11 | Pending |
 | DUI-05 | Phase 11 | Pending |

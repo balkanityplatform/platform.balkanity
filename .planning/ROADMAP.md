@@ -412,7 +412,7 @@ Plans:
 Plans:
 **Wave 1** *(foundation slice — unblocks the four surface slices)*
 
-- [ ] 11-01-PLAN.md — Driver shell: shared `app/driver/layout.tsx` + `DriverBottomNav` (DUI-02) + surface-local line icons + all new EN/BG keys
+- [x] 11-01-PLAN.md — Driver shell: shared `app/driver/layout.tsx` + `DriverBottomNav` (DUI-02) + surface-local line icons + all new EN/BG keys
 
 **Wave 2** *(blocked on Wave 1; 02 + 03 + 04 + 05 run in parallel — disjoint files)*
 
@@ -449,5 +449,5 @@ v1.1 phases execute in numeric order after v1.0: 9 → 10 → 11 → 12
 |-------|----------------|--------|-----------|
 | 9. Design System Foundation | 5/5 | Complete   | 2026-06-20 |
 | 10. Guest UI Rebuild | 4/4 | Complete   | 2026-06-21 |
-| 11. Driver PWA Rebuild | 0/5 | Planned | - |
+| 11. Driver PWA Rebuild | 1/5 | In Progress|  |
 | 12. Admin Console Rebuild | 0/TBD | Not started | - |

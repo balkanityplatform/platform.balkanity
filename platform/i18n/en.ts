@@ -395,6 +395,26 @@ export const en = {
   devShowcaseStatusDotVariantHeading: "Variant",
   devShowcaseStepperHeading: "Lifecycle stepper",
   devShowcaseRouteMotifHeading: "Route motif",
+
+  // --- Phase 11: driver PWA rebuild (UI-SPEC Copywriting Contract) ---
+  // Presentation-only re-skin. Bottom-nav labels (DUI-02), the coral pool badge
+  // (DUI-01, presentation copy over status='paid' — NOT a new TransferState), the
+  // en_route→arrived advance label (DUI-04), the Profile sign-out CTA (D-05), and
+  // the detail-grid caption keys that replace the hardcoded English in run/[id].
+  navAvailable: "Available",
+  navMyTrips: "My Trips",
+  navProfile: "Profile",
+  driverUnclaimedBadge: "Unclaimed",
+  driverConfirmArrivalCta: "Confirm arrival",
+  driverSignOutCta: "Sign out",
+  driverArrivalLabel: "Arrival",
+  driverFlightLabel: "Flight",
+  driverFareLabel: "Fare",
+  driverPassengersLabel: "Passengers",
+  driverLuggageLabel: "Luggage",
+  driverGuestNameLabel: "Guest name",
+  driverGuestPhoneLabel: "Guest phone",
+  driverNotesLabel: "Notes",
 } as const;
 
 // The dictionary contract — bg.ts is type-checked against this (parity gate).

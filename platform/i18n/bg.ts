@@ -389,4 +389,24 @@ export const bg: Dict = {
   devShowcaseStatusDotVariantHeading: "Вариант",
   devShowcaseStepperHeading: "Степер на жизнения цикъл",
   devShowcaseRouteMotifHeading: "Мотив на маршрута",
+
+  // --- Фаза 11: преработка на шофьорското PWA (UI-SPEC Copywriting Contract) ---
+  // Само презентация. Етикети на долната навигация (DUI-02), кораловият бейдж на
+  // пула (DUI-01, презентационен текст върху status='paid' — НЕ нов TransferState),
+  // етикетът за преход en_route→arrived (DUI-04), CTA за изход от профила (D-05) и
+  // надписите на детайлната решетка, заместващи твърдо зададения английски в run/[id].
+  navAvailable: "Свободни",
+  navMyTrips: "Моите пътувания",
+  navProfile: "Профил",
+  driverUnclaimedBadge: "Непоет",
+  driverConfirmArrivalCta: "Потвърди пристигане",
+  driverSignOutCta: "Изход",
+  driverArrivalLabel: "Пристигане",
+  driverFlightLabel: "Полет",
+  driverFareLabel: "Цена",
+  driverPassengersLabel: "Пътници",
+  driverLuggageLabel: "Багаж",
+  driverGuestNameLabel: "Име на госта",
+  driverGuestPhoneLabel: "Телефон на госта",
+  driverNotesLabel: "Бележки",
 };

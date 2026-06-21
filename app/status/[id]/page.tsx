@@ -5,7 +5,7 @@
 // so the migration-0004 `wp_transfers_guest_self_read` RLS policy is the authorization
 // gate: a JWT email ≠ guest_email matches no policy → zero rows → the session-expired
 // state. Authorization uses auth.getUser() (revalidates the JWT server-side), NEVER
-// getSession() (which trusts the cookie unverified — Pitfall 6 / CLAUDE.md lock).
+// the unrevalidated cookie-trusting variant (which is spoofable — Pitfall 6 / CLAUDE.md lock).
 //
 // DRIVER REVEAL (D-06, post-claim). driver_profiles carries ONLY an admin-read RLS
 // policy (migration 0002), so a guest cookie-session read returns ZERO rows. Therefore,
@@ -21,6 +21,15 @@
 // The route/airport/zone trip metadata is non-PII destination data; it is read with the
 // service-role client (mirrors /pickup and /pay/success) so a deactivated destination
 // still resolves the guest's own route. NetworkFirst is enforced by app/sw.ts (Task 3).
+import { DetailsGrid } from "@/app/(guest)/_pass/DetailsGrid";
+import {
+  CalendarIcon,
+  ClockIcon,
+  PeopleIcon,
+  PlaneIcon,
+} from "@/app/(guest)/_pass/icons";
+import { PassHeader } from "@/app/(guest)/_pass/PassHeader";
+import { TransferPass } from "@/app/(guest)/_pass/TransferPass";
 import { getDict } from "@/platform/i18n/dictionary";
 import { fmtEur } from "@/platform/money/commission";
 import { createAdminClient } from "@/platform/supabase/admin";
@@ -95,7 +104,7 @@ export default async function StatusPage({ params }: { params: Params }) {
   // Cookie-bound anon client — RLS is the authorization gate for the guest read.
   const supabase = await createClient();
 
-  // getUser revalidates the JWT server-side (NEVER getSession — Pitfall 6).
+  // getUser revalidates the JWT server-side (never the unrevalidated variant — Pitfall 6).
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -159,37 +168,53 @@ export default async function StatusPage({ params }: { params: Params }) {
 
   const isPaid = status === "paid" || row.paid_at != null;
 
+  // The REAL truncated transfer id (first 8 chars of the UUID, uppercased) — the
+  // status pass SHOWS the ref (Decision 1). No invented id, no scannable stripe graphic.
+  const shortId = id.slice(0, 8).toUpperCase();
+
   return (
     <main className="mx-auto flex max-w-[480px] flex-col gap-[48px] px-[16px] py-[48px]">
       <h1 className="text-[28px] font-semibold leading-[1.2] text-slate">
         {t.statusTitle}
       </h1>
 
-      {/* Trip summary — Card-grouped per UI-SPEC. */}
-      <Card className="flex flex-col gap-[8px]">
-        <h2 className="text-[20px] font-semibold leading-[1.2] text-slate">
-          {t.statusYourTrip}
-        </h2>
-        <p className="text-[16px] leading-[1.5] text-slate">
-          {fill(t.statusRouteLine, { airport, zone })}
-        </p>
-        <p className="text-[14px] leading-[1.4] text-grey">
-          {fill(t.statusArrivalLine, {
-            arrivalDate: fmtDate(row.arrival_at),
-            arrivalTime: fmtTime(row.arrival_at),
-          })}
-        </p>
-        {row.flight_no ? (
-          <p className="text-[14px] leading-[1.4] text-grey">
-            {fill(t.statusFlightLine, { flightNo: row.flight_no })}
-          </p>
-        ) : null}
-        {row.pax != null ? (
-          <p className="text-[14px] leading-[1.4] text-grey">
-            {fill(t.statusPaxLine, { pax: String(row.pax) })}
-          </p>
-        ) : null}
-      </Card>
+      {/* The booking IS the pass: teal header (RouteMotif airport → property) +
+          real truncated ref + real-fields-only DetailsGrid (Decision 1/3). */}
+      <TransferPass
+        header={
+          <PassHeader
+            eyebrow={t.passEyebrow}
+            refLabel={fill(t.passRefLabel, { shortId })}
+            startLabel={airport}
+            endLabel={zone}
+          />
+        }
+      >
+        <DetailsGrid
+          items={[
+            {
+              caption: t.passDate,
+              value: fmtDate(row.arrival_at),
+              icon: <CalendarIcon />,
+            },
+            {
+              caption: t.passFlightNo,
+              value: row.flight_no ?? "",
+              icon: <PlaneIcon />,
+            },
+            {
+              caption: t.passGuests,
+              value: row.pax != null ? String(row.pax) : "",
+              icon: <PeopleIcon />,
+            },
+            {
+              caption: t.passTime,
+              value: fmtTime(row.arrival_at),
+              icon: <ClockIcon />,
+            },
+          ]}
+        />
+      </TransferPass>
 
       {/* Lifecycle stepper (SC4) — horizontal LifecycleStepper (DS-04) */}
       <section className="flex flex-col gap-[16px]">

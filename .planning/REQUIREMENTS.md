@@ -24,9 +24,9 @@
 
 ### Guest UI
 
-- [ ] **GUI-01**: The guest booking screen renders as the boarding-pass "Transfer Pass" (airport→property route header, details grid for date/flight/pickup/guests, payment-status row, total prepaid, pay CTA).
+- [x] **GUI-01**: The guest booking screen renders as the boarding-pass "Transfer Pass" (airport→property route header, details grid for date/flight/pickup/guests, payment-status row, total prepaid, pay CTA).
 - [ ] **GUI-02**: The booking form inputs are restyled to the design system (48px fields, teal focus, Montserrat labels) with no change to the fields collected or validation.
-- [ ] **GUI-03**: The magic-link status page renders as the pass with the live lifecycle state reflected via the DS-04 stepper.
+- [x] **GUI-03**: The magic-link status page renders as the pass with the live lifecycle state reflected via the DS-04 stepper.
 - [ ] **GUI-04**: The pay action shows the Stripe-secured CTA and a "Secured payment · powered by Stripe" trust footer; it drives the existing Checkout-session flow unchanged.
 
 ### Driver PWA
@@ -69,9 +69,9 @@ Every v1.1 requirement maps to exactly one phase (9–12). 18/18 mapped — no o
 | DS-02 | Phase 9 | Complete |
 | DS-03 | Phase 9 | Complete |
 | DS-04 | Phase 9 | Complete |
-| GUI-01 | Phase 10 | Pending |
+| GUI-01 | Phase 10 | Complete |
 | GUI-02 | Phase 10 | Pending |
-| GUI-03 | Phase 10 | Pending |
+| GUI-03 | Phase 10 | Complete |
 | GUI-04 | Phase 10 | Pending |
 | DUI-01 | Phase 11 | Pending |
 | DUI-02 | Phase 11 | Pending |

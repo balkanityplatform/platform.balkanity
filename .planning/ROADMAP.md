@@ -437,6 +437,6 @@ v1.1 phases execute in numeric order after v1.0: 9 → 10 → 11 → 12
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 9. Design System Foundation | 5/5 | Complete   | 2026-06-20 |
-| 10. Guest UI Rebuild | 0/4 | Planned | - |
+| 10. Guest UI Rebuild | 1/4 | In Progress|  |
 | 11. Driver PWA Rebuild | 0/TBD | Not started | - |
 | 12. Admin Console Rebuild | 0/TBD | Not started | - |

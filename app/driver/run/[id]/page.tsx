@@ -14,10 +14,12 @@ import { notFound, redirect } from "next/navigation";
 import { getCurrentRole } from "@/platform/auth/role";
 import { getDict, getLang } from "@/platform/i18n/dictionary";
 import { createClient } from "@/platform/supabase/server";
-import { LifecycleTimeline } from "@/platform/ui/LifecycleTimeline";
-import { LanguageToggle } from "@/platform/ui/LanguageToggle";
+import { LifecycleStepper } from "@/platform/ui/LifecycleStepper";
+import { RouteMotif } from "@/platform/ui/RouteMotif";
+import { PlaneIcon, BuildingIcon } from "@/app/(guest)/_pass/icons";
 import type { TransferState } from "@/platform/ui/StatusDot";
 import { fmtEur } from "@/platform/money/commission";
+import { DetailView } from "./DetailView";
 
 type DetailRow = {
   id: string;
@@ -85,42 +87,62 @@ export default async function DriverTransferDetailPage({
   });
 
   return (
-    <main className="min-h-dvh bg-white">
-      <header className="flex items-center justify-between border-b border-grey/20 bg-white px-[24px] py-[16px]">
-        <a
-          href="/driver/run"
-          className="text-[14px] font-semibold text-teal underline"
-        >
-          {t.myRunTitle}
-        </a>
-        <LanguageToggle current={lang} label={t.langToggle} />
-      </header>
+    <section className="mx-auto flex max-w-2xl flex-col gap-[24px] px-[24px] py-[24px]">
+      {/* Horizontal lifecycle stepper (DS-04, Decision 4) — replaces the vertical timeline. */}
+      <LifecycleStepper current={row.status as TransferState} />
 
-      <section className="mx-auto flex max-w-2xl flex-col gap-[24px] px-[24px] py-[24px]">
-        <LifecycleTimeline current={row.status as TransferState} />
+      {/* Hero route card: airport → zone/address (Decision 1 — NO live map). */}
+      <RouteMotif
+        start={{
+          icon: <PlaneIcon />,
+          label: row.destinations?.airport ?? t.airportLabel,
+        }}
+        end={{
+          icon: <BuildingIcon />,
+          label:
+            row.destinations?.zone ?? row.destinations?.address ?? t.zoneLabel,
+        }}
+      />
 
-        {/* Trip facts — legitimately visible post-claim. */}
-        <div className="grid grid-cols-2 gap-[16px] rounded-md border border-grey/30 bg-white p-[16px] shadow-sm">
-          <Fact label={t.airportLabel} value={row.destinations?.airport ?? null} />
-          <Fact label={t.zoneLabel} value={row.destinations?.zone ?? null} />
-          <Fact label={t.addressLabel} value={row.destinations?.address ?? null} />
-          <Fact label="Arrival" value={arrival} />
-          <Fact label="Flight" value={row.flight_no} />
-          <Fact label="Fare" value={`${fmtEur(row.amount_cents)} €`} />
-          <Fact label="Passengers" value={row.pax != null ? String(row.pax) : null} />
-          <Fact
-            label="Luggage"
-            value={row.luggage_count != null ? String(row.luggage_count) : null}
-          />
-        </div>
+      {/* Trip facts — legitimately visible post-claim. */}
+      <div className="grid grid-cols-2 gap-[16px] rounded-md border border-grey/30 bg-white p-[16px] shadow-sm">
+        <Fact label={t.airportLabel} value={row.destinations?.airport ?? null} />
+        <Fact label={t.zoneLabel} value={row.destinations?.zone ?? null} />
+        <Fact label={t.addressLabel} value={row.destinations?.address ?? null} />
+        <Fact label={t.driverArrivalLabel} value={arrival} />
+        <Fact label={t.driverFlightLabel} value={row.flight_no} />
+        <Fact label={t.driverFareLabel} value={`${fmtEur(row.amount_cents)} €`} />
+        <Fact
+          label={t.driverPassengersLabel}
+          value={row.pax != null ? String(row.pax) : null}
+        />
+        <Fact
+          label={t.driverLuggageLabel}
+          value={row.luggage_count != null ? String(row.luggage_count) : null}
+        />
+      </div>
 
-        {/* Guest contact — full PII, visible only because the driver owns this claim. */}
-        <div className="flex flex-col gap-[16px] rounded-md border border-grey/30 bg-white p-[16px] shadow-sm">
-          <Fact label="Guest name" value={row.guest_name} />
-          <Fact label="Guest phone" value={row.guest_phone} />
-          <Fact label="Notes" value={row.notes} />
-        </div>
-      </section>
-    </main>
+      {/* Guest contact — full PII, visible only because the driver owns this claim. */}
+      <div className="flex flex-col gap-[16px] rounded-md border border-grey/30 bg-white p-[16px] shadow-sm">
+        <Fact label={t.driverGuestNameLabel} value={row.guest_name} />
+        <Fact label={t.driverGuestPhoneLabel} value={row.guest_phone} />
+        <Fact label={t.driverNotesLabel} value={row.notes} />
+      </div>
+
+      {/* Next-forward-edge advance CTA (Confirm arrival on en_route→arrived) — the server action
+          cannot be invoked from this RSC, so the interaction lives in the DetailView island. */}
+      <DetailView
+        id={row.id}
+        status={row.status as TransferState}
+        copy={{
+          advanceToEnRouteCta: t.advanceToEnRouteCta,
+          advanceToArrivedCta: t.advanceToArrivedCta,
+          advanceToPickedUpCta: t.advanceToPickedUpCta,
+          advanceToCompletedCta: t.advanceToCompletedCta,
+          driverConfirmArrivalCta: t.driverConfirmArrivalCta,
+          advanceFailedToast: t.advanceFailedToast,
+        }}
+      />
+    </section>
   );
 }

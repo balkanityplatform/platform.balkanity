@@ -11,6 +11,7 @@
 //   - the success-spoof e2e (tests/e2e/success-spoof.spec.ts): a direct hit with no
 //     webhook must NOT render the word "paid". Hence the literal "Paid" receipt line is
 //     emitted ONLY inside the `status === "paid"` branch — never for an unpaid transfer.
+import { LockIcon } from "@/app/(guest)/_pass/icons";
 import { getDict } from "@/platform/i18n/dictionary";
 import { fmtEur } from "@/platform/money/commission";
 import { createAdminClient } from "@/platform/supabase/admin";
@@ -64,53 +65,56 @@ export default async function PaySuccessPage({
 
   const isPaid = status === "paid";
 
+  // Lighter design-system restyle (CONTEXT D-01) — Card + Display title + teal
+  // track link + a single teal Stripe-trust touch. This is the confirmation
+  // pass-lite treatment (no full pass skeuomorphism); zero behaviour change.
   const trackLink =
     "text-[16px] font-semibold leading-[1.5] text-teal underline";
 
   return (
     <main className="mx-auto flex max-w-[480px] flex-col gap-[32px] px-[16px] py-[48px]">
-      <h1 className="text-[28px] font-semibold leading-[1.2] text-slate">
+      <h1 className="text-display font-semibold text-slate">
         {t.paySuccessTitle}
       </h1>
       <Card className="flex flex-col gap-[16px]">
         {!transferId ? (
-          <p className="text-[16px] leading-[1.5] text-slate">
-            {t.paySuccessNoRef}
-          </p>
+          <p className="text-body text-slate">{t.paySuccessNoRef}</p>
         ) : status === null ? (
-          <p className="text-[16px] leading-[1.5] text-slate">
-            {t.paySuccessNotFound}
-          </p>
+          <p className="text-body text-slate">{t.paySuccessNotFound}</p>
         ) : isPaid ? (
           // The ONLY place the word "Paid" is rendered — guarded by the real status.
           <>
-            <p className="text-[20px] font-semibold leading-[1.2] text-slate">
+            <p className="text-heading font-semibold text-slate">
               {fill(t.statusReceiptPaidLine, {
                 amount: amountCents !== null ? fmtEur(amountCents) : "",
                 paidDate: fmtDate(paidAt),
               })}
             </p>
-            <p className="text-[14px] leading-[1.4] text-grey">
-              {t.statusReceiptSubNote}
-            </p>
+            <p className="text-label text-grey">{t.statusReceiptSubNote}</p>
             <a href={`/status/${transferId}`} className={trackLink}>
               {t.paySuccessTrackCta}
             </a>
+            <p className="flex items-center gap-[8px] text-label text-teal">
+              <LockIcon />
+              {t.payTrustFooter}
+            </p>
           </>
         ) : (
           // Un-paid (e.g. "requested"): NEUTRAL confirming state per UI-SPEC — never an
           // authoritative "paid" affordance (SC2/SC5 spoof gate; the verified webhook is
           // the sole paid writer). Point the guest to their status page to track it.
           <>
-            <p className="text-[20px] font-semibold leading-[1.2] text-slate">
-              {t.paySuccessConfirming}
-            </p>
+            <p className="text-heading font-semibold text-slate">{t.paySuccessConfirming}</p>
             <a href={`/status/${transferId}`} className={trackLink}>
               {t.paySuccessTrackCta}
             </a>
-            <a href="/track" className="text-[14px] leading-[1.4] text-grey underline">
+            <a href="/track" className="text-label text-grey underline">
               {t.paySuccessTrackFallback}
             </a>
+            <p className="flex items-center gap-[8px] text-label text-teal">
+              <LockIcon />
+              {t.payTrustFooter}
+            </p>
           </>
         )}
       </Card>

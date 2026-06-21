@@ -83,9 +83,9 @@ Montserrat exclusively, **400 + 600 pair** (the loaded weights). Phase 9 roles, 
 | Display | 28px | 600 | 1.2 (34px) | Page title ("My Trips"); large fare on the trip detail (optional) |
 | Heading | 24px | 600 | 1.33 (32px) | Section headings; empty-state heading (mockup 20px → lifted toward Heading; existing 20px empty headings acceptable as `headline`-adjacent) |
 | Body | 16px | 400 | 1.5 (24px) | Card primary line (arrival date·time), passenger info values, note body, fare value |
-| Label | 14px | 600 | 1.4 (≈20px) | Card meta captions, status labels, stepper labels, nav-tab labels, "Unclaimed" badge, details-grid captions (UPPERCASE permitted) |
+| Label | 14px | 600 | 1.4 (≈20px) | Card meta captions, status labels, stepper labels, "Unclaimed" badge, details-grid captions (UPPERCASE permitted) |
 
-Caption micro-text from the mockup (`text-[10px]`/`text-[11px]`) is **lifted to 14px Label** (12px `label-md` absolute minimum) — do not ship sub-14px body text. Nav-tab labels render at 12px Label minimum (the one place 12px is acceptable, matching native bottom-nav convention); icons carry the redundant signal so the label is never the sole cue. UPPERCASE tracking is permitted on grid captions ("ARRIVAL", "FLIGHT", "FARE", "PASSENGERS", "LUGGAGE") and the "Unclaimed" badge as a styling treatment of the Label role.
+Caption micro-text from the mockup (`text-[10px]`/`text-[11px]`) is **lifted to 14px Label** (12px `label-md` absolute minimum) — do not ship sub-14px body text. **Bottom-nav tab labels are the single deliberate exception: a FIXED 12px / 600 value** (not a floor, not a variable Label instance — render exactly 12px), the one place 12px is acceptable, matching native bottom-nav convention; icons carry the redundant signal so the label is never the sole cue. All other Label uses stay at 14px. UPPERCASE tracking is permitted on grid captions ("ARRIVAL", "FLIGHT", "FARE", "PASSENGERS", "LUGGAGE") and the "Unclaimed" badge as a styling treatment of the Label role.
 
 ---
 

@@ -47,7 +47,10 @@ export function RefundForm({
   const disclosure = copy.refundFeeDisclosure.replace("{fee}", recordedFeeEur);
 
   return (
-    <form action={formAction} className="flex flex-col gap-[16px]">
+    <form
+      action={formAction}
+      className="flex flex-col gap-[16px] rounded-md border border-grey/30 bg-white p-[24px]"
+    >
       <input type="hidden" name="id" value={transferId} />
 
       <TextField
@@ -63,7 +66,9 @@ export function RefundForm({
       <TextField label={copy.actionReasonLabel} name="reason" type="text" required />
 
       {/* ALWAYS shown — the fee is never recovered by a refund (D-12). */}
-      <p className="text-[14px] leading-[1.4] text-grey">{disclosure}</p>
+      <p className="rounded-md bg-slate/5 px-[16px] py-[12px] text-[14px] leading-[1.4] text-grey">
+        {disclosure}
+      </p>
 
       <Button type="submit" variant="ghost" disabled={pending}>
         {copy.refundTransferCta}
@@ -75,7 +80,7 @@ export function RefundForm({
         </p>
       ) : null}
       {state.status === "success" ? (
-        <p role="status" className="text-[14px] leading-[1.4] text-teal">
+        <p role="status" className="text-[14px] font-semibold leading-[1.4] text-teal">
           ✓
         </p>
       ) : null}

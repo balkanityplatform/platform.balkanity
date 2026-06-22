@@ -4,13 +4,13 @@ milestone: v1.1
 milestone_name: UI Rebuild
 status: executing
 stopped_at: Phase 12 context gathered
-last_updated: "2026-06-22T18:47:37.827Z"
-last_activity: 2026-06-22 -- Phase 12 planning complete
+last_updated: "2026-06-22T19:32:19.379Z"
+last_activity: 2026-06-22
 progress:
   total_phases: 4
   completed_phases: 3
-  total_plans: 14
-  completed_plans: 14
+  total_plans: 19
+  completed_plans: 15
   percent: 75
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-20)
 
 **Core value:** A guest can prepay an airport transfer via a destination link, and a driver can reliably claim and fulfil it — with money only ever marked `paid` by a verified Stripe webhook, and zero double-claims under concurrency.
-**Current focus:** Phase 11 — driver-pwa-rebuild
+**Current focus:** Phase 12 — admin-console-rebuild
 
 ## Current Position
 
-Phase: 11 (driver-pwa-rebuild) — EXECUTING
-Plan: 5 of 5
+Phase: 12 (admin-console-rebuild) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-06-22 -- Phase 12 planning complete
+Last activity: 2026-06-22
 
 ## Handoff (for a new session)
 
@@ -105,6 +105,7 @@ Last activity: 2026-06-22 -- Phase 12 planning complete
 | Phase 11 P03 | 6min | 2 tasks | 2 files |
 | Phase 11 P04 | 3min | 2 tasks | 2 files |
 | Phase 11 P05 | 4min | 2 tasks | 2 files |
+| Phase 12 P01 | 20min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -210,6 +211,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 11-04: Confirm-Arrival CTA labels en_route→arrived via labelByNext[arrived]=driverConfirmArrivalCta; advanceStatus reused verbatim
 - [Phase ?]: Plan 11-05: signOutAction is the lone new write of Phase 11 — auth/session-only @supabase/ssr signOut + redirect, no schema/RLS
 - [Phase ?]: Plan 11-05: DigestPreferenceCard left unedited — already on the DS Card chrome; behaviour verbatim (NOTF-05)
+- [Phase ?]: [12-01]: Admin shell app/admin/layout.tsx mirrors app/driver/layout.tsx (D-04) — async RSC, one own-rows bell seed, auth.getUser() identity, NO role gate + NO service-role in layout; menu/search aria labels reuse existing keys (no new keys beyond Task 1)
 
 ### Pending Todos
 
@@ -243,6 +245,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-22T18:29:11.258Z
+Last session: 2026-06-22T19:32:00.513Z
 Stopped at: Phase 12 context gathered
-Resume file: .planning/phases/12-admin-console-rebuild/12-CONTEXT.md
+Resume file: None

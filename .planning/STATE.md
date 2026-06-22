@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 Phase: 12 (admin-console-rebuild) — EXECUTING
 Plan: 5 of 5
 Status: Phase complete — ready for verification
-Last activity: 2026-06-22
+Last activity: 2026-06-22 - Completed quick task 260622-x4g: copyable public booking URL on destinations
 
 ## Handoff (for a new session)
 
@@ -245,6 +245,12 @@ None yet.
 - Infra guardrail: all Supabase/Vercel work targets Balkanity only (ref `qyhdogajtmnvxphrslwm`), never Kalvia (`utyatpadtibqqswsfvtr`).
 - Review gate standing: schema / auth / RLS / payment changes require sign-off before applying (v1.1 should touch NONE of these).
 - SECURITY: `.env.local.example` (tracked) verified CLEAN 2026-06-19. `.env.local` is gitignored. Remaining hygiene: `SUPABASE_ACCESS_TOKEN` rotated 2026-06-19 (old revoke is the user's action); DB password was exposed in chat via `SUPABASE_DB_URL` during Phase 06 UAT — reset before pilot.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260622-x4g | Show a copyable public booking URL on each active destination row in /admin/destinations | 2026-06-22 | 5191bb7 | [260622-x4g-show-a-copyable-public-booking-url-on-ea](./quick/260622-x4g-show-a-copyable-public-booking-url-on-ea/) |
 
 ## Deferred Items
 

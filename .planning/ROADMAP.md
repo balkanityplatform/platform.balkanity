@@ -437,7 +437,18 @@ Plans:
   4. The transfer detail view is restyled to the design system with the existing assign / reassign / cancel / refund actions intact and behaving identically (refund never sets `paid`)
   5. A top bar shows the search field (client-side filter of loaded transfers), the notifications bell (existing feed), and the signed-in admin identity
 
-**Plans**: TBD
+**Plans**: 5 plans (2 waves)
+Plans:
+**Wave 1** *(foundation slice — unblocks the four surface slices)*
+
+- [ ] 12-01-PLAN.md — Admin shell: shared `app/admin/layout.tsx` + sidebar (`AdminSidebar`/`tabs`/4 line icons) + top bar (search/identity/single bell) + all new EN/BG keys (AUI-01, AUI-05 top bar)
+
+**Wave 2** *(blocked on Wave 1; 02 + 03 + 04 + 05 run in parallel — disjoint files)*
+
+- [ ] 12-02-PLAN.md — Dashboard: 4 KPI cards (Unclaimed/Claimed/En route/Total today) from the existing transfer read + Recent-transfers top-5 (AUI-02, D-05)
+- [ ] 12-03-PLAN.md — Transfers table: `<ul>`→`<table>` + mobile cards + client search over loaded rows + client sort (Needs attention default), retire server `q` (AUI-03, AUI-05, D-01/D-02/D-04)
+- [ ] 12-04-PLAN.md — Transfer detail: `LifecycleTimeline`→`LifecycleStepper` swap + DS restyle, all five ops + RefundForm verbatim (refund never sets `paid`) (AUI-04)
+- [ ] 12-05-PLAN.md — Settings hub `/admin/settings` + drop per-page headers/bell across drivers/companies/properties/destinations/health, behaviour verbatim (AUI-01, D-03)
 **UI hint**: yes
 
 ### Progress (v1.1)
@@ -450,4 +461,4 @@ v1.1 phases execute in numeric order after v1.0: 9 → 10 → 11 → 12
 | 9. Design System Foundation | 5/5 | Complete   | 2026-06-20 |
 | 10. Guest UI Rebuild | 4/4 | Complete   | 2026-06-21 |
 | 11. Driver PWA Rebuild | 5/5 | Complete   | 2026-06-21 |
-| 12. Admin Console Rebuild | 0/TBD | Not started | - |
+| 12. Admin Console Rebuild | 0/5 | Planned | - |

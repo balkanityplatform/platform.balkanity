@@ -5,60 +5,26 @@
 // labels arrive already resolved (no `lang` needed). usePathname() from
 // next/navigation derives the active tab so the chrome reads as a native app.
 //
-// Active-state rules (D-02):
-//  - Available  → active ONLY on exact "/driver" (NOT a prefix, so it does not
-//    light under /driver/run or /driver/settings).
-//  - My Trips   → active on the "/driver/run" prefix (covers /driver/run AND the
-//    detail route /driver/run/[id], so the tab stays lit on the detail screen).
-//  - Profile    → active on the "/driver/settings" prefix.
+// MOBILE ONLY (<md): hidden on md+ where DriverTopNav takes over in the header. Tab
+// hrefs + active-state rules live in the shared ./tabs builder (single source of truth).
 //
 // No authz rides on this highlight — every route still re-gates server-side via
 // getCurrentRole(). The 12px/600 nav label is the ONE deliberate sub-14px exception
 // (UI-SPEC Typography); the line icon carries redundant signal.
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  AvailableTabIcon,
-  MyTripsTabIcon,
-  ProfileTabIcon,
-} from "@/app/driver/_ui/icons";
+import { buildDriverTabs, type DriverNavCopy } from "./tabs";
 
-export type DriverBottomNavCopy = {
-  navAvailable: string;
-  navMyTrips: string;
-  navProfile: string;
-};
+export type DriverBottomNavCopy = DriverNavCopy;
 
 export function DriverBottomNav({ copy }: { copy: DriverBottomNavCopy }) {
   const pathname = usePathname();
-
-  const tabs = [
-    {
-      href: "/driver",
-      label: copy.navAvailable,
-      Icon: AvailableTabIcon,
-      // Exact match — must NOT light up under /driver/run or /driver/settings.
-      active: pathname === "/driver",
-    },
-    {
-      href: "/driver/run",
-      label: copy.navMyTrips,
-      Icon: MyTripsTabIcon,
-      // Prefix — keeps My Trips active on /driver/run AND /driver/run/[id] (D-02).
-      active: pathname.startsWith("/driver/run"),
-    },
-    {
-      href: "/driver/settings",
-      label: copy.navProfile,
-      Icon: ProfileTabIcon,
-      active: pathname.startsWith("/driver/settings"),
-    },
-  ];
+  const tabs = buildDriverTabs(copy, pathname);
 
   return (
     <nav
       aria-label={copy.navAvailable}
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-grey/20 bg-white pb-[env(safe-area-inset-bottom)]"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-grey/20 bg-white pb-[env(safe-area-inset-bottom)] md:hidden"
     >
       <ul className="mx-auto flex max-w-2xl items-stretch justify-around">
         {tabs.map(({ href, label, Icon, active }) => (

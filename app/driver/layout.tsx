@@ -18,6 +18,7 @@ import { readOwnNotifications } from "@/platform/notifications/feed";
 import { NotificationBell } from "@/platform/ui/NotificationBell";
 import { LanguageToggle } from "@/platform/ui/LanguageToggle";
 import { DriverBottomNav } from "./_nav/DriverBottomNav";
+import { DriverTopNav } from "./_nav/DriverTopNav";
 
 export default async function DriverLayout({
   children,
@@ -30,9 +31,23 @@ export default async function DriverLayout({
   const bellInitial = await readOwnNotifications();
 
   return (
-    <div className="min-h-dvh bg-white pb-[calc(64px+env(safe-area-inset-bottom))]">
-      {/* Slim top header: logo chip · Alerts bell · Language toggle (lifted from the pages). */}
-      <header className="flex items-center justify-between border-b border-grey/20 bg-white px-[24px] py-[16px]">
+    <div className="min-h-dvh bg-white pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-0">
+      {/* Slim top header: logo chip · (desktop primary nav, centered) · Alerts bell · Language toggle.
+          On md+ the DriverTopNav is absolutely centered and DriverBottomNav hides; below md the
+          bottom nav owns navigation and this center slot is empty. */}
+      <header className="relative flex items-center justify-between border-b border-grey/20 bg-white px-[24px] py-[16px]">
+        {/* Desktop primary nav — true-centered regardless of the logo / actions widths. */}
+        <div className="pointer-events-none absolute inset-y-0 left-1/2 hidden -translate-x-1/2 items-center md:flex">
+          <div className="pointer-events-auto">
+            <DriverTopNav
+              copy={{
+                navAvailable: t.navAvailable,
+                navMyTrips: t.navMyTrips,
+                navProfile: t.navProfile,
+              }}
+            />
+          </div>
+        </div>
         <span className="inline-flex items-center">
           <Image
             src="/brand/balkanity-logo.png"

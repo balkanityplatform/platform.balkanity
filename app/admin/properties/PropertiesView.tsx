@@ -1,18 +1,18 @@
 "use client";
 // app/admin/properties/PropertiesView.tsx — Properties console view (ONBD-02).
 //
-// Mirrors app/admin/companies/CompaniesView.tsx: slate console chrome (reused from
-// app/admin/page.tsx), the create form (with a parent-company Select), the DataList of
-// properties (each row: name + parent company + active/inactive StatusDot + Edit /
-// Deactivate ghost actions), and the empty state. Editing a row swaps its controls for
-// an inline PropertyForm bound to updateProperty. Deactivation posts to the
-// deactivateProperty action (D-12 enforced server-side). All copy is passed in from the
+// Mirrors app/admin/companies/CompaniesView.tsx: the create form (with a parent-company
+// Select), the DataList of properties (each row: name + parent company + active/inactive
+// StatusDot + Edit / Deactivate ghost actions), and the empty state. Editing a row swaps
+// its controls for an inline PropertyForm bound to updateProperty. Deactivation posts to
+// the deactivateProperty action (D-12 enforced server-side). All copy is passed in from the
 // server page (dictionary-resolved → no flash, PLAT-04).
-import Image from "next/image";
+//
+// The slate console chrome (sidebar + top bar + bell + LanguageToggle) is owned by
+// app/admin/layout.tsx (Plan 01) — this view renders NO <header> of its own.
 import { useActionState, useState } from "react";
 import { Button } from "@/platform/ui/Button";
 import { DataList } from "@/platform/ui/DataList";
-import { LanguageToggle } from "@/platform/ui/LanguageToggle";
 import { type PropertyActionState, deactivateProperty } from "./actions";
 import { PropertyForm } from "./PropertyForm";
 
@@ -51,7 +51,6 @@ function DeactivateButton({ id, label }: { id: string; label: string }) {
 }
 
 export type PropertiesViewCopy = {
-  langToggle: string;
   propertiesTitle: string;
   propertiesEmptyHeading: string;
   propertiesEmptyBody: string;
@@ -71,12 +70,10 @@ export type PropertiesViewCopy = {
 export function PropertiesView({
   properties,
   companies,
-  lang,
   copy,
 }: {
   properties: Property[];
   companies: { id: string; name: string }[];
-  lang: "en" | "bg";
   copy: PropertiesViewCopy;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -122,22 +119,7 @@ export function PropertiesView({
   }));
 
   return (
-    <main className="min-h-dvh bg-white">
-      {/* Slate console chrome (reused from app/admin/page.tsx). */}
-      <header className="flex items-center justify-between bg-slate px-[24px] py-[16px]">
-        <span className="inline-flex items-center rounded-[6px] bg-white px-[8px] py-[4px]">
-          <Image
-            src="/brand/balkanity-logo.png"
-            alt="Balkanity"
-            width={96}
-            height={96}
-            className="h-[28px] w-auto"
-          />
-        </span>
-        <LanguageToggle current={lang} label={copy.langToggle} className="text-white" />
-      </header>
-
-      <section className="mx-auto flex max-w-2xl flex-col gap-[32px] px-[24px] py-[48px]">
+    <section className="mx-auto flex max-w-2xl flex-col gap-[32px] px-[24px] py-[48px]">
         <h1 className="text-[28px] font-semibold leading-[1.2] text-slate">
           {copy.propertiesTitle}
         </h1>
@@ -164,7 +146,6 @@ export function PropertiesView({
             inactiveLabel={copy.inactiveLabel}
           />
         )}
-      </section>
-    </main>
+    </section>
   );
 }

@@ -20,13 +20,11 @@
 // PII (where the admin is already authorized).
 //
 // WCAG 1.4.1 (threat T-06-COLOR): every amber/coral state carries a worded TEXT label/badge.
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentRole } from "@/platform/auth/role";
 import { getDict, getLang } from "@/platform/i18n/dictionary";
 import { createClient } from "@/platform/supabase/server";
-import { LanguageToggle } from "@/platform/ui/LanguageToggle";
 import { EmailCapGauge, EMAIL_SOFT_CAP_DEFAULT } from "./EmailCapGauge";
 
 // An open health_events row as displayed by the recon / stuck lists.
@@ -116,23 +114,10 @@ export default async function HealthPage() {
 
   const cap = EMAIL_SOFT_CAP_DEFAULT;
 
+  // The slate console chrome (sidebar + top bar + bell + LanguageToggle) is owned by
+  // app/admin/layout.tsx (Plan 01) — this page renders NO <header> of its own.
   return (
-    <main className="min-h-dvh bg-white">
-      {/* Slate console chrome (identical to app/admin/page.tsx / TransfersView). */}
-      <header className="flex items-center justify-between bg-slate px-[24px] py-[16px]">
-        <span className="inline-flex items-center rounded-[6px] bg-white px-[8px] py-[4px]">
-          <Image
-            src="/brand/balkanity-logo.png"
-            alt="Balkanity"
-            width={96}
-            height={96}
-            className="h-[28px] w-auto"
-          />
-        </span>
-        <LanguageToggle current={lang} label={t.langToggle} className="text-white" />
-      </header>
-
-      <section className="mx-auto flex max-w-2xl flex-col gap-[24px] px-[24px] py-[48px]">
+    <section className="mx-auto flex max-w-2xl flex-col gap-[24px] px-[24px] py-[48px]">
         <h1 className="text-[28px] font-semibold leading-[1.2] text-slate">{t.healthTitle}</h1>
 
         {/* 1. Email-cap gauge — the focal anchor, first in the stack (UI-SPEC §Layout). */}
@@ -226,7 +211,6 @@ export default async function HealthPage() {
             </ul>
           )}
         </div>
-      </section>
-    </main>
+    </section>
   );
 }

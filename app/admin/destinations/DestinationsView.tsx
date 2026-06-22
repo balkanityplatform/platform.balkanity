@@ -1,20 +1,20 @@
 "use client";
 // app/admin/destinations/DestinationsView.tsx — Destinations console view (ONBD-03/04).
 //
-// Mirrors app/admin/properties/PropertiesView.tsx: slate console chrome (reused from
-// app/admin/page.tsx), the create form (with a parent-property Select + slug + pricing),
-// the DataList of destinations (each row: label + slug + parent property/company + price
-// + active/inactive StatusDot + Edit / Deactivate ghost actions), and the empty state.
-// Editing a row swaps its controls for an inline DestinationForm bound to
-// updateDestination. Deactivation posts to the deactivateDestination action (destinations
+// Mirrors app/admin/properties/PropertiesView.tsx: the create form (with a parent-property
+// Select + slug + pricing), the DataList of destinations (each row: label + slug + parent
+// property/company + price + active/inactive StatusDot + Edit / Deactivate ghost actions),
+// and the empty state. Editing a row swaps its controls for an inline DestinationForm bound
+// to updateDestination. Deactivation posts to the deactivateDestination action (destinations
 // are leaves — D-11: an inactive destination simply stops resolving its /pickup link).
 // All copy is passed in from the server page (dictionary-resolved → no flash, PLAT-04).
-import Image from "next/image";
+//
+// The slate console chrome (sidebar + top bar + bell + LanguageToggle) is owned by
+// app/admin/layout.tsx (Plan 01) — this view renders NO <header> of its own.
 import { useActionState, useState } from "react";
 import { fmtEur } from "@/platform/money/commission";
 import { Button } from "@/platform/ui/Button";
 import { DataList } from "@/platform/ui/DataList";
-import { LanguageToggle } from "@/platform/ui/LanguageToggle";
 import { type DestinationActionState, deactivateDestination } from "./actions";
 import { DestinationForm, type DestinationFormCopy } from "./DestinationForm";
 
@@ -56,7 +56,6 @@ function DeactivateButton({ id, label }: { id: string; label: string }) {
 }
 
 export type DestinationsViewCopy = DestinationFormCopy & {
-  langToggle: string;
   destinationsTitle: string;
   destinationsEmptyHeading: string;
   destinationsEmptyBody: string;
@@ -69,12 +68,10 @@ export type DestinationsViewCopy = DestinationFormCopy & {
 export function DestinationsView({
   destinations,
   properties,
-  lang,
   copy,
 }: {
   destinations: Destination[];
   properties: { id: string; name: string }[];
-  lang: "en" | "bg";
   copy: DestinationsViewCopy;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -147,22 +144,7 @@ export function DestinationsView({
   });
 
   return (
-    <main className="min-h-dvh bg-white">
-      {/* Slate console chrome (reused from app/admin/page.tsx). */}
-      <header className="flex items-center justify-between bg-slate px-[24px] py-[16px]">
-        <span className="inline-flex items-center rounded-[6px] bg-white px-[8px] py-[4px]">
-          <Image
-            src="/brand/balkanity-logo.png"
-            alt="Balkanity"
-            width={96}
-            height={96}
-            className="h-[28px] w-auto"
-          />
-        </span>
-        <LanguageToggle current={lang} label={copy.langToggle} className="text-white" />
-      </header>
-
-      <section className="mx-auto flex max-w-2xl flex-col gap-[32px] px-[24px] py-[48px]">
+    <section className="mx-auto flex max-w-2xl flex-col gap-[32px] px-[24px] py-[48px]">
         <h1 className="text-[28px] font-semibold leading-[1.2] text-slate">
           {copy.destinationsTitle}
         </h1>
@@ -189,7 +171,6 @@ export function DestinationsView({
             inactiveLabel={copy.inactiveLabel}
           />
         )}
-      </section>
-    </main>
+    </section>
   );
 }

@@ -13,9 +13,8 @@
 // Copy is resolved server-side (no-flash) and handed to the client view as a prop bag.
 import { redirect } from "next/navigation";
 import { getCurrentRole } from "@/platform/auth/role";
-import { getDict, getLang } from "@/platform/i18n/dictionary";
+import { getDict } from "@/platform/i18n/dictionary";
 import { createClient } from "@/platform/supabase/server";
-import { readOwnNotifications } from "@/platform/notifications/feed";
 import { DriversView, type DriverRow } from "./DriversView";
 
 export default async function DriversPage() {
@@ -23,7 +22,7 @@ export default async function DriversPage() {
     redirect("/sign-in");
   }
 
-  const [t, lang] = await Promise.all([getDict(), getLang()]);
+  const t = await getDict();
 
   // Anon cookie-bound reads — the admin-read RLS policies are the data-layer gate.
   const supabase = await createClient();
@@ -47,25 +46,12 @@ export default async function DriversPage() {
     email: emailById.get(p.user_id as string) ?? null,
   }));
 
-  // Role-gated own-rows-only seed for the Alerts bell (caller-auth RLS — never service-role).
-  const bellInitial = await readOwnNotifications();
-
+  // The shell (app/admin/layout.tsx) seeds the single own-rows NotificationBell now — this
+  // page no longer mounts its own bell, so no readOwnNotifications() seed is needed here.
   return (
     <DriversView
       drivers={drivers}
-      lang={lang}
-      bellInitial={bellInitial}
-      bellCopy={{
-        alertsTrigger: t.alertsTrigger,
-        alertsTriggerAria: t.alertsTriggerAria,
-        alertsPanelTitle: t.alertsPanelTitle,
-        markAllReadCta: t.markAllReadCta,
-        alertsEmptyHeading: t.alertsEmptyHeading,
-        alertsEmptyBody: t.alertsEmptyBody,
-        alertsLoadFailed: t.alertsLoadFailed,
-      }}
       copy={{
-        langToggle: t.langToggle,
         driversTitle: t.driversTitle,
         inviteDriverTitle: t.inviteDriverTitle,
         driversEmptyHeading: t.driversEmptyHeading,

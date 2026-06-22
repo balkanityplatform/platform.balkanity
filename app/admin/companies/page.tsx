@@ -9,7 +9,7 @@
 // is resolved server-side (no-flash) and handed to the client view as a prop bag.
 import { redirect } from "next/navigation";
 import { getCurrentRole } from "@/platform/auth/role";
-import { getDict, getLang } from "@/platform/i18n/dictionary";
+import { getDict } from "@/platform/i18n/dictionary";
 import { createClient } from "@/platform/supabase/server";
 import { CompaniesView } from "./CompaniesView";
 
@@ -18,7 +18,7 @@ export default async function CompaniesPage() {
     redirect("/sign-in");
   }
 
-  const [t, lang] = await Promise.all([getDict(), getLang()]);
+  const t = await getDict();
 
   // Anon cookie-bound read — the admin-read RLS policy is the data-layer gate.
   const supabase = await createClient();
@@ -36,9 +36,7 @@ export default async function CompaniesPage() {
   return (
     <CompaniesView
       companies={companies}
-      lang={lang}
       copy={{
-        langToggle: t.langToggle,
         companiesTitle: t.companiesTitle,
         companiesEmptyHeading: t.companiesEmptyHeading,
         companiesEmptyBody: t.companiesEmptyBody,

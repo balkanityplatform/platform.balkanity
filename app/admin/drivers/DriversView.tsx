@@ -1,21 +1,17 @@
 "use client";
 // app/admin/drivers/DriversView.tsx — Drivers console view (ONBD-05).
 //
-// Client view rendering the slate console chrome (reused from the companies/
-// properties slices), the InviteDriverForm island at the top, and either the
+// Client view rendering the InviteDriverForm island at the top, and either the
 // invited-driver list (name + phone + email per row) or the drivers empty state.
+//
+// The slate console chrome (sidebar + top bar + the single alerts bell +
+// LanguageToggle) is owned by app/admin/layout.tsx (Plan 01) — this view renders NO
+// <header> of its own and mounts NO bell (the shell owns the single own-rows bell).
 //
 // NOTE: drivers have no active/inactive lifecycle in v1 (the invite is the only
 // account-creation path, AUTH-03), so this list is a plain roster rather than the
 // active/inactive DataList used by companies/properties. All copy is passed in from
 // the server page (dictionary-resolved → no flash, PLAT-04).
-import Image from "next/image";
-import { LanguageToggle } from "@/platform/ui/LanguageToggle";
-import {
-  NotificationBell,
-  type NotificationBellCopy,
-} from "@/platform/ui/NotificationBell";
-import type { NotificationRow } from "@/platform/notifications/feed";
 import { InviteDriverForm, type InviteDriverCopy } from "./InviteDriverForm";
 
 export type DriverRow = {
@@ -26,7 +22,6 @@ export type DriverRow = {
 };
 
 export type DriversViewCopy = InviteDriverCopy & {
-  langToggle: string;
   driversTitle: string;
   inviteDriverTitle: string;
   driversEmptyHeading: string;
@@ -35,16 +30,10 @@ export type DriversViewCopy = InviteDriverCopy & {
 
 export function DriversView({
   drivers,
-  lang,
   copy,
-  bellInitial,
-  bellCopy,
 }: {
   drivers: DriverRow[];
-  lang: "en" | "bg";
   copy: DriversViewCopy;
-  bellInitial: NotificationRow[];
-  bellCopy: NotificationBellCopy;
 }) {
   const formCopy: InviteDriverCopy = {
     emailLabel: copy.emailLabel,
@@ -57,34 +46,7 @@ export function DriversView({
   };
 
   return (
-    <main className="min-h-dvh bg-white">
-      {/* Slate console chrome (reused from the companies/properties pages). */}
-      <header className="flex items-center justify-between bg-slate px-[24px] py-[16px]">
-        <span className="inline-flex items-center rounded-[6px] bg-white px-[8px] py-[4px]">
-          <Image
-            src="/brand/balkanity-logo.png"
-            alt="Balkanity"
-            width={96}
-            height={96}
-            className="h-[28px] w-auto"
-          />
-        </span>
-        {/* Alerts bell — admin slate chrome, header-right (reuses the driver bell, D-08). */}
-        <span className="inline-flex items-center gap-[8px] text-white">
-          <NotificationBell
-            initial={bellInitial}
-            lang={lang}
-            copy={bellCopy}
-          />
-          <LanguageToggle
-            current={lang}
-            label={copy.langToggle}
-            className="text-white"
-          />
-        </span>
-      </header>
-
-      <section className="mx-auto flex max-w-2xl flex-col gap-[32px] px-[24px] py-[48px]">
+    <section className="mx-auto flex max-w-2xl flex-col gap-[32px] px-[24px] py-[48px]">
         <h1 className="text-[28px] font-semibold leading-[1.2] text-slate">
           {copy.driversTitle}
         </h1>
@@ -123,7 +85,6 @@ export function DriversView({
             ))}
           </ul>
         )}
-      </section>
-    </main>
+    </section>
   );
 }

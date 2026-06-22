@@ -66,9 +66,16 @@ blocked: 0
   reason: "User reported: nav highlighting works but placement should be a top nav — tabs centered in the top header (between logo and Alerts/EN-BG) on desktop/wide screens with the bottom bar hidden; keep the existing bottom nav on mobile/phones. Responsive split."
   severity: minor
   test: 1
-  root_cause: ""
-  artifacts: []
-  missing:
-    - "Responsive top nav: render Available/My Trips/Profile centered in the driver top header on md+ breakpoints; hide DriverBottomNav on md+"
-    - "Preserve DriverBottomNav on mobile (<md); preserve usePathname() active-tab teal highlighting in both placements"
+  root_cause: "Design choice — phase built bottom-nav-only per UI-SPEC; user wanted responsive top nav on desktop."
+  status_resolution: "FIXED — commit aeca5a8. Extracted shared ./tabs builder; added DriverTopNav (centered in header, md+ only); DriverBottomNav now md:hidden; layout drops reserved bottom padding on md+. Awaiting re-verification on deployed desktop."
+  artifacts:
+    - path: "app/driver/_nav/DriverTopNav.tsx"
+      issue: "new desktop top nav"
+    - path: "app/driver/_nav/DriverBottomNav.tsx"
+      issue: "md:hidden + shared tabs builder"
+    - path: "app/driver/_nav/tabs.ts"
+      issue: "new shared tab source of truth"
+    - path: "app/driver/layout.tsx"
+      issue: "mount DriverTopNav centered; md:pb-0"
+  missing: []
   debug_session: ""

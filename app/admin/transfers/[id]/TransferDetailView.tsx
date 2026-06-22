@@ -1,8 +1,10 @@
 "use client";
 // app/admin/transfers/[id]/TransferDetailView.tsx — admin transfer detail + ops island (OPS-02/03/04).
 //
-// Slate console chrome. Renders the transfer's lifecycle (LifecycleTimeline) + trip/payment facts,
-// then the FIVE wired ops controls (Plan 05):
+// Renders inside the shared admin slate-console shell (app/admin/layout.tsx owns the sidebar +
+// top bar + bell + language toggle — this view has NO own header). Renders the transfer's
+// lifecycle via the horizontal LifecycleStepper (DS-04) + trip/payment facts, then the FIVE
+// wired ops controls (Plan 05):
 //   • assign  — one-tap: a small inline form (driver id) posting to `assign`; NO reason (D-10).
 //   • reassign/release/cancel — each behind a CONFIRM DIALOG that requires the D-10 reason note
 //     (the *Confirm copy is the dialog prompt). The destructive three use the coral token.
@@ -17,11 +19,9 @@
 //
 // T-06-STALE: this /admin navigation is NetworkFirst at the SW layer so status/detail data is
 // never stale-served from cache (Pitfall 4).
-import Image from "next/image";
 import Link from "next/link";
 import { useActionState, useEffect, useState } from "react";
-import { LanguageToggle } from "@/platform/ui/LanguageToggle";
-import { LifecycleTimeline } from "@/platform/ui/LifecycleTimeline";
+import { LifecycleStepper } from "@/platform/ui/LifecycleStepper";
 import { fmtEur } from "@/platform/money/commission";
 import type { TransferState } from "@/platform/ui/StatusDot";
 import {
@@ -259,25 +259,9 @@ export function TransferDetailView({
 
   return (
     <main className="min-h-dvh bg-white">
-      {/* Slate console chrome. */}
-      <header className="flex items-center justify-between bg-slate px-[24px] py-[16px]">
-        <Link
-          href="/admin/transfers"
-          className="inline-flex items-center rounded-[6px] bg-white px-[8px] py-[4px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
-        >
-          <Image
-            src="/brand/balkanity-logo.png"
-            alt="Balkanity"
-            width={96}
-            height={96}
-            className="h-[28px] w-auto"
-          />
-        </Link>
-        <LanguageToggle current={lang} label={copy.langToggle} className="text-white" />
-      </header>
-
+      {/* No own header — the shared admin shell (app/admin/layout.tsx) owns the chrome. */}
       {row === null ? (
-        <section className="mx-auto flex max-w-2xl flex-col gap-[8px] px-[24px] py-[48px]">
+        <section className="mx-auto flex max-w-5xl flex-col gap-[8px] px-[24px] py-[48px]">
           <h1 className="text-[28px] font-semibold leading-[1.2] text-slate">
             {copy.transfersEmptyHeading}
           </h1>
@@ -290,18 +274,27 @@ export function TransferDetailView({
           </Link>
         </section>
       ) : (
-        <section className="mx-auto flex max-w-2xl flex-col gap-[32px] px-[24px] py-[48px]">
+        <section className="mx-auto flex max-w-5xl flex-col gap-[32px] px-[24px] py-[48px]">
+          {/* Back affordance to the transfers list (content-area link, not chrome). */}
+          <Link
+            href="/admin/transfers"
+            className="inline-flex w-fit items-center text-[14px] font-semibold leading-[1.4] text-teal hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+          >
+            ← {copy.transfersTitle}
+          </Link>
+
           <h1 className="text-[28px] font-semibold leading-[1.2] text-slate">
             {row.guest_name ?? copy.transfersTitle}
           </h1>
 
-          {/* Lifecycle timeline (D-02). */}
+          {/* Horizontal lifecycle stepper (DS-04) — derives worded labels + the cancelled
+              terminal itself; never hand-rolled. */}
           <div className="flex flex-col gap-[16px]">
-            <LifecycleTimeline current={row.status} />
+            <LifecycleStepper current={row.status} />
           </div>
 
           {/* Trip facts. */}
-          <dl className="grid grid-cols-1 gap-[16px] sm:grid-cols-2">
+          <dl className="grid grid-cols-1 gap-[20px] rounded-md border border-grey/30 bg-white p-[24px] sm:grid-cols-2 lg:grid-cols-3">
             <Fact label={copy.emailLabel} value={row.guest_email} />
             <Fact label="Phone" value={row.guest_phone} />
             <Fact label="Arrival" value={fmtDateTime(row.arrival_at, lang)} />
@@ -321,7 +314,7 @@ export function TransferDetailView({
           </dl>
 
           {/* Payment facts. */}
-          <dl className="grid grid-cols-1 gap-[16px] sm:grid-cols-2">
+          <dl className="grid grid-cols-1 gap-[20px] rounded-md border border-grey/30 bg-white p-[24px] sm:grid-cols-2 lg:grid-cols-3">
             <Fact label="Fare" value={`${fmtEur(row.amount_cents)} €`} />
             <Fact
               label="Stripe fee"

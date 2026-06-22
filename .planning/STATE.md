@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: UI Rebuild
 status: executing
-stopped_at: Phase 12 context gathered
-last_updated: "2026-06-22T19:37:18.598Z"
+stopped_at: Completed 12-03-PLAN.md
+last_updated: "2026-06-22T19:45:21.236Z"
 last_activity: 2026-06-22
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 19
-  completed_plans: 16
+  completed_plans: 17
   percent: 75
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-20)
 ## Current Position
 
 Phase: 12 (admin-console-rebuild) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-06-22
 
@@ -107,6 +107,7 @@ Last activity: 2026-06-22
 | Phase 11 P05 | 4min | 2 tasks | 2 files |
 | Phase 12 P01 | 20min | 3 tasks | 7 files |
 | Phase 12 P02 | 4min | 2 tasks | 2 files |
+| Phase 12 P03 | 6min | 2 tasks tasks | 3 files files |
 
 ## Accumulated Context
 
@@ -215,6 +216,10 @@ Recent decisions affecting current work:
 - [Phase ?]: [12-01]: Admin shell app/admin/layout.tsx mirrors app/driver/layout.tsx (D-04) — async RSC, one own-rows bell seed, auth.getUser() identity, NO role gate + NO service-role in layout; menu/search aria labels reuse existing keys (no new keys beyond Task 1)
 - [Phase ?]: [12-02]: Transfer Pool dashboard derives 4 KPI counts + top-5 recent rows from the EXISTING anon-RLS wp_transfers admin read (no new query/endpoint, D-03/D-05); read-only, role gate preserved on the page, zero elevated client (T-12-05/06/07)
 - [Phase ?]: [12-02]: 'Total today' anchored on arrival_at (the only date field on the loaded row) — read shape not widened; needs-attention marker = unclaimed paid rows reusing the transfers-list D-09 coral rule with a text badge (WCAG 1.4.1)
+- [Phase ?]: [12-03]: Admin transfers list reworked into the pending-transmissions <table> (desktop) + the prior <ul> rows reused verbatim as the mobile card fallback (D-04); coral needs-attention border + worded badge preserved
+- [Phase ?]: [12-03]: Top-bar search filters LOADED rows client-side via a admin:search window CustomEvent from AdminTopBar (sibling islands; Plan-01 layout untouched); no URL q (D-01)
+- [Phase ?]: [12-03]: Client sort control (Needs attention default / Soonest arrival / Status) is the SOLE ordering authority; server needsAttention pin partition removed from page.tsx (D-02)
+- [Phase ?]: [12-03]: Server q/ilike/destination-search retired; getCurrentRole gate + anon-RLS wp_transfers read shape + .in(status)/attention filter preserved; driver_id surfaced on TransferRow for the worded Driver cell (no read-shape change)
 
 ### Pending Todos
 
@@ -248,6 +253,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-06-22T19:37:00.337Z
-Stopped at: Phase 12 context gathered
+Last session: 2026-06-22T19:45:21.230Z
+Stopped at: Completed 12-03-PLAN.md
 Resume file: None

@@ -41,7 +41,7 @@
 
 - [x] **AUI-01**: A persistent left sidebar provides the admin nav (Dashboard, Transfers, Drivers, Settings) with the active item highlighted.
 - [x] **AUI-02**: The Transfer Pool dashboard shows KPI cards (Unclaimed, Claimed, En route, Total today) computed from real transfer data.
-- [ ] **AUI-03**: The transfers list renders as the pending-transmissions table (time/ID, passenger, route, lifecycle bar, status, assigned driver, row actions: view / assign / cancel) with filter + sort.
+- [x] **AUI-03**: The transfers list renders as the pending-transmissions table (time/ID, passenger, route, lifecycle bar, status, assigned driver, row actions: view / assign / cancel) with filter + sort.
 - [ ] **AUI-04**: The transfer detail view is restyled to the design system with the existing assign / reassign / cancel / refund actions intact.
 - [x] **AUI-05**: A top bar shows the search field (client-side filter of loaded transfers), the notifications bell (existing feed), and the signed-in admin identity.
 
@@ -80,7 +80,7 @@ Every v1.1 requirement maps to exactly one phase (9–12). 18/18 mapped — no o
 | DUI-05 | Phase 11 | Complete |
 | AUI-01 | Phase 12 | Complete |
 | AUI-02 | Phase 12 | Complete |
-| AUI-03 | Phase 12 | Pending |
+| AUI-03 | Phase 12 | Complete |
 | AUI-04 | Phase 12 | Pending |
 | AUI-05 | Phase 12 | Complete |
 

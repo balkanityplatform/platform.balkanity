@@ -4,11 +4,11 @@
 // Client island carrying three slots:
 //  (a) a client-side search <input type="search"> reusing the controlled-input +
 //      focus-visible:outline-teal shape from app/admin/transfers/TransfersView.tsx.
-//      FOR THIS PLAN the input is PRESENTATIONAL — its value is held in local useState
-//      but not yet wired to row filtering. The loaded-rows filter wiring lands in Plan 03
-//      (AUI-05 completion); the `onSearchChange` callback prop is the stable seam the
-//      layout/Plan-03 surface will pass through. No data path / no PII here (threat
-//      T-12-04 accept).
+//      Plan 03 (AUI-05) WIRES this to loaded-rows filtering: every change dispatches a
+//      `admin:search` window CustomEvent that the transfers list island (TransfersView)
+//      listens for and filters its ALREADY-LOADED rows against — client-side, no URL `q`,
+//      no server round-trip, no new data path / no PII here (threat T-12-04 accept). The
+//      `onSearchChange` callback prop remains a stable seam for any non-event consumer.
 //  (b) an `actions` slot rendering the layout-provided NotificationBell + LanguageToggle
 //      (the shell owns the single bell seed — never mounted twice).
 //  (c) the signed-in admin identity — a worded "Signed in as" label + email, passed in as
@@ -65,8 +65,16 @@ export function AdminTopBar({
           name="q"
           value={search}
           onChange={(e) => {
-            setSearch(e.target.value);
-            onSearchChange?.(e.target.value);
+            const value = e.target.value;
+            setSearch(value);
+            onSearchChange?.(value);
+            // Plan-03 (AUI-05) client-side seam: broadcast to TransfersView (loaded-rows
+            // filter). Client-only — no URL `q`, no server round-trip.
+            if (typeof window !== "undefined") {
+              window.dispatchEvent(
+                new CustomEvent("admin:search", { detail: value }),
+              );
+            }
           }}
           placeholder={copy.searchPlaceholder}
           aria-label={copy.searchPlaceholder}

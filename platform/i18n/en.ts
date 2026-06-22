@@ -415,6 +415,38 @@ export const en = {
   driverGuestNameLabel: "Guest name",
   driverGuestPhoneLabel: "Guest phone",
   driverNotesLabel: "Notes",
+
+  // --- Phase 12: admin console rebuild (UI-SPEC Copywriting Contract) ---
+  // Presentation-only re-skin. The single key-introduction point for the whole phase —
+  // Wave-2 plans CONSUME these keys, they do not add more. Sidebar labels (AUI-01;
+  // Transfers/Drivers reuse transfersTitle/driversTitle, NOT re-added), the "Transfer
+  // Pool" dashboard title + four KPI labels (AUI-02), the transfers-table column headers
+  // + row-action + Unassigned cell + client sort control (AUI-03), and the top-bar
+  // signed-in-identity label (AUI-05). No ops behaviour or copy semantics change.
+  adminDashboardTitle: "Transfer Pool",
+  kpiUnclaimed: "Unclaimed",
+  kpiClaimed: "Claimed",
+  kpiEnRoute: "En route",
+  kpiTotalToday: "Total today",
+  navDashboard: "Dashboard",
+  navSettings: "Settings",
+  adminSettingsTitle: "Settings",
+  colTimeId: "Time / ID",
+  colPassenger: "Passenger",
+  colRoute: "Route",
+  colLifecycle: "Lifecycle",
+  colStatus: "Status",
+  colDriver: "Driver",
+  colActions: "Actions",
+  rowActionView: "View",
+  driverUnassigned: "Unassigned",
+  adminSortLabel: "Sort",
+  sortAttention: "Needs attention",
+  sortArrival: "Soonest arrival",
+  sortStatus: "Status",
+  signedInAs: "Signed in as",
+  adminRecentTransfersHeading: "Recent transfers",
+  adminViewAllCta: "View all",
 } as const;
 
 // The dictionary contract — bg.ts is type-checked against this (parity gate).

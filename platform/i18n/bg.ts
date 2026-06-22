@@ -409,4 +409,36 @@ export const bg: Dict = {
   driverGuestNameLabel: "Име на госта",
   driverGuestPhoneLabel: "Телефон на госта",
   driverNotesLabel: "Бележки",
+
+  // --- Фаза 12: преработка на админ конзолата (UI-SPEC Copywriting Contract) ---
+  // Само презентация. Единствената точка за въвеждане на ключове за цялата фаза —
+  // плановете от Вълна 2 КОНСУМИРАТ тези ключове, не добавят нови. Етикети на страничната
+  // лента (AUI-01; Transfers/Drivers преизползват transfersTitle/driversTitle, НЕ се
+  // добавят отново), заглавието "Transfer Pool" + четирите KPI етикета (AUI-02), заглавията
+  // на колоните в таблицата + действието на реда + клетката "Unassigned" + контролата за
+  // сортиране (AUI-03) и етикетът за вписания администратор в горната лента (AUI-05).
+  adminDashboardTitle: "Пул с трансфери",
+  kpiUnclaimed: "Непоети",
+  kpiClaimed: "Поети",
+  kpiEnRoute: "В движение",
+  kpiTotalToday: "Общо днес",
+  navDashboard: "Табло",
+  navSettings: "Настройки",
+  adminSettingsTitle: "Настройки",
+  colTimeId: "Час / ID",
+  colPassenger: "Пътник",
+  colRoute: "Маршрут",
+  colLifecycle: "Жизнен цикъл",
+  colStatus: "Статус",
+  colDriver: "Шофьор",
+  colActions: "Действия",
+  rowActionView: "Преглед",
+  driverUnassigned: "Неназначен",
+  adminSortLabel: "Сортиране",
+  sortAttention: "Изискват внимание",
+  sortArrival: "Най-скорошно пристигане",
+  sortStatus: "Статус",
+  signedInAs: "Вписан като",
+  adminRecentTransfersHeading: "Последни трансфери",
+  adminViewAllCta: "Виж всички",
 };

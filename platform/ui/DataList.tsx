@@ -17,6 +17,10 @@ export type DataListItem = {
   active: boolean;
   // Per-row action controls (e.g. Edit / Deactivate buttons).
   actions?: ReactNode;
+  // Optional full-width content rendered on its own line beneath the name/actions
+  // row — for content too wide to sit inline (e.g. a long booking URL). Other
+  // consumers omit it and the row renders exactly as before.
+  subRow?: ReactNode;
 };
 
 export type DataListProps = {
@@ -32,29 +36,33 @@ export function DataList({ items, activeLabel, inactiveLabel }: DataListProps) {
       {items.map((item) => (
         <li
           key={item.id}
-          className="flex min-h-[56px] flex-col gap-[8px] px-[16px] py-[12px] sm:flex-row sm:items-center sm:justify-between"
+          className="flex min-h-[56px] flex-col gap-[8px] px-[16px] py-[12px]"
         >
-          <div className="flex items-center gap-[12px]">
-            <span className="text-[16px] font-semibold leading-[1.4] text-slate">
-              {item.name}
-            </span>
-            <span className="inline-flex items-center gap-[4px]">
-              {/* Coloured dot — never the sole signal; the label always renders. */}
-              <span
-                data-testid="status-dot"
-                aria-hidden="true"
-                className={`inline-block h-[10px] w-[10px] rounded-full ${
-                  item.active ? "bg-teal" : "bg-grey"
-                }`}
-              />
-              <span className="text-[14px] font-semibold leading-[1.4] text-slate">
-                {item.active ? activeLabel : inactiveLabel}
+          <div className="flex flex-col gap-[8px] sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-[12px]">
+              <span className="text-[16px] font-semibold leading-[1.4] text-slate">
+                {item.name}
               </span>
-            </span>
+              <span className="inline-flex items-center gap-[4px]">
+                {/* Coloured dot — never the sole signal; the label always renders. */}
+                <span
+                  data-testid="status-dot"
+                  aria-hidden="true"
+                  className={`inline-block h-[10px] w-[10px] rounded-full ${
+                    item.active ? "bg-teal" : "bg-grey"
+                  }`}
+                />
+                <span className="text-[14px] font-semibold leading-[1.4] text-slate">
+                  {item.active ? activeLabel : inactiveLabel}
+                </span>
+              </span>
+            </div>
+            {item.actions ? (
+              <div className="flex items-center gap-[8px]">{item.actions}</div>
+            ) : null}
           </div>
-          {item.actions ? (
-            <div className="flex items-center gap-[8px]">{item.actions}</div>
-          ) : null}
+          {/* Full-width line for content too wide to sit inline (e.g. booking URL). */}
+          {item.subRow ? <div>{item.subRow}</div> : null}
         </li>
       ))}
     </ul>

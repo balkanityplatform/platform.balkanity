@@ -134,15 +134,6 @@ export function DestinationsView({
           />
         ) : (
           <div className="flex items-center gap-[8px]">
-            {/* Active rows only: the full public booking URL + Copy button (D-11 —
-                inactive destinations stop resolving /pickup, so no live link). */}
-            {d.active ? (
-              <CopyBookingLink
-                slug={d.slug}
-                copyCta={copy.copyBookingLinkCta}
-                copiedLabel={copy.bookingLinkCopiedLabel}
-              />
-            ) : null}
             <Button
               type="button"
               variant="ghost"
@@ -155,6 +146,17 @@ export function DestinationsView({
             ) : null}
           </div>
         ),
+      // Active rows only: the full public booking URL + Copy button on its own
+      // full-width line (D-11 — inactive destinations stop resolving /pickup, so
+      // no live link). Hidden while editing so the row isn't doubled up.
+      subRow:
+        d.active && editingId !== d.id ? (
+          <CopyBookingLink
+            slug={d.slug}
+            copyCta={copy.copyBookingLinkCta}
+            copiedLabel={copy.bookingLinkCopiedLabel}
+          />
+        ) : undefined,
     };
   });
 

@@ -58,8 +58,11 @@ export function CopyBookingLink({
   // The aria-label always carries the action wording in BOTH states (never colour/icon
   // alone), satisfying WCAG 1.4.1. The visible label is wrapped in aria-live="polite"
   // so the swap to "Copied" is announced.
+  // Rendered on its own full-width line (DataList subRow), so the URL gets the whole
+  // row width: it reads on one line for short origins and wraps cleanly (never
+  // char-by-char) for long ones, with the Copy button pinned to the end.
   return (
-    <span className="flex items-center gap-[8px]">
+    <span className="flex items-center justify-between gap-[12px] rounded-md bg-grey/5 px-[12px] py-[8px]">
       <span className="min-w-0 break-all text-[14px] leading-[1.4] text-grey">
         {url}
       </span>

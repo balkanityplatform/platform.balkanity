@@ -114,6 +114,8 @@ export const en = {
   propertyNameLabel: "Property name",
   destinationLabelLabel: "Destination label",
   slugLabel: "Link slug",
+  copyBookingLinkCta: "Copy booking link",
+  bookingLinkCopiedLabel: "Copied",
   addressLabel: "Address",
   zoneLabel: "Zone / area",
   airportLabel: "Airport",

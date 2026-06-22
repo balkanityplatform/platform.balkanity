@@ -115,6 +115,8 @@ export const bg: Dict = {
   propertyNameLabel: "Име на имот",
   destinationLabelLabel: "Етикет на дестинация",
   slugLabel: "Линк (slug)",
+  copyBookingLinkCta: "Копирай линк за резервация",
+  bookingLinkCopiedLabel: "Копирано",
   addressLabel: "Адрес",
   zoneLabel: "Зона / район",
   airportLabel: "Летище",

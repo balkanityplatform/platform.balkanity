@@ -8,10 +8,12 @@
 // bypass RLS). This is the UNMASKED admin read (distinct from the driver's masked wp_pool()).
 //
 // searchParams are UNTRUSTED input (threat T-06-INJ): the status filter is applied via the
-// parameterized PostgREST `.in("status", …)` and the name/flight search via `.or(ilike)` —
-// never string-built SQL. Destination-name search is applied in-RSC after the read (pilot
-// volume — RESEARCH A3). needsAttention is computed per row in the RSC with simple pilot
-// constants (D-09); coral rows are stable-sorted to the top (D-07) then soonest arrival.
+// parameterized PostgREST `.in("status", …)` — never string-built SQL. The free-text SEARCH
+// is now CLIENT-SIDE over the loaded rows (D-01) — the server `q` ilike/destination
+// search machinery is RETIRED; the shell top-bar search is the single search affordance and
+// filters the already-loaded set in TransfersView (no URL `q`, no new endpoint, T-12-10).
+// needsAttention is computed per row in the RSC with simple pilot constants (D-09); the
+// client SORT control in TransfersView is now the sole ordering authority over loaded rows.
 import { redirect } from "next/navigation";
 import { getCurrentRole } from "@/platform/auth/role";
 import { getDict, getLang } from "@/platform/i18n/dictionary";
@@ -80,7 +82,7 @@ function computeNeedsAttention(row: RawRow, now: number): boolean {
 export default async function TransfersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; attention?: string; q?: string }>;
+  searchParams: Promise<{ status?: string; attention?: string }>;
 }) {
   if ((await getCurrentRole()) !== "admin") {
     redirect("/sign-in");
@@ -93,7 +95,6 @@ export default async function TransfersPage({
     .map((s) => s.trim())
     .filter((s): s is TransferState => STATUS_OPTIONS.includes(s as TransferState));
   const attentionOnly = params.attention === "1";
-  const search = (params.q ?? "").trim();
 
   // Anon cookie-bound read — the wp_transfers_admin_read RLS policy is the data gate.
   const supabase = await createClient();
@@ -110,46 +111,30 @@ export default async function TransfersPage({
     query = query.in("status", statusFilter);
   }
 
-  // Free-text search across guest name / flight no. at the query layer (parameterized ilike).
-  if (search) {
-    const s = search.replace(/[%,()]/g, ""); // strip PostgREST filter metacharacters
-    query = query.or(`guest_name.ilike.%${s}%,flight_no.ilike.%${s}%`);
-  }
+  // Free-text search is now CLIENT-SIDE over the loaded rows (D-01) — the server ilike
+  // branch + in-RSC destination search machinery is retired; the shell top-bar search filters
+  // the already-loaded set in TransfersView (no URL `q`, no new endpoint).
 
   const { data } = await query;
   const raw = (data ?? []) as unknown as RawRow[];
 
+  // This is an async RSC that renders ONCE per request (not a re-rendering client hook), so a
+  // single wall-clock read for the needsAttention windows is deterministic for the render.
+  // eslint-disable-next-line react-hooks/purity -- RSC renders once; no unstable re-render.
   const now = Date.now();
 
-  // Destination-name search applied in-RSC (pilot volume — RESEARCH A3): a row is kept when
-  // the query already matched (name/flight via .or) OR the destination zone/airport matches.
-  const searched = search
-    ? raw.filter((r) => {
-        const needle = search.toLowerCase();
-        const inGuest = (r.guest_name ?? "").toLowerCase().includes(needle);
-        const inFlight = (r.flight_no ?? "").toLowerCase().includes(needle);
-        const inDest = [r.destinations?.zone, r.destinations?.airport]
-          .filter(Boolean)
-          .some((v) => (v as string).toLowerCase().includes(needle));
-        return inGuest || inFlight || inDest;
-      })
-    : raw;
-
-  const withFlag = searched.map((r) => ({
+  const withFlag = raw.map((r) => ({
     ...r,
     needsAttention: computeNeedsAttention(r, now),
   }));
 
+  // The attention quick-filter stays a server narrow (D-08). The needsAttention coral PIN is
+  // NOT applied here anymore (D-02): the client sort control in TransfersView is the sole
+  // ordering authority over the loaded rows, so the server hands them in the natural
+  // arrival_at ASC load order and TransfersView reorders (default = needs-attention pin).
   const filtered = attentionOnly ? withFlag.filter((r) => r.needsAttention) : withFlag;
 
-  // Stable sort: needsAttention pinned to the TOP (D-07), then soonest arrival (the query
-  // already ordered by arrival_at ASC, so a stable partition preserves that secondary order).
-  const sorted = [...filtered].sort((a, b) => {
-    if (a.needsAttention !== b.needsAttention) return a.needsAttention ? -1 : 1;
-    return 0;
-  });
-
-  const rows: TransferRow[] = sorted.map((r) => ({
+  const rows: TransferRow[] = filtered.map((r) => ({
     id: r.id,
     status: r.status as TransferState,
     arrival_at: r.arrival_at,
@@ -158,6 +143,7 @@ export default async function TransfersPage({
     amount_cents: r.amount_cents,
     zone: r.destinations?.zone ?? null,
     airport: r.destinations?.airport ?? null,
+    driver_id: r.driver_id,
     needsAttention: r.needsAttention,
   }));
 
@@ -168,17 +154,26 @@ export default async function TransfersPage({
       statusOptions={STATUS_OPTIONS}
       activeStatus={statusFilter}
       attentionOnly={attentionOnly}
-      query={search}
       copy={{
-        langToggle: t.langToggle,
-        transfersTitle: t.transfersTitle,
         filterByStatusLabel: t.filterByStatusLabel,
         needsAttentionFilterCta: t.needsAttentionFilterCta,
-        transferSearchPlaceholder: t.transferSearchPlaceholder,
         transfersEmptyHeading: t.transfersEmptyHeading,
         transfersEmptyBody: t.transfersEmptyBody,
         transfersNoMatchBody: t.transfersNoMatchBody,
         needsAttentionBadge: t.needsAttentionBadge,
+        colTimeId: t.colTimeId,
+        colPassenger: t.colPassenger,
+        colRoute: t.colRoute,
+        colLifecycle: t.colLifecycle,
+        colStatus: t.colStatus,
+        colDriver: t.colDriver,
+        colActions: t.colActions,
+        rowActionView: t.rowActionView,
+        driverUnassigned: t.driverUnassigned,
+        adminSortLabel: t.adminSortLabel,
+        sortAttention: t.sortAttention,
+        sortArrival: t.sortArrival,
+        sortStatus: t.sortStatus,
       }}
     />
   );

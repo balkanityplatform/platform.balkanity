@@ -16,6 +16,7 @@ import { fmtEur } from "@/platform/money/commission";
 import { Button } from "@/platform/ui/Button";
 import { DataList } from "@/platform/ui/DataList";
 import { type DestinationActionState, deactivateDestination } from "./actions";
+import { CopyBookingLink } from "./CopyBookingLink";
 import { DestinationForm, type DestinationFormCopy } from "./DestinationForm";
 
 type Destination = {
@@ -63,6 +64,8 @@ export type DestinationsViewCopy = DestinationFormCopy & {
   deactivateConfirmCta: string;
   activeLabel: string;
   inactiveLabel: string;
+  copyBookingLinkCta: string;
+  bookingLinkCopiedLabel: string;
 };
 
 export function DestinationsView({
@@ -105,7 +108,10 @@ export function DestinationsView({
     const parent = d.companyName
       ? `${d.propertyName} — ${d.companyName}`
       : d.propertyName;
-    const meta = [`/${d.slug}`, parent, `€${fmtEur(d.priceCents)}`]
+    // For active rows the full public booking URL is shown by CopyBookingLink in the
+    // actions slot, so the bare relative `/<slug>` token would be redundant/misleading —
+    // drop it there. Inactive rows keep it as the only slug reference (no live link, D-11).
+    const meta = [d.active ? null : `/${d.slug}`, parent, `€${fmtEur(d.priceCents)}`]
       .filter(Boolean)
       .join(" · ");
     return {
@@ -128,6 +134,15 @@ export function DestinationsView({
           />
         ) : (
           <div className="flex items-center gap-[8px]">
+            {/* Active rows only: the full public booking URL + Copy button (D-11 —
+                inactive destinations stop resolving /pickup, so no live link). */}
+            {d.active ? (
+              <CopyBookingLink
+                slug={d.slug}
+                copyCta={copy.copyBookingLinkCta}
+                copiedLabel={copy.bookingLinkCopiedLabel}
+              />
+            ) : null}
             <Button
               type="button"
               variant="ghost"

@@ -102,6 +102,8 @@ export default async function DestinationsPage() {
         deactivateConfirmCta: t.deactivateConfirmCta,
         activeLabel: t.activeLabel,
         inactiveLabel: t.inactiveLabel,
+        copyBookingLinkCta: t.copyBookingLinkCta,
+        bookingLinkCopiedLabel: t.bookingLinkCopiedLabel,
         fieldRequired: t.fieldRequired,
         saveFailed: t.saveFailed,
         slugInvalid: t.slugInvalid,
